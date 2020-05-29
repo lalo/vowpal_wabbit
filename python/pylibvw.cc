@@ -15,6 +15,9 @@
 #include "future_compat.h"
 #include "slates_label.h"
 
+#include "red_python.h"
+#include "reductions_fwd.h"
+
 // see http://www.boost.org/doc/libs/1_56_0/doc/html/bbv2/installation.html
 #define BOOST_PYTHON_USE_GCC_SYMBOL_VISIBILITY 1
 #include <boost/make_shared.hpp>
@@ -32,6 +35,8 @@ typedef boost::shared_ptr<vw> vw_ptr;
 typedef boost::shared_ptr<example> example_ptr;
 typedef boost::shared_ptr<Search::search> search_ptr;
 typedef boost::shared_ptr<Search::predictor> predictor_ptr;
+
+typedef boost::shared_ptr<RED_PYTHON::Copperhead> redpython_ptr;
 
 const size_t lDEFAULT = 0;
 const size_t lBINARY = 1;
@@ -74,6 +79,12 @@ void my_finish(vw_ptr all)
 
 void my_save(vw_ptr all, std::string name)
 { VW::save_predictor(*all, name);
+}
+
+redpython_ptr get_red_python_ptr(vw_ptr all)
+{ 
+  RED_PYTHON::Copperhead* temp = (RED_PYTHON::Copperhead*)(all->copperhead);
+  return boost::shared_ptr<RED_PYTHON::Copperhead>(temp, dont_delete_me);
 }
 
 search_ptr get_search_ptr(vw_ptr all)
@@ -480,6 +491,7 @@ float ex_get_simplelabel_label(example_ptr ec) { return ec->l.simple.label; }
 float ex_get_simplelabel_weight(example_ptr ec) { return ec->l.simple.weight; }
 float ex_get_simplelabel_initial(example_ptr ec) { return ec->l.simple.initial; }
 float ex_get_simplelabel_prediction(example_ptr ec) { return ec->pred.scalar; }
+void ex_set_simplelabel_prediction(example_ptr ec, float fl) { ec->pred.scalar = fl; }
 float ex_get_prob(example_ptr ec) { return ec->pred.prob; }
 
 uint32_t ex_get_multiclass_label(example_ptr ec) { return ec->l.multi.label; }
@@ -562,6 +574,7 @@ size_t   get_num_features(example_ptr ec) { return ec->num_features; }
 float    get_partial_prediction(example_ptr ec) { return ec->partial_prediction; }
 float    get_updated_prediction(example_ptr ec) { return ec->updated_prediction; }
 float    get_loss(example_ptr ec) { return ec->loss; }
+void     set_loss(example_ptr ec, float fl) { ec->loss = fl; }
 float    get_total_sum_feat_sq(example_ptr ec) { return ec->total_sum_feat_sq; }
 
 double get_sum_loss(vw_ptr vw) { return vw->sd->sum_loss; }
@@ -608,6 +621,14 @@ uint32_t search_predict_many_some(search_ptr sch, example_ptr ec, std::vector<ui
 }
 */
 
+void verify_redpy_set_properly(redpython_ptr redpy)
+{
+  if (redpy->random_number == 0)
+  {
+    THROW("redpy: something is clearly wrong!");
+  }
+}
+
 void verify_search_set_properly(search_ptr sch)
 {
   if (sch->task_name == nullptr)
@@ -625,6 +646,28 @@ uint32_t search_get_num_actions(search_ptr sch)
 { verify_search_set_properly(sch);
   HookTask::task_data* d = sch->get_task_data<HookTask::task_data>();
   return (uint32_t)d->num_actions;
+}
+
+void learn_redpy_fn(RED_PYTHON::Copperhead& redpy, example* ec)
+{
+  try
+  {
+    py::object run = *(py::object*)redpy.run_object;
+
+    //possible delete gets triggered
+    boost::shared_ptr<example> temp_ptr(ec, dont_delete_me);
+    py::object temp = py::object(temp_ptr);
+
+    // py::object temp = py::object(*ec);
+    run.attr("__call__")(temp);
+  }
+  catch (...)
+  {
+    // TODO: Properly translate and return Python exception. #2169
+    PyErr_Print();
+    PyErr_Clear();
+    THROW("Exception in 'learn_redypy_fn'");
+  }
 }
 
 void search_run_fn(Search::search& sch)
@@ -686,6 +729,19 @@ void py_delete_run_object(void* pyobj)
 void set_force_oracle(search_ptr sch, bool useOracle)
 { verify_search_set_properly(sch);
   sch->set_force_oracle(useOracle);
+}
+
+// void baselearn(redpython_ptr redpy, example_ptr ec)
+void baselearn(redpython_ptr redpy, example_ptr ec)
+{
+  ((VW::LEARNER::single_learner *)redpy->base_learn)->learn(*ec);
+}
+
+void set_python_reduction_hook(redpython_ptr redpy, py::object learn_object)
+{ verify_redpy_set_properly(redpy);
+  redpy->run_f = &learn_redpy_fn;
+  redpy->run_object = new py::object(learn_object);
+  return;
 }
 
 void set_structured_predict_hook(search_ptr sch, py::object run_object, py::object setup_object, py::object takedown_object)
@@ -804,6 +860,8 @@ BOOST_PYTHON_MODULE(pylibvw)
   .def("get_sum_loss", &get_sum_loss, "return the total cumulative loss suffered so far")
   .def("get_weighted_examples", &get_weighted_examples, "return the total weight of examples so far")
 
+  .def("get_red_python_ptr", &get_red_python_ptr, "return a pointer to the RED_PYTHON::Copperhead data structure")
+
   .def("get_search_ptr", &get_search_ptr, "return a pointer to the search data structure")
   .def("audit_example", &my_audit_example, "print example audit information")
   .def("get_id", &get_model_id, "return the model id")
@@ -850,6 +908,7 @@ BOOST_PYTHON_MODULE(pylibvw)
   .def("get_partial_prediction", &get_partial_prediction, "Returns the partial prediction associated with this example")
   .def("get_updated_prediction", &get_updated_prediction, "Returns the partial prediction as if we had updated it after learning")
   .def("get_loss", &get_loss, "Returns the loss associated with this example")
+  .def("set_loss", &set_loss, "Returns the loss associated with this example")
   .def("get_total_sum_feat_sq", &get_total_sum_feat_sq, "The total sum of feature-value squared for this example")
 
   .def("num_namespaces", &ex_num_namespaces, "The total number of namespaces associated with this example")
@@ -873,6 +932,7 @@ BOOST_PYTHON_MODULE(pylibvw)
   .def("get_simplelabel_weight", &ex_get_simplelabel_weight, "Assuming a simple_label label type, return the importance weight")
   .def("get_simplelabel_initial", &ex_get_simplelabel_initial, "Assuming a simple_label label type, return the initial (baseline) prediction")
   .def("get_simplelabel_prediction", &ex_get_simplelabel_prediction, "Assuming a simple_label label type, return the final prediction")
+  .def("set_simplelabel_prediction", &ex_set_simplelabel_prediction, "Assuming a simple_label label type, return the final prediction")
   .def("get_multiclass_label", &ex_get_multiclass_label, "Assuming a multiclass label type, get the true label")
   .def("get_multiclass_weight", &ex_get_multiclass_weight, "Assuming a multiclass label type, get the importance weight")
   .def("get_multiclass_prediction", &ex_get_multiclass_prediction, "Assuming a multiclass label type, get the prediction")
@@ -915,6 +975,11 @@ BOOST_PYTHON_MODULE(pylibvw)
   .def("set_learner_id", &my_set_learner_id, "select the learner with which to make this prediction")
   .def("set_tag", &my_set_tag, "change the tag of this prediction")
   .def("predict", &Search::predictor::predict, "make a prediction")
+  ;
+
+  py::class_<RED_PYTHON::Copperhead, redpython_ptr>("red_python")
+  .def("set_python_reduction_hook", &set_python_reduction_hook, "Set the hook (function pointer) (you don't want to call this yourself!")
+  .def("call_base_learn", &baselearn, "TODO insert comment here")
   ;
 
   py::class_<Search::search, search_ptr>("search")
