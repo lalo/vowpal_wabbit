@@ -506,9 +506,8 @@ base_learner* cb_adf_setup(options_i& options, vw& all)
     return nullptr;
 
   // Ensure serialization of this option in all cases.
-  if (!options.was_supplied("cb_type"))
+  if (options.ensure_default_dependency("cb_type", type_string))
   {
-    options.insert("cb_type", type_string);
     options.add_and_parse(new_options);
   }
 
@@ -547,15 +546,8 @@ base_learner* cb_adf_setup(options_i& options, vw& all)
   if ((!options.was_supplied("csoaa_ldf") && !options.was_supplied("wap_ldf")) || rank_all ||
       !options.was_supplied("csoaa_rank"))
   {
-    if (!options.was_supplied("csoaa_ldf"))
-    {
-      options.insert("csoaa_ldf", "multiline");
-    }
-
-    if (!options.was_supplied("csoaa_rank"))
-    {
-      options.insert("csoaa_rank", "");
-    }
+    options.ensure_default_dependency("csoaa_ldf", "multiline");
+    options.ensure_default_dependency("csoaa_rank");
   }
 
   if (options.was_supplied("baseline") && check_baseline_enabled)
