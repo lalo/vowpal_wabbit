@@ -197,17 +197,12 @@ VW::LEARNER::base_learner* setup(config::options_i& options, vw& all)
       .add(make_option("first_only", first_only).keep().help("Only explore the first action in a tie-breaking event"))
       .add(make_option("cb_type", type_string)
                .keep()
+               .default_value(type_string)
                .help("contextual bandit method to use in {ips,dr,mtr}. Default: mtr"));
   options.add_and_parse(new_options);
 
   if (!cb_explore_adf_option || !options.was_supplied("cover"))
     return nullptr;
-
-  // Ensure serialization of cb_type in all cases.
-  if (options.ensure_default_dependency("cb_type", type_string))
-  {
-    options.add_and_parse(new_options);
-  }
 
   // Ensure serialization of cb_adf in all cases.
   options.ensure_default_dependency("cb_adf");
