@@ -132,6 +132,8 @@ struct options_i
   virtual std::shared_ptr<base_option> get_option(const std::string& key) = 0;
   virtual std::shared_ptr<const base_option> get_option(const std::string& key) const = 0;
 
+  virtual void temp_replace_vec_arg() = 0;
+
   virtual void insert(const std::string& key, const std::string& value) = 0;
   virtual void replace(const std::string& key, const std::string& value) = 0;
   virtual std::vector<std::string> get_positional_tokens() const { return std::vector<std::string>(); }

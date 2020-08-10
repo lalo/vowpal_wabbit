@@ -9,6 +9,7 @@ namespace po = boost::program_options;
 
 #include <memory>
 #include <vector>
+#include <stack>
 #include <sstream>
 #include <set>
 #include <algorithm>
@@ -60,6 +61,20 @@ struct options_boost_po : public options_i
   std::vector<std::shared_ptr<const base_option>> get_all_options() const override;
   std::shared_ptr<base_option> get_option(const std::string& key) override;
   std::shared_ptr<const base_option> get_option(const std::string& key) const override;
+
+  std::stack<std::vector<std::string> > m_command_line_stack;
+
+  void temp_replace_vec_arg() override
+  {
+    this->m_command_line_stack.pop();
+    this->m_command_line = this->m_command_line_stack.top();
+  }
+
+  // super hack
+  void temp_init_replace_vec_arg()
+  {
+    this->m_command_line = this->m_command_line_stack.top();
+  }
 
   void insert(const std::string& key, const std::string& value) override
   {
@@ -159,6 +174,7 @@ struct options_boost_po : public options_i
   std::map<std::string, std::shared_ptr<base_option>> m_options;
 
   std::vector<std::string> m_command_line;
+
 
   std::stringstream m_help_stringstream;
 

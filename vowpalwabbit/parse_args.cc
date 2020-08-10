@@ -1259,7 +1259,35 @@ void load_input_model(vw& all, io_buf& io_temp)
   }
 }
 
-VW::LEARNER::base_learner* setup_base(options_i& options, vw& all)
+// sketch of idea
+// for this to work we might need to invest on options a bit: to make sure its airtight
+VW::LEARNER::base_learner* setup_base(options_i& options, vw& all, bool reset_stack)
+{
+  // only setup reduction functions that call into setup_base will set reset_stack as true
+  if (reset_stack) {
+    all.reduction_stack = all.reduction_stack_full_copy;
+    //this will move to the next set of args
+    all.options->temp_replace_vec_arg();
+  }
+
+  auto setup_func = all.reduction_stack.top();
+  all.reduction_stack.pop();
+
+  // make a copy of current stack since we're going to prob replace it recursively: see line 1266
+  auto snapshot_stack = all.reduction_stack;
+  auto base = setup_func(options, all);
+  // restore stack in case base == nullptr and we need to try again with the next function
+  all.reduction_stack = snapshot_stack;
+
+  if (base == nullptr)
+    // no need to reset stack, since we still haven't found a match of those args with a reduction
+    return setup_base(options, all, false);
+  else
+    return base;
+}
+
+// old one to have it here
+VW::LEARNER::base_learner* setup_base_original(options_i& options, vw& all)
 {
   auto setup_func = all.reduction_stack.top();
   all.reduction_stack.pop();
@@ -1346,7 +1374,18 @@ void parse_reductions(options_i& options, vw& all)
   all.reduction_stack.push(Search::setup);
   all.reduction_stack.push(audit_regressor_setup);
 
-  all.l = setup_base(options, all);
+  all.reduction_stack_full_copy = all.reduction_stack;
+
+  auto temp_options = dynamic_cast<options_boost_po*>(all.options);
+
+  // in my mind the first arg will be the .necessary
+  temp_options->m_command_line_stack.push(std::vector<std::string>{"-last_reduction","-some_arg"});
+  temp_options->m_command_line_stack.push(std::vector<std::string>{"-n-1_reduction","-some_arg", "-another_arg"});
+  temp_options->m_command_line_stack.push(std::vector<std::string>{"-first_reduction","-an_arg"});
+
+  // push the top of the args to options to prepare for the setup_base call
+  temp_options->temp_init_replace_vec_arg();
+  all.l = setup_base(options, all, false);
 }
 
 vw& parse_args(options_i& options, trace_message_t trace_listener, void* trace_context)

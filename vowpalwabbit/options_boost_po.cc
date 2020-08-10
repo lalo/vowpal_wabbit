@@ -131,6 +131,7 @@ void options_boost_po::add_and_parse(const option_group_definition& group)
   }
 }
 
+// this has to now search all the stack of args to check if it's there
 bool options_boost_po::was_supplied(const std::string& key) const
 {
   // Best check, only valid after options parsed.
@@ -153,6 +154,10 @@ bool options_boost_po::ensure_default_dependency(const std::string& key, const s
   if (!this->was_supplied(key))
   {
     this->insert(key, value);
+
+    //this could also go to insert, but its kinda insane that we have free access to insert outside of this class
+    //so, planning on cutting direct access to this->insert
+    this->m_command_line_stack.push(std::vector<std::string>{key, value});
     return true;
   }
 
