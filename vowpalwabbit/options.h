@@ -114,6 +114,8 @@ struct options_i
   virtual bool was_supplied(const std::string& key) const = 0;
   virtual bool ensure_default_dependency(const std::string& key) = 0;
   virtual bool ensure_default_dependency(const std::string& key, const std::string& value) = 0;
+  virtual bool bypass_necessary() const = 0;
+  virtual void set_bypass_necessary(bool) = 0;
   virtual std::string help() const = 0;
 
   virtual std::vector<std::shared_ptr<base_option>> get_all_options() = 0;
@@ -176,6 +178,8 @@ struct option_group_definition
   // will check if ALL of 'necessary' options were suplied
   bool check_necessary_enabled(const options_i& options) const
   {
+    if (options.bypass_necessary()) return true;
+
     if (m_necessary_flags.size() == 0) return false;
 
     bool check_if_all_necessary_enabled = true;

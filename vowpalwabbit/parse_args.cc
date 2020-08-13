@@ -1270,9 +1270,10 @@ void load_input_model(vw& all, io_buf& io_temp)
 
 VW::LEARNER::base_learner* setup_base(options_i& options, vw& all)
 {
-  auto setup_func = all.reduction_stack.top();
+  auto setup_func_id = all.reduction_stack.top();
   all.reduction_stack.pop();
-  auto base = std::get<1>(setup_func)(options, all);
+  auto setup_func = all.reduction_fn_dic.at(setup_func_id);
+  auto base = setup_func(options, all);
 
   // this mean that setup_func did not do any setup since it didnt add itself to the chain of learners
   if (base == nullptr)
@@ -1281,15 +1282,14 @@ VW::LEARNER::base_learner* setup_base(options_i& options, vw& all)
   }
   else
   {
-    all.enabled_reductions.push_back(std::get<0>(setup_func));
+    all.enabled_reductions.push_back(setup_func_id);
     return base;
   }
-
 }
+
 
 void parse_reductions(options_i& options, vw& all)
 {
-
   //dictionary string->function
   // config file based on the option_group_definition -> function with the dictionary above
   // setup_base
@@ -1306,89 +1306,161 @@ void parse_reductions(options_i& options, vw& all)
   for r in default_good_old: dict[r]()
   */
 
+  all.reduction_fn_dic = {
   // Base algorithms
-  all.reduction_stack.push(std::make_tuple("gd", GD::setup)); // always
-  all.reduction_stack.push(std::make_tuple("ksvm", kernel_svm_setup));
-  all.reduction_stack.push(std::make_tuple("ftrl", ftrl_setup)); // custom logic
-  all.reduction_stack.push(std::make_tuple("svrg", svrg_setup));
-  all.reduction_stack.push(std::make_tuple("sendto", sender_setup));
-  all.reduction_stack.push(std::make_tuple("bfgs", gd_mf_setup));
-  all.reduction_stack.push(std::make_tuple("print", print_setup));
-  all.reduction_stack.push(std::make_tuple("noop", noop_setup));
-  all.reduction_stack.push(std::make_tuple("lda", lda_setup));
-  all.reduction_stack.push(std::make_tuple("conjugate_gradient", bfgs_setup));
-  all.reduction_stack.push(std::make_tuple("OjaNewton", OjaNewton_setup));
-  // all.reduction_stack.push(std::make_tuple("vw_cntk", VW_CNTK::setup));
+    {"gd", GD::setup}, // always
+    {"ksvm", kernel_svm_setup},
+    {"ftrl", ftrl_setup},  // custom logic
+    {"svrg", svrg_setup},
+    {"sendto", sender_setup},
+    {"bfgs", gd_mf_setup},
+    {"print", print_setup},
+    {"noop", noop_setup},
+    {"lda", lda_setup},
+    {"conjugate_gradient", bfgs_setup},
+    {"OjaNewton", OjaNewton_setup},
+    // all.reduction_stack.push(std::make_tuple("vw_cntk", VW_CNTK::setup));
 
   // Score Users
-  all.reduction_stack.push(std::make_tuple("baseline", baseline_setup));
-  all.reduction_stack.push(std::make_tuple("exp_replay_b", ExpReplay::expreplay_setup<'b', simple_label>)); // custom logic
-  all.reduction_stack.push(std::make_tuple("active", active_setup));
-  all.reduction_stack.push(std::make_tuple("active_cover", active_cover_setup));
-  all.reduction_stack.push(std::make_tuple("confidence", confidence_setup));
-  all.reduction_stack.push(std::make_tuple("nn", nn_setup));
-  all.reduction_stack.push(std::make_tuple("new_mf", mf_setup));
-  all.reduction_stack.push(std::make_tuple("marginal", marginal_setup));
-  all.reduction_stack.push(std::make_tuple("autolink", autolink_setup));
-  all.reduction_stack.push(std::make_tuple("lrq", lrq_setup));
-  all.reduction_stack.push(std::make_tuple("lrqfa", lrqfa_setup));
-  all.reduction_stack.push(std::make_tuple("stage_poly", stagewise_poly_setup));
-  all.reduction_stack.push(std::make_tuple("scorer", scorer_setup)); //always
-  // Reductions
-  all.reduction_stack.push(std::make_tuple("bootstrap", bs_setup));
-  all.reduction_stack.push(std::make_tuple("binary", binary_setup));
+    {"baseline", baseline_setup},
+    {"exp_replay_b", ExpReplay::expreplay_setup<'b', simple_label>},  // custom logic
+    {"active", active_setup},
+    {"active_cover", active_cover_setup},
+    {"confidence", confidence_setup},
+    {"nn", nn_setup},
+    {"new_mf", mf_setup},
+    {"marginal", marginal_setup},
+    {"autolink", autolink_setup},
+    {"lrq", lrq_setup},
+    {"lrqfa", lrqfa_setup},
+    {"stage_poly", stagewise_poly_setup},
+    {"scorer", scorer_setup},  // always
 
-  all.reduction_stack.push(std::make_tuple("exp_replay_m", ExpReplay::expreplay_setup<'m', MULTICLASS::mc_label>)); // custom logic
-  all.reduction_stack.push(std::make_tuple("top", topk_setup));
-  all.reduction_stack.push(std::make_tuple("oaa", oaa_setup));
-  all.reduction_stack.push(std::make_tuple("boosting", boosting_setup));
-  all.reduction_stack.push(std::make_tuple("ect", ect_setup));
-  all.reduction_stack.push(std::make_tuple("log_multi", log_multi_setup));
-  all.reduction_stack.push(std::make_tuple("recall_tree", recall_tree_setup));
-  all.reduction_stack.push(std::make_tuple("memory_tree", memory_tree_setup));
-  all.reduction_stack.push(std::make_tuple("classweight", classweight_setup));
-  all.reduction_stack.push(std::make_tuple("multilabel_oaa", multilabel_oaa_setup));
-  all.reduction_stack.push(std::make_tuple("plt", plt_setup));
+  // reductions
+    {"bootstrap", bs_setup},
+    {"binary", binary_setup},
 
-  all.reduction_stack.push(std::make_tuple("cs_active", cs_active_setup));
-  all.reduction_stack.push(std::make_tuple("csoaa", CSOAA::csoaa_setup));
-  all.reduction_stack.push(std::make_tuple("interact", interact_setup));
-  all.reduction_stack.push(std::make_tuple("csoaa_ldf", CSOAA::csldf_setup));
-  all.reduction_stack.push(std::make_tuple("cb", cb_algs_setup));
-  all.reduction_stack.push(std::make_tuple("cb_adf", cb_adf_setup));
-  all.reduction_stack.push(std::make_tuple("multiworld_test", mwt_setup));
-  all.reduction_stack.push(std::make_tuple("cb_explore", cb_explore_setup));
-  all.reduction_stack.push(std::make_tuple("cb_explore_adf_greedy", VW::cb_explore_adf::greedy::setup));      // custom logic
-  all.reduction_stack.push(std::make_tuple("cb_explore_adf_softmax", VW::cb_explore_adf::softmax::setup));
-  all.reduction_stack.push(std::make_tuple("cb_explore_adf_rnd", VW::cb_explore_adf::rnd::setup));
-  all.reduction_stack.push(std::make_tuple("cb_explore_adf_squarecb", VW::cb_explore_adf::squarecb::setup));
-  all.reduction_stack.push(std::make_tuple("cb_explore_adf_regcb", VW::cb_explore_adf::regcb::setup));        // custom logic
-  all.reduction_stack.push(std::make_tuple("cb_explore_adf_first", VW::cb_explore_adf::first::setup));
-  all.reduction_stack.push(std::make_tuple("cb_explore_adf_cover", VW::cb_explore_adf::cover::setup));
-  all.reduction_stack.push(std::make_tuple("cb_explore_adf_bag", VW::cb_explore_adf::bag::setup));
-  all.reduction_stack.push(std::make_tuple("cb_dro", cb_dro_setup));
-  all.reduction_stack.push(std::make_tuple("cb_sample", cb_sample_setup));
-  all.reduction_stack.push(std::make_tuple("shared_feature_merger_setup", VW::shared_feature_merger::shared_feature_merger_setup)); // custom logic
-  all.reduction_stack.push(std::make_tuple("ccb_explore_adf", CCB::ccb_explore_adf_setup));
-  all.reduction_stack.push(std::make_tuple("slates", VW::slates::slates_setup));
+    {"exp_replay_m", ExpReplay::expreplay_setup<'m', MULTICLASS::mc_label>},  // custom logic
+    {"top", topk_setup},
+    {"oaa", oaa_setup},
+    {"boosting", boosting_setup},
+    {"ect", ect_setup},
+    {"log_multi", log_multi_setup},
+    {"recall_tree", recall_tree_setup},
+    {"memory_tree", memory_tree_setup},
+    {"classweight", classweight_setup},
+    {"multilabel_oaa", multilabel_oaa_setup},
+    {"plt", plt_setup},
+
+    {"cs_active", cs_active_setup},
+    {"csoaa", CSOAA::csoaa_setup},
+    {"interact", interact_setup},
+    {"csoaa_ldf", CSOAA::csldf_setup},
+    {"cb", cb_algs_setup},
+    {"cb_adf", cb_adf_setup},
+    {"multiworld_test", mwt_setup},
+    {"cb_explore", cb_explore_setup},
+    {"cb_explore_adf_greedy", VW::cb_explore_adf::greedy::setup},  // custom logic
+    {"cb_explore_adf_softmax", VW::cb_explore_adf::softmax::setup},
+    {"cb_explore_adf_rnd", VW::cb_explore_adf::rnd::setup},
+    {"cb_explore_adf_squarecb", VW::cb_explore_adf::squarecb::setup},
+    {"cb_explore_adf_regcb", VW::cb_explore_adf::regcb::setup},  // custom logic
+    {"cb_explore_adf_first", VW::cb_explore_adf::first::setup},
+    {"cb_explore_adf_cover", VW::cb_explore_adf::cover::setup},
+    {"cb_explore_adf_bag", VW::cb_explore_adf::bag::setup},
+    {"cb_dro", cb_dro_setup}, {"cb_sample", cb_sample_setup},
+    {"shared_feature_merger_setup", VW::shared_feature_merger::shared_feature_merger_setup},  // custom logic
+    {"ccb_explore_adf", CCB::ccb_explore_adf_setup},
+    {"slates", VW::slates::slates_setup},
   // cbify/warm_cb can genrate multi-examples. Merge shared features after them
-  all.reduction_stack.push(std::make_tuple("warm_cb", warm_cb_setup));
-  all.reduction_stack.push(std::make_tuple("cbify", cbify_setup));
-  all.reduction_stack.push(std::make_tuple("cbify_ldf", cbifyldf_setup));
-  all.reduction_stack.push(std::make_tuple("explore_eval", explore_eval_setup));
-  all.reduction_stack.push(std::make_tuple("replay_c", ExpReplay::expreplay_setup<'c', COST_SENSITIVE::cs_label>)); // custom logic
-  all.reduction_stack.push(std::make_tuple("search", Search::setup));
+    {"warm_cb", warm_cb_setup},
+    {"cbify", cbify_setup},
+    {"cbify_ldf", cbifyldf_setup},
+    {"explore_eval", explore_eval_setup},
+    {"replay_c", ExpReplay::expreplay_setup<'c', COST_SENSITIVE::cs_label>},  // custom logic
+    {"search", Search::setup},
   // this string can be a constant under audit_regressor.h
-  all.reduction_stack.push(std::make_tuple("audit_regressor", [](options_i& options, vw& all) { return audit_regressor_setup("audit_regressor", options, all); }));
-  //temp this will be removed
-  all.reduction_stack.push(std::make_tuple("custom_python_reduction", red_python_setup));
+    {"audit_regressor",
+      [](options_i& options, vw& all) { return audit_regressor_setup("audit_regressor", options, all); }},
+    {"custom_python_reduction", red_python_setup}
+  };
 
-  /*
-  three flags:
-  - gated
-  - always
-  - depends
-  */
+  // Base algorithms
+  all.reduction_stack.push("gd");  // always
+  all.reduction_stack.push("ksvm");
+  all.reduction_stack.push("ftrl");  // custom logic
+  all.reduction_stack.push("svrg");
+  all.reduction_stack.push("sendto");
+  all.reduction_stack.push("bfgs");
+  all.reduction_stack.push("print");
+  all.reduction_stack.push("noop");
+  all.reduction_stack.push("lda");
+  all.reduction_stack.push("conjugate_gradient");
+  all.reduction_stack.push("OjaNewton");
+  // all.reduction_stack.push("vw_cntk");
+
+  // Score Users
+  all.reduction_stack.push("baseline");
+  all.reduction_stack.push("exp_replay_b");  // custom logic
+  all.reduction_stack.push("active");
+  all.reduction_stack.push("active_cover");
+  all.reduction_stack.push("confidence");
+  all.reduction_stack.push("nn");
+  all.reduction_stack.push("new_mf");
+  all.reduction_stack.push("marginal");
+  all.reduction_stack.push("autolink");
+  all.reduction_stack.push("lrq");
+  all.reduction_stack.push("lrqfa");
+  all.reduction_stack.push("stage_poly");
+  all.reduction_stack.push("scorer");  // always
+  // Reductions
+  all.reduction_stack.push("bootstrap");
+  all.reduction_stack.push("binary");
+
+  all.reduction_stack.push("exp_replay_m");  // custom logic
+  all.reduction_stack.push("top");
+  all.reduction_stack.push("oaa");
+  all.reduction_stack.push("boosting");
+  all.reduction_stack.push("ect");
+  all.reduction_stack.push("log_multi");
+  all.reduction_stack.push("recall_tree");
+  all.reduction_stack.push("memory_tree");
+  all.reduction_stack.push("classweight");
+  all.reduction_stack.push("multilabel_oaa");
+  all.reduction_stack.push("plt");
+
+  all.reduction_stack.push("cs_active");
+  all.reduction_stack.push("csoaa");
+  all.reduction_stack.push("interact");
+  all.reduction_stack.push("csoaa_ldf");
+  all.reduction_stack.push("cb");
+  all.reduction_stack.push("cb_adf");
+  all.reduction_stack.push("multiworld_test");
+  all.reduction_stack.push("cb_explore");
+  all.reduction_stack.push("cb_explore_adf_greedy");  // custom logic
+  all.reduction_stack.push("cb_explore_adf_softmax");
+  all.reduction_stack.push("cb_explore_adf_rnd");
+  all.reduction_stack.push("cb_explore_adf_squarecb");
+  all.reduction_stack.push("cb_explore_adf_regcb");  // custom logic
+  all.reduction_stack.push("cb_explore_adf_first");
+  all.reduction_stack.push("cb_explore_adf_cover");
+  all.reduction_stack.push("cb_explore_adf_bag");
+  all.reduction_stack.push("cb_dro");
+  all.reduction_stack.push("cb_sample");
+  all.reduction_stack.push("shared_feature_merger_setup");  // custom logic
+  all.reduction_stack.push("ccb_explore_adf");
+  all.reduction_stack.push("slates");
+  // cbify/warm_cb can genrate multi-examples. Merge shared features after them
+  all.reduction_stack.push("warm_cb");
+  all.reduction_stack.push("cbify");
+  all.reduction_stack.push("cbify_ldf");
+  all.reduction_stack.push("explore_eval");
+  all.reduction_stack.push("replay_c");  // custom logic
+  all.reduction_stack.push("search");
+  // this string can be a constant under audit_regressor.h
+  all.reduction_stack.push("audit_regressor");
+  //temp this will be removed
+  all.reduction_stack.push("custom_python_reduction");
 
   all.l = setup_base(options, all);
 }
