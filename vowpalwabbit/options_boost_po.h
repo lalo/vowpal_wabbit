@@ -60,6 +60,14 @@ struct options_boost_po : public options_i
   std::shared_ptr<base_option> get_option(const std::string& key) override;
   std::shared_ptr<const base_option> get_option(const std::string& key) const override;
 
+  bool bypass_necessary() const override
+  { return this->bypass_enabled;
+  }
+
+  void set_bypass_necessary(bool newVal) override
+  { this->bypass_enabled = newVal;
+  }
+
   void insert(const std::string& key, const std::string& value) override
   {
     m_command_line.push_back("--" + key);
@@ -160,6 +168,7 @@ struct options_boost_po : public options_i
   void add_to_description(std::shared_ptr<typed_option<T>> opt, po::options_description& options_description);
 
  private:
+  bool bypass_enabled =false;
   std::map<std::string, std::shared_ptr<base_option>> m_options;
 
   std::vector<std::string> m_command_line;
