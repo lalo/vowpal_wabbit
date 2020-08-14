@@ -457,7 +457,7 @@ input_options parse_source(vw& all, options_i& options)
 
   // Check if the options provider has any positional args. Only really makes sense for command line, others just return
   // an empty list.
-  const auto positional_tokens = options.get_positional_tokens();
+  const auto positional_tokens = options.get_data_values();
   if (positional_tokens.size() == 1)
   {
     all.data_filename = positional_tokens[0];
@@ -1468,9 +1468,9 @@ void parse_reductions(options_i& options, vw& all)
   all.reduction_stack.push("csoaa_ldf");
   all.reduction_stack.push("cb_adf");
   all.reduction_stack.push("cb_explore_adf_greedy");  // custom logic
-  all.reduction_stack.push("cb_explore_adf_regcb");  // custom logic
+  //all.reduction_stack.push("cb_explore_adf_regcb");  // custom logic
   all.reduction_stack.push("shared_feature_merger_setup");  // custom logic
-  all.reduction_stack.push("cbify");
+  //all.reduction_stack.push("cbify");
   all.reduction_stack.push("warm_cb");
 
   // feel free to test it out:
