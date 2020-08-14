@@ -1265,6 +1265,13 @@ void load_input_model(vw& all, io_buf& io_temp)
 
 VW::LEARNER::base_learner* setup_base(options_i& options, vw& all)
 {
+  // handle case where there is no base learner and no one returns
+  if (all.reduction_stack.empty()) {
+    // we could always default on gd, instead of nullptr and/or error ?
+    cout << "this reduction_stack does not have a base learner defined";
+    return nullptr;
+  }
+
   auto setup_func_id = all.reduction_stack.top();
   all.reduction_stack.pop();
   auto setup_func = all.reduction_fn_dic.at(setup_func_id);
