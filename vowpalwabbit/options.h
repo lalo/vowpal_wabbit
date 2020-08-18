@@ -112,6 +112,8 @@ struct options_i
   virtual void add_and_parse(const option_group_definition& group) = 0;
   virtual bool add_parse_and_check_necessary(const option_group_definition& group) = 0;
   virtual bool was_supplied(const std::string& key) const = 0;
+  virtual bool ensure_default_dependency(const std::string& key) = 0;
+  virtual bool ensure_default_dependency(const std::string& key, const std::string& value) = 0;
   virtual std::string help() const = 0;
 
   virtual std::vector<std::shared_ptr<base_option>> get_all_options() = 0;
@@ -120,8 +122,9 @@ struct options_i
   virtual std::shared_ptr<const base_option> get_option(const std::string& key) const = 0;
 
   virtual void insert(const std::string& key, const std::string& value) = 0;
+  virtual void require(const std::string& key, const std::string& value) = 0;
   virtual void replace(const std::string& key, const std::string& value) = 0;
-  virtual std::vector<std::string> get_positional_tokens() const { return std::vector<std::string>(); }
+  virtual std::vector<std::string> get_data_values() { return std::vector<std::string>(); }
 
   template <typename T>
   typed_option<T>& get_typed_option(const std::string& key)

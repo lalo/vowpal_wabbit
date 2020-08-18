@@ -630,14 +630,14 @@ base_learner* warm_cb_setup(options_i& options, vw& all)
 
   init_adf_data(*data.get(), num_actions);
 
-  options.insert("cb_min_cost", std::to_string(data->loss0));
-  options.insert("cb_max_cost", std::to_string(data->loss1));
+  options.require("cb_min_cost", std::to_string(data->loss0));
+  options.require("cb_max_cost", std::to_string(data->loss1));
 
   if (options.was_supplied("baseline"))
   {
     std::stringstream ss;
     ss << std::max(std::abs(data->loss0), std::abs(data->loss1)) / (data->loss1 - data->loss0);
-    options.insert("lr_multiplier", ss.str());
+    options.require("lr_multiplier", ss.str());
   }
 
   learner<warm_cb, example>* l;

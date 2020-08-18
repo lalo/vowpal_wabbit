@@ -2897,7 +2897,7 @@ base_learner* setup(options_i& options, vw& all)
   if (!options.was_supplied("csoaa") && !options.was_supplied("cs_active") && !options.was_supplied("csoaa_ldf") &&
       !options.was_supplied("wap_ldf") && !options.was_supplied("cb"))
   {
-    options.insert("csoaa", std::to_string(priv.A));
+    options.require("csoaa", std::to_string(priv.A));
   }
 
   priv.active_csoaa = options.was_supplied("cs_active");

@@ -62,6 +62,11 @@ void options_boost_po::add_and_parse(const option_group_definition& group)
     // The last definition is kept. There was a bug where using .insert at a later pointer changed the command line but
     // the previously defined option's default value was serialized into the model. This resolves that state info.
     m_options[opt_ptr->m_name] = opt_ptr;
+
+    // only add to string when it's being defined
+    if (m_required_options.count(opt_ptr->m_name) || m_required_options.count(opt_ptr->m_short_name))
+    { this->insert(opt_ptr->m_name, m_required_options[opt_ptr->m_name]);
+    };
   }
 
   // Add the help for the given options.
@@ -130,6 +135,69 @@ void options_boost_po::add_and_parse(const option_group_definition& group)
     THROW(ex.what());
   }
 }
+  std::vector<std::string> options_boost_po::get_data_values()
+  {
+    /*
+    po::positional_options_description p;
+    //p.add("data", -1);
+    auto copied_description = master_description;
+    p.add("data,d", 1);
+    copied_description.add_options()("data,d", po::value<std::vector<std::string>>()->composing(), "Example set");
+    //copied_description.add_options()("csoaa_ldf", po::value<std::string>(), "Example set");
+    po::parsed_options pos = po::command_line_parser(m_command_line)
+                                 .style(po::command_line_style::default_style ^ po::command_line_style::allow_guessing)
+                                 .options(copied_description)
+                                 .allow_unregistered()
+                                 .positional(p)
+                                 .run();
+
+    auto it = std::find_if(
+        pos.options.begin(), pos.options.end(), [](po::option const& o) { return o.string_key == "data"; });
+
+    /*
+    if (it == pos.options.end())
+    {
+      // fail: no --data or -d
+    }
+    else
+    {
+      return it->value;
+    }
+    */
+
+    po::positional_options_description p;
+    p.add("__positional__", -1);
+    auto copied_description = master_description;
+    copied_description.add_options()("__positional__", po::value<std::vector<std::string>>()->composing(), "");
+    po::parsed_options pos = po::command_line_parser(m_command_line)
+                                 .style(po::command_line_style::default_style ^ po::command_line_style::allow_guessing)
+                                 .options(copied_description)
+                                 .allow_unregistered()
+                                 .positional(p)
+                                 .run();
+
+    po::variables_map vm;
+    po::store(pos, vm);
+
+    // keep track that data was actually defined via positional args
+    this->m_defined_options.insert("data");
+    this->m_defined_options.insert("d");
+    this->m_defined_options.insert("-d");
+
+    // add to help
+
+    if (vm.count("__positional__") != 0)
+    {
+      //agregar que se proceso
+      this->m_supplied_options.insert("data");
+      this->m_ignore_supplied.insert("data");
+      this->m_supplied_options.insert("d");
+      this->m_ignore_supplied.insert("d");
+
+      return vm["__positional__"].as<std::vector<std::string>>();
+    }
+    return std::vector<std::string>();
+  }
 
 bool options_boost_po::add_parse_and_check_necessary(const option_group_definition& group)
 {
@@ -148,6 +216,21 @@ bool options_boost_po::was_supplied(const std::string& key) const
   // Basic check, std::string match against command line.
   auto it = std::find(m_command_line.begin(), m_command_line.end(), std::string("--" + key));
   return it != m_command_line.end();
+}
+
+bool options_boost_po::ensure_default_dependency(const std::string& key) {
+  return this->ensure_default_dependency(key, "");
+}
+
+bool options_boost_po::ensure_default_dependency(const std::string& key, const std::string& value)
+{
+  if (!this->was_supplied(key))
+  {
+    this->require(key, value);
+    return true;
+  }
+
+  return false;
 }
 
 std::string options_boost_po::help() const { return m_help_stringstream.str(); }

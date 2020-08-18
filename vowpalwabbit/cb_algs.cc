@@ -145,13 +145,6 @@ base_learner* cb_algs_setup(options_i& options, vw& all)
   if (!options.add_parse_and_check_necessary(new_options))
     return nullptr;
 
-  // Ensure serialization of this option in all cases.
-  if (!options.was_supplied("cb_type"))
-  {
-    options.insert("cb_type", type_string);
-    options.add_and_parse(new_options);
-  }
-
   cb_to_cs& c = data->cbcs;
 
   size_t problem_multiplier = 2;  // default for DR
@@ -175,12 +168,9 @@ base_learner* cb_algs_setup(options_i& options, vw& all)
     c.cb_type = CB_TYPE_DR;
   }
 
-  if (!options.was_supplied("csoaa"))
-  {
-    std::stringstream ss;
-    ss << data->cbcs.num_actions;
-    options.insert("csoaa", ss.str());
-  }
+  std::stringstream ss;
+  ss << data->cbcs.num_actions;
+  options.ensure_default_dependency("csoaa", ss.str());
 
   auto base = as_singleline(setup_base(options, all));
   if (eval)
