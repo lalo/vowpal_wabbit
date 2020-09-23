@@ -492,6 +492,18 @@ learner<T, E>& init_learner(
   return *ret;
 }
 
+// base learner/predictor
+// used only for python_red.cc
+template <class T, class E, class L>
+learner<T, E>& init_learner(
+    T* dat, void (*learn)(T&, L&, E&), void (*predict)(T&, L&, E&), size_t params_per_weight)
+{
+  auto ret =
+      &learner<T, E>::init_learner(dat, (L*)nullptr, learn, predict, params_per_weight, prediction_type_t::scalar);
+
+  return *ret;
+}
+
 // base predictor only
 template <class T, class E, class L>
 learner<T, E>& init_learner(void (*predict)(T&, L&, E&), size_t params_per_weight)

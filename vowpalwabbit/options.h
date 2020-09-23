@@ -7,6 +7,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <map>
 #include <typeinfo>
 #include <memory>
 #include <unordered_set>
@@ -110,6 +111,7 @@ struct option_group_definition;
 struct options_i
 {
   virtual void add_and_parse(const option_group_definition& group) = 0;
+  virtual void tint(const std::string& reduction_name) = 0;
   virtual bool add_parse_and_check_necessary(const option_group_definition& group) = 0;
   virtual bool was_supplied(const std::string& key) const = 0;
   virtual bool ensure_default_dependency(const std::string& key) = 0;
@@ -122,6 +124,7 @@ struct options_i
   virtual std::vector<std::shared_ptr<const base_option>> get_all_options() const = 0;
   virtual std::shared_ptr<base_option> get_option(const std::string& key) = 0;
   virtual std::shared_ptr<const base_option> get_option(const std::string& key) const = 0;
+  virtual std::map<std::string, std::vector<option_group_definition>> get_collection_of_options() const = 0;
 
   virtual void insert(const std::string& key, const std::string& value) = 0;
   virtual void require(const std::string& key, const std::string& value) = 0;

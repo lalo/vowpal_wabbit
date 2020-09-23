@@ -336,7 +336,7 @@ vw::vw()
 
   searchstr = nullptr;
 
-  ext_binding = nullptr;
+  //ext_binding = nullptr;
 
   nonormalize = false;
   l1_lambda = 0.0;

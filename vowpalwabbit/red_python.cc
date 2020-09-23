@@ -5,6 +5,7 @@
 #include "red_python.h"
 
 #include "reductions.h"
+#include "learner.h"
 #include "vw.h"
 
 using namespace LEARNER;
@@ -52,4 +53,25 @@ VW::LEARNER::base_learner* red_python_setup(options_i& options, vw& all)
   all.ext_binding.release();
 
   return make_base(ret);
+}
+
+using namespace RED_PYTHON;
+VW::LEARNER::base_learner* red_python_base_setup(options_i& options, vw& all)
+{
+  //VW::LEARNER::learner<ExternalBinding, example>& ret = init_learner(all.ext_binding.get(), learn, predict, ((uint64_t)1 << all.weights.stride_shift()));
+  //VW::LEARNER::learner<ExternalBinding, example>& ret =
+  //    learner<ExternalBinding, example>::init_learner(all.ext_binding.get(), nullptr, learn, predict, 1, prediction_type_t::scalar);
+
+  if (!all.ext_binding)
+    return nullptr;
+
+  //en parte de pyvw.cc agregar scoped calloc or throw porque esta cosa uqiere freeptr
+  all.ext_binding->SetRandomNumber(4);
+
+  learner<ExternalBinding, example>& l = init_learner(all.ext_binding.get(), learn, predict, 1);
+  all.ext_binding.release();
+
+  return make_base(l);
+
+  //return nullptr;
 }

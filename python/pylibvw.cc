@@ -2,6 +2,7 @@
 // individual contributors. All rights reserved. Released under a BSD (revised)
 // license as described in the file LICENSE.
 
+#include <algorithm>
 #include "vw.h"
 
 #include "multiclass.h"
@@ -12,6 +13,8 @@
 #include "parse_example.h"
 #include "gd.h"
 #include "options_serializer_boost_po.h"
+#include "options.h"
+#include "options_types.h"
 #include "future_compat.h"
 #include "slates_label.h"
 
@@ -38,6 +41,8 @@ typedef boost::shared_ptr<Search::predictor> predictor_ptr;
 
 class PyCppBridge ;
 typedef boost::shared_ptr<PyCppBridge> py_cpp_bridge_ptr;
+class OptionManager ;
+typedef boost::shared_ptr<OptionManager> op_manager_ptr;
 
 const size_t lDEFAULT = 0;
 const size_t lBINARY = 1;
@@ -59,6 +64,187 @@ const size_t pMULTICLASSPROBS = 7;
 const size_t pDECISION_SCORES = 8;
 
 void dont_delete_me(void*arg) { }
+
+class OptionManager
+{
+  std::map<std::string, std::vector<VW::config::option_group_definition>> m_option_group_dic;
+  py::object m_cla;
+  VW::config::options_i& m_opt;
+
+  public:
+  OptionManager(VW::config::options_i& options, py::object cla) : m_opt(options),m_option_group_dic(options.get_collection_of_options()),m_cla(cla) {}
+
+  // o listas de namedtuples por cada opcion
+  // listas de namedtuples, que contienen una lista de namedtuples pero tambien incluyen descripcion
+
+/*
+  template <typename T>
+  T do_also(std::shared_ptr<VW::config::base_option> option)
+  {
+      auto temp = m_cla(dynamic_cast<const typed_option<T>&>(option.get()));
+      return temp;
+  }
+  */
+
+  template <typename T>
+  py::object* value_to_pyobject(VW::config::typed_option<T>& opt)
+  {
+    return new py::object(m_cla(opt.m_name
+                                , opt.m_help
+                                , opt.m_short_name
+                                , opt.m_keep
+                                , opt.m_necessary
+                                , opt.m_allow_override
+                                , opt.value()
+                                , m_opt.was_supplied(opt.m_name) 
+                                , opt.default_value()
+                                , opt.default_value_supplied()));
+  }
+
+  template <typename T>
+  py::object* value_to_pyobject(VW::config::typed_option<std::vector<T>>& opt)
+  {
+    py::list values;
+
+    auto vec = opt.value();
+    if (vec.size() > 0)
+    {
+      for (auto const& opt : vec)
+      {
+        //std::cout << opt;
+        values.append(py::object(opt));
+      }
+    }
+
+    return new py::object(m_cla(opt.m_name
+                            , opt.m_help
+                            , opt.m_short_name
+                            , opt.m_keep
+                            , opt.m_necessary
+                            , opt.m_allow_override
+                            , values
+                            , m_opt.was_supplied(opt.m_name) 
+                            , py::list()
+                            , opt.default_value_supplied()));
+
+    //return new py::object();
+    /*
+    auto vec = typed_option.value();
+    if (vec.size() > 0)
+    {
+      for (auto const& value : vec)
+      {
+        m_output_stream << " --" << typed_option.m_name;
+        m_output_stream << " " << value;
+      }
+    }
+    */
+  }
+
+  template <typename T>
+  py::object* transform_if_t(VW::config::base_option& base_option)
+  {
+    if (base_option.m_type_hash == typeid(T).hash_code())
+    {
+      auto typed = dynamic_cast<VW::config::typed_option<T>&>(base_option);
+      return value_to_pyobject(typed);
+
+      //return true;
+    }
+
+    return nullptr;
+    //return false;
+  }
+
+
+  template <typename TTypes>
+  py::object do_also(VW::config::base_option& options)
+  {
+    py::object* temp = transform_if_t<typename TTypes::head>(options);
+    if (temp != nullptr)
+    {
+      auto repack = py::object(*temp);
+      delete temp;
+      return repack;
+      //return *(py::incref(py::object(temp).ptr()));
+      //return py::object(py::handle<py::object>(temp));
+    }
+
+    return do_also<typename TTypes::tail>(options);
+  }
+
+
+
+/*
+template <>
+void do_also<VW::config::typelist<>>(VW::config::base_option&)
+{
+  THROW("That is an unsupported option type.");
+}
+*/
+
+  py::object do_something(vw_ptr all, bool enabled)
+  {
+/*
+    auto collections = py::import("collections");
+    auto namedtuple = collections.attr("namedtuple");
+    py::list fields;
+    fields.append("name");
+    fields.append("has_default");
+    auto option_py_obj = namedtuple("Opt", fields);
+ */
+
+    //auto pyvw = py::import("metavw");
+    //auto testImpObj = pyvw.attr("TestImp");
+
+    //return option_py_obj("mi nombre", true);
+    //return act_test;
+
+    py::dict dres;
+    auto it = m_option_group_dic.begin();
+
+    auto enabled_reductions = all->enabled_reductions;
+
+    while (it != m_option_group_dic.end())
+    {
+      auto reduction_enabled = std::find(enabled_reductions.begin(), enabled_reductions.end(), it->first) != enabled_reductions.end();
+      //add except 'general'
+      if (((it->first).compare("general") != 0) && enabled && !reduction_enabled)
+      {
+        it++;
+        continue;
+      }
+
+      py::list option_groups;
+
+      for(auto options_group : it->second)
+      {
+        py::list options;
+        for(auto opt : options_group.m_options)
+        {
+          //auto temp = m_cla(opt->m_name, opt->m_help, opt->m_short_name, opt->m_keep, opt->m_necessary, opt->m_allow_override);
+          auto temp = do_also<VW::config::supported_options_types>(*opt.get());
+          options.append(temp);
+        }
+
+        option_groups.append(py::make_tuple(options_group.m_name, options));
+      }
+
+      dres[it->first] = option_groups;
+
+      it++;
+    }
+    return dres;
+  }
+
+
+};
+
+template <>
+py::object OptionManager::do_also<VW::config::typelist<>>(VW::config::base_option& options)
+{
+  return py::object();
+}
 
 class PyCppBridge : public RED_PYTHON::ExternalBinding {
   private:
@@ -128,7 +314,9 @@ vw_ptr my_initialize(std::string args, py::object with_reduction)
     args += " --no_stdin";
 
   if (with_reduction)
-  { auto ext_binding = std::unique_ptr<RED_PYTHON::ExternalBinding>(new PyCppBridge(&with_reduction));
+  { 
+    //auto ext_binding = scoped_calloc_or_throw<RED_PYTHON::ExternalBinding>(new PyCppBridge(&with_reduction));
+    auto ext_binding = std::unique_ptr<RED_PYTHON::ExternalBinding>(new PyCppBridge(&with_reduction));
     foo = VW::initialize_with_reduction(args, nullptr, false, nullptr, nullptr, std::move(ext_binding));
   }
   else
@@ -154,6 +342,12 @@ void my_save(vw_ptr all, std::string name)
 
 search_ptr get_search_ptr(vw_ptr all)
 { return boost::shared_ptr<Search::search>((Search::search*)(all->searchstr), dont_delete_me);
+}
+
+op_manager_ptr get_op_manager_ptr(vw_ptr all, py::object cla)
+{ 
+  // removed dont_delete_me, verify its sane
+  return op_manager_ptr(new OptionManager(*all->options, cla), dont_delete_me);
 }
 
 void my_audit_example(vw_ptr all, example_ptr ec) { GD::print_audit_features(*all, *ec); }
@@ -642,6 +836,7 @@ size_t   get_example_counter(example_ptr ec) { return ec->example_counter; }
 uint64_t get_ft_offset(example_ptr ec) { return ec->ft_offset; }
 size_t   get_num_features(example_ptr ec) { return ec->num_features; }
 float    get_partial_prediction(example_ptr ec) { return ec->partial_prediction; }
+void     set_partial_prediction(example_ptr ec, float value) { ec->partial_prediction = value; }
 float    get_updated_prediction(example_ptr ec) { return ec->updated_prediction; }
 float    get_loss(example_ptr ec) { return ec->loss; }
 void     set_loss(example_ptr ec, float fl) { ec->loss = fl; }
@@ -887,6 +1082,8 @@ BOOST_PYTHON_MODULE(pylibvw)
   .def("get_sum_loss", &get_sum_loss, "return the total cumulative loss suffered so far")
   .def("get_weighted_examples", &get_weighted_examples, "return the total weight of examples so far")
 
+  .def("get_option_manager_ptr", &get_op_manager_ptr, "return a pointer to the option manager data structure")
+
   .def("get_search_ptr", &get_search_ptr, "return a pointer to the search data structure")
   .def("audit_example", &my_audit_example, "print example audit information")
   .def("get_id", &get_model_id, "return the model id")
@@ -931,6 +1128,7 @@ BOOST_PYTHON_MODULE(pylibvw)
   .def("get_example_counter", &get_example_counter, "Returns the counter of total number of examples seen up to and including this one")
   .def("get_ft_offset", &get_ft_offset, "Returns the feature offset for this example (used, eg, by multiclass classification to bulk offset all features)")
   .def("get_partial_prediction", &get_partial_prediction, "Returns the partial prediction associated with this example")
+  .def("set_partial_prediction", &set_partial_prediction, "Sets the partial prediction associated with this example")
   .def("get_updated_prediction", &get_updated_prediction, "Returns the partial prediction as if we had updated it after learning")
   .def("get_loss", &get_loss, "Returns the loss associated with this example")
   .def("set_loss", &set_loss, "Sets the loss associated with this example")
@@ -957,7 +1155,7 @@ BOOST_PYTHON_MODULE(pylibvw)
   .def("get_simplelabel_weight", &ex_get_simplelabel_weight, "Assuming a simple_label label type, return the importance weight")
   .def("get_simplelabel_initial", &ex_get_simplelabel_initial, "Assuming a simple_label label type, return the initial (baseline) prediction")
   .def("get_simplelabel_prediction", &ex_get_simplelabel_prediction, "Assuming a simple_label label type, return the final prediction")
-  .def("set_simplelabel_prediction", &ex_set_simplelabel_prediction, "Assuming a simple_label label type, return the final prediction")
+  .def("set_simplelabel_prediction", &ex_set_simplelabel_prediction, "Assuming a simple_label label type, set the final prediction")
   .def("get_multiclass_label", &ex_get_multiclass_label, "Assuming a multiclass label type, get the true label")
   .def("get_multiclass_weight", &ex_get_multiclass_weight, "Assuming a multiclass label type, get the importance weight")
   .def("get_multiclass_prediction", &ex_get_multiclass_prediction, "Assuming a multiclass label type, get the prediction")
@@ -1001,6 +1199,10 @@ BOOST_PYTHON_MODULE(pylibvw)
   .def("set_learner_id", &my_set_learner_id, "select the learner with which to make this prediction")
   .def("set_tag", &my_set_tag, "change the tag of this prediction")
   .def("predict", &Search::predictor::predict, "make a prediction")
+  ;
+
+  py::class_<OptionManager, op_manager_ptr>("option_manager", py::no_init)
+  .def("call_a", &OptionManager::do_something, py::return_value_policy<py::return_by_value>(), "do something")
   ;
 
   py::class_<PyCppBridge, py_cpp_bridge_ptr>("reduction_bridge", py::no_init)

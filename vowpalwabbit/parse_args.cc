@@ -669,7 +669,8 @@ void parse_feature_tweaks(options_i& options, vw& all, std::vector<std::string>&
                      "'N:=S' where := is operator. Empty N or S are treated as default namespace. Use ':' as a "
                      "wildcard in S.")
                .keep())
-      .add(make_option("bit_precision", new_bits).short_name("b").help("number of bits in the feature table"))
+      //check why default value is not set here as usual
+      .add(make_option("bit_precision", new_bits).default_value(18).short_name("b").help("number of bits in the feature table"))
       .add(make_option("noconstant", noconstant).help("Don't add a constant feature"))
       .add(make_option("constant", all.initial_constant).short_name("C").help("Set initial value of constant"))
       .add(make_option("ngram", ngram_strings)
@@ -1268,12 +1269,24 @@ void load_input_model(vw& all, io_buf& io_temp)
   }
 }
 
+//refactored in the same 
 VW::LEARNER::base_learner* setup_base(options_i& options, vw& all)
 {
+  if (all.reduction_stack.size() == 0)
+  {
+    all.trace_message << "Error empty reduction stack: no base learner";
+    return nullptr;
+  }
+
   auto setup_func_id = all.reduction_stack.top();
   all.reduction_stack.pop();
   auto setup_func = all.reduction_fn_dic.at(setup_func_id);
+
+  // 'hacky' way of keeping track of the option group created by the setup_func about to be created
+  options.tint(setup_func_id);
   auto base = setup_func(options, all);
+  // reset back to general
+  options.tint("general");
 
   // this mean that setup_func did not do any setup since it didnt add itself to the chain of learners
   if (base == nullptr)
@@ -1304,6 +1317,17 @@ void parse_reductions(options_i& options, vw& all)
 
 
   for r in default_good_old: dict[r]()
+  */
+
+//change to struct
+/*
+ interface iStackable:
+  name:
+  function_pointer //setupfn
+
+  kernel.cc
+
+  class kernel_svm 
   */
 
   all.reduction_fn_dic = {
@@ -1382,11 +1406,13 @@ void parse_reductions(options_i& options, vw& all)
   // this string can be a constant under audit_regressor.h
     {"audit_regressor",
       [](options_i& options, vw& all) { return audit_regressor_setup("audit_regressor", options, all); }},
-    {"custom_python_reduction", red_python_setup}
+    {"custom_python_reduction", red_python_setup},
+    {"custom_python_base_reduction", red_python_base_setup}
   };
 
   // Base algorithms
-  all.reduction_stack.push("gd");  // always
+  all.reduction_stack.push("custom_python_base_reduction");
+  //all.reduction_stack.push("gd");  // always
   all.reduction_stack.push("ksvm");
   all.reduction_stack.push("ftrl");  // custom logic
   all.reduction_stack.push("svrg");
@@ -1398,6 +1424,7 @@ void parse_reductions(options_i& options, vw& all)
   all.reduction_stack.push("conjugate_gradient");
   all.reduction_stack.push("OjaNewton");
   // all.reduction_stack.push("vw_cntk");
+
 
   // Score Users
   all.reduction_stack.push("baseline");
@@ -1460,7 +1487,21 @@ void parse_reductions(options_i& options, vw& all)
   // this string can be a constant under audit_regressor.h
   all.reduction_stack.push("audit_regressor");
   //temp this will be removed
-  all.reduction_stack.push("custom_python_reduction");
+  //all.reduction_stack.push("custom_python_reduction");
+
+
+//&"gd", "scorer", "custom_python_reduction"
+// link.give_me_next_python_reduction_pointer_py();
+
+  // vw.h -> bunch of init
+  // string args...., list[str] reduction_stack); python api side (hidden from the suer) we translate python config obj -> cmd string
+
+  // if (custom_reduction_mode_on)
+    /*
+    grab reduciton_stack pumped from init
+    store it all.reduction_stack
+    */
+
 
   all.l = setup_base(options, all);
 }

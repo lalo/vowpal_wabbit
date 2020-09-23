@@ -376,6 +376,7 @@ void predict(gd& g, base_learner&, example& ec)
   if (l1)
     ec.partial_prediction = trunc_predict(all, ec, all.sd->gravity);
   else
+   // what were doing right now with python
     ec.partial_prediction = inline_predict(all, ec);
 
   ec.partial_prediction *= (float)all.sd->contraction;

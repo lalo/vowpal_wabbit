@@ -561,6 +561,14 @@ base_learner* cb_adf_setup(options_i& options, vw& all)
       init_learner(ld, base, learn, predict, problem_multiplier, prediction_type_t::action_scores);
   l.set_finish_example(CB_ADF::finish_multiline_example);
 
+  //l.name -> "cb_adf"
+
+  //learner , what is ALL tha is going to get run when i call into learner.learn() -> name() call into 1
+  // 1 vs many       name, learn actual al
+  // 1 vs 1         name, 
+  // many vs many
+
+
   bare->set_scorer(all.scorer);
 
   l.set_save_load(CB_ADF::save_load);

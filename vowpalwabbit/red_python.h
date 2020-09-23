@@ -7,6 +7,7 @@
 #include "reductions_fwd.h"
 
 VW::LEARNER::base_learner* red_python_setup(VW::config::options_i& options, vw& all);
+VW::LEARNER::base_learner* red_python_base_setup(VW::config::options_i& options, vw& all);
 
 namespace RED_PYTHON
 {

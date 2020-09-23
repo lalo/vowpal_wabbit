@@ -63,6 +63,10 @@ struct options_boost_po : public options_i
   std::shared_ptr<base_option> get_option(const std::string& key) override;
   std::shared_ptr<const base_option> get_option(const std::string& key) const override;
 
+  void tint(const std::string& reduction_name) override
+  { m_current_reduction_tint = reduction_name;
+  }
+
   bool bypass_necessary() const override
   { return this->bypass_enabled;
   }
@@ -120,6 +124,10 @@ struct options_boost_po : public options_i
     *(it + 1) = value;
   }
 
+  std::map<std::string, std::vector<option_group_definition>> get_collection_of_options() const override
+  {
+    return m_option_group_dic;
+  }
 
  private:
   template <typename T>
@@ -160,7 +168,16 @@ struct options_boost_po : public options_i
   template <typename T>
   void add_to_description(std::shared_ptr<typed_option<T>> opt, po::options_description& options_description);
 
+  void add_to_option_group_collection(const option_group_definition& group);
+
  private:
+  // Collection that tracks for now
+  // setup_function_id (str) -> list of option_group_definition
+  // this is needed to improve python custom stack
+  std::map<std::string, std::vector<option_group_definition>> m_option_group_dic;
+
+  std::string m_current_reduction_tint = "general";
+
   bool bypass_enabled =false;
   std::map<std::string, std::shared_ptr<base_option>> m_options;
 
