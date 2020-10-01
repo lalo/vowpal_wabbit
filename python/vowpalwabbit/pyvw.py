@@ -122,6 +122,11 @@ class Copperhead(ABC):
     def _finish_example(self, ec):
         pass
 
+    # this method should be implemented only if needed
+    @no_impl
+    def _save_load(self, ec):
+        pass
+
     # private functions end user
     def _learn_convenience(self, ec, vwbridge):
         self._learn(ec, Learner(vwbridge))
@@ -131,6 +136,9 @@ class Copperhead(ABC):
 
     def _is_finish_example_implemented(self):
         return not hasattr(self._finish_example, 'no_impl')
+
+    def _is_save_load_implemented(self):
+        return not hasattr(self._save_load, 'no_impl')
 
 class SearchTask:
     """Search task class"""

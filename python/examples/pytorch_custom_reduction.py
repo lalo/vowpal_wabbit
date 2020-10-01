@@ -11,6 +11,9 @@ class PyTorchReduction(pyvw.Copperhead):
         super(PyTorchReduction, self).__init__()
         # create sparse
 
+    def _save_load(self):
+        print("saving/loading")
+
     def reduction_init(self, vw):
         config = vw.get_config()
         self.num_bits = config["general"][6][1][6].value
@@ -109,7 +112,7 @@ def print_config(config):
 # this should match cpp_binary() output
 # doesn't do anything, runs in python see class impl NoopPythonicReductions
 def noop_example():
-    vw = pyvw.vw(python_reduction=PyTorchReduction, arg_str="--loss_function logistic --binary  -d /root/vowpal_wabbit/test/train-sets/rcv1_small.dat")
+    vw = pyvw.vw(python_reduction=PyTorchReduction, arg_str="--save_resume --loss_function logistic --binary  -d /root/vowpal_wabbit/test/train-sets/rcv1_small.dat")
     #print(vw.get_stride())
     vw.run_parser()
 

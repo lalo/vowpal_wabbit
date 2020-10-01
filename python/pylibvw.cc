@@ -251,18 +251,24 @@ class PyCppBridge : public RED_PYTHON::ExternalBinding {
       py::object* py_reduction_impl;
       void* base_learner;
       bool register_finish_learn = false;
+      bool register_save_load = false;
 
   public:
       int random_num = 0;
 
       PyCppBridge(py::object* py_reduction_impl) : py_reduction_impl(new py::object(*py_reduction_impl))
       { this->register_finish_learn = py::extract<bool>(call_py_impl_method("_is_finish_example_implemented"));
+        this->register_save_load = py::extract<bool>(call_py_impl_method("_is_save_load_implemented"));
       }
 
       ~PyCppBridge() { }
 
       bool ShouldRegisterFinishExample()
       { return this->register_finish_learn;
+      }
+
+      bool ShouldRegisterSaveLoad()
+      { return this->register_save_load;
       }
 
       void SetRandomNumber(int n)
@@ -294,6 +300,10 @@ class PyCppBridge : public RED_PYTHON::ExternalBinding {
 
       void ActualFinishExample(example* ec)
       { this->call_py_impl_method("_finish_example", example_ptr(ec, dont_delete_me));
+      }
+      
+      void ActualSaveLoad()
+      { this->call_py_impl_method("_save_load");
       }
 
       void SetBaseLearner(void* learner)

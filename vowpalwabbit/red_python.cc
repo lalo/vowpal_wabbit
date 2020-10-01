@@ -32,6 +32,10 @@ void finish_example(vw& all, ExternalBinding& external_binding, example& ec) {
   VW::finish_example(all, ec);
 }
 
+void save_load(ExternalBinding& external_binding, io_buf& model_file, bool read, bool text) {
+  external_binding.ActualSaveLoad();
+}
+
 }  // namespace RED_PYTHON
 using namespace RED_PYTHON;
 VW::LEARNER::base_learner* red_python_setup(options_i& options, vw& all)
@@ -48,6 +52,9 @@ VW::LEARNER::base_learner* red_python_setup(options_i& options, vw& all)
 
   if (all.ext_binding->ShouldRegisterFinishExample())
     ret.set_finish_example(finish_example);
+
+  if (all.ext_binding->ShouldRegisterSaveLoad())
+    ret.set_save_load(save_load);
 
   // learner should delete ext_binding
   all.ext_binding.release();
@@ -69,6 +76,13 @@ VW::LEARNER::base_learner* red_python_base_setup(options_i& options, vw& all)
   all.ext_binding->SetRandomNumber(4);
 
   learner<ExternalBinding, example>& l = init_learner(all.ext_binding.get(), learn, predict, 1);
+
+  if (all.ext_binding->ShouldRegisterFinishExample())
+    l.set_finish_example(finish_example);
+
+  if (all.ext_binding->ShouldRegisterSaveLoad())
+    l.set_save_load(save_load);
+
   all.ext_binding.release();
 
   return make_base(l);
