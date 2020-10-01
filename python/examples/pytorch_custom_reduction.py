@@ -15,8 +15,8 @@ class PyTorchReduction(pyvw.Copperhead):
         config = vw.get_config()
         self.num_bits = config["general"][6][1][6].value
         self.num_features = 1 << self.num_bits
-        # self.model = torch.nn.Linear(self.num_features, 2)
-        self.model = torch.nn.SparseLinear(self.num_features, 2)
+        self.model = torch.nn.Linear(self.num_features, 2)
+        # self.model = torch.nn.SparseLinear(self.num_features, 2)
         self.logsoftmax = torch.nn.LogSoftmax(dim=-1)
         self.optimizer = torch.optim.Adam(self.model.parameters(),
                                           lr=0.5) 
@@ -53,20 +53,27 @@ class PyTorchReduction(pyvw.Copperhead):
 
         # return X
 
-    def _predict(self, ec, learner):
-        with torch.no_grad():
+    def _predict(self, ec, learner, no_grad_enabled=True):
+        if no_grad_enabled:
+            with torch.no_grad():
+                pred = self.model.forward(self.vw_ex_to_pytorch(ec))
+                logits = self.logsoftmax(pred)
+        else:
             pred = self.model.forward(self.vw_ex_to_pytorch(ec))
             logits = self.logsoftmax(pred)
 
-        ec.set_partial_prediction(logits[0, -1] - np.log(0.5))
-        ec.set_simplelabel_prediction(logits[0, -1] - np.log(0.5))
+        ec.set_partial_prediction(logits[0, -1].item() - np.log(0.5))
+        ec.set_simplelabel_prediction(logits[0, -1].item() - np.log(0.5))
 
         return pred
 
     def _learn(self, ec, learner):
         self.optimizer.zero_grad()
-        pred = self._predict(ec, learner)
-        loss = ec.get_simplelabel_weight() * self.lossfn(pred, [ 1 if ec.get_simplelabel_label() > 0 else 0 ])
+        pred = self._predict(ec, learner, False)
+        target = torch.LongTensor([ 1 if ec.get_simplelabel_label() > 0 else 0 ])
+        # loss = ec.get_simplelabel_weight() * self.lossfn(pred, target)
+        # missing requires_grad see line 57
+        loss = self.lossfn(pred, target)
         loss.backward()
         self.optimizer.step()
         self.scheduler.step()
@@ -102,11 +109,11 @@ def print_config(config):
 # this should match cpp_binary() output
 # doesn't do anything, runs in python see class impl NoopPythonicReductions
 def noop_example():
-    vw = pyvw.vw(python_reduction=PyTorchReduction, arg_str="--loss_function logistic --binary  -d /root/vw/test/train-sets/rcv1_small.dat")
+    vw = pyvw.vw(python_reduction=PyTorchReduction, arg_str="--loss_function logistic --binary  -d /root/vowpal_wabbit/test/train-sets/rcv1_small.dat")
     #print(vw.get_stride())
     vw.run_parser()
 
-    print_config(vw.get_config())
+    # print_config(vw.get_config())
     vw.finish()
     #prediction = vw.predict("-1 |f 9:6.2699720e-02 14:3.3754818e-02")
     #vw.learn("-1 |f 9:6.2699720e-02 14:3.3754818e-02")
