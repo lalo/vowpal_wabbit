@@ -9,7 +9,6 @@ from vowpalwabbit import pyvw
 class PyTorchReduction(pyvw.Copperhead):
     def __init__(self):
         super(PyTorchReduction, self).__init__()
-        # create sparse
 
     def _save_load(self):
         print("saving/loading")
@@ -81,14 +80,15 @@ class PyTorchReduction(pyvw.Copperhead):
         self.optimizer.step()
         self.scheduler.step()
 
-print(os.getpid())
+def sanity_check():
+    print(os.getpid())
 
-print(torch.__version__)
+    print(torch.__version__)
 
-if sys.version_info > (3, 0):
-    print("good, python3")
-else:
-    raise Exception("you are not on python 3")
+    if sys.version_info > (3, 0):
+        print("good, python3")
+    else:
+        raise Exception("you are not on python 3")
 
 def print_config(config):
     cmd_str = []
@@ -121,5 +121,6 @@ def noop_example():
     #prediction = vw.predict("-1 |f 9:6.2699720e-02 14:3.3754818e-02")
     #vw.learn("-1 |f 9:6.2699720e-02 14:3.3754818e-02")
 
+sanity_check()
 print("noop")
 noop_example()

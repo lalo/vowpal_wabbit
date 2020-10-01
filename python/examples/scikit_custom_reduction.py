@@ -99,7 +99,7 @@ def print_config(config):
 
 def run_example():
     # vw = pyvw.vw(python_reduction=ScikitGDReduction, arg_str="--loss_function logistic --binary -d /root/vw/test/train-sets/rcv1_small.dat")
-    vw = pyvw.vw(python_reduction=ScikitGDReduction, arg_str="--loss_function logistic -d /root/vw/test/train-sets/rcv1_small.dat")
+    vw = pyvw.vw(python_reduction=ScikitGDReduction, arg_str="--loss_function logistic -d /root/vowpal_wabbit/test/train-sets/rcv1_small.dat")
 
     vw.run_parser()
     config = vw.get_config()
