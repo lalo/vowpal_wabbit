@@ -35,7 +35,7 @@ class ScikitGDReduction(pyvw.Copperhead):
             names = pyvw.namespace_id(ec, ns_id)
             for i in range(ec.num_features_in(names.ord_ns)):
                 f = ec.feature(names.ord_ns, i)
-                f = f & (((1 << self.num_bits) << 0) - 1)
+                f = f & ((1 << self.num_bits) - 1)
 
                 # sanity check
                 assert(f < (self.num_features))
@@ -93,6 +93,9 @@ def print_config(config):
                     cmd_str.append(temp_str)
 
     print(cmd_str)
+
+
+# load from a file, save to a file, save the model or save the state
 
 def run_example():
     # vw = pyvw.vw(python_reduction=ScikitGDReduction, arg_str="--loss_function logistic --binary -d /root/vw/test/train-sets/rcv1_small.dat")

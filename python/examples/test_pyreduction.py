@@ -202,8 +202,10 @@ def noop_example():
     #vw = pyvw.vw(python_reduction=NoopPythonReduction, arg_str="--loss_function logistic --binary --active_cover --oracular -d /root/vw/test/train-sets/rcv1_small.dat")
     vw = pyvw.vw(python_reduction=NoopPythonReduction, arg_str="--loss_function logistic --binary  -d /root/vw/test/train-sets/rcv1_small.dat")
     #print(vw.get_stride())
-    vw.run_parser()
-    vw.finish()
+
+    #vw.run_parser()
+    #vw.finish()
+
     #prediction = vw.predict("-1 |f 9:6.2699720e-02 14:3.3754818e-02")
     #vw.learn("-1 |f 9:6.2699720e-02 14:3.3754818e-02")
     #print(prediction)

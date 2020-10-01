@@ -3,6 +3,7 @@ import math
 import numpy as np
 import torch
 
+from scipy.sparse import coo_matrix
 from vowpalwabbit import pyvw
 
 class PyTorchReduction(pyvw.Copperhead):
@@ -11,31 +12,18 @@ class PyTorchReduction(pyvw.Copperhead):
         # create sparse
 
     def reduction_init(self, vw):
-        # get initial l rate
-        self.optimizer = torch.optim.Adam(self.model.parameters(),
-                                          lr=...) 
-
-        from sklearn.linear_model import SGDClassifier
-
         config = vw.get_config()
-        # 1. set of all classes (0 and 1 for binary -> labels)
-        self.classes = np.array([0,1])
-
         self.num_bits = config["general"][6][1][6].value
-        self.num_bits = 18
-        #self.num_features = 1 << self.num_bits
+        self.num_features = 1 << self.num_bits
+        # self.model = torch.nn.Linear(self.num_features, 2)
+        self.model = torch.nn.SparseLinear(self.num_features, 2)
+        self.logsoftmax = torch.nn.LogSoftmax(dim=-1)
+        self.optimizer = torch.optim.Adam(self.model.parameters(),
+                                          lr=0.5) 
+        self.scheduler = torch.optim.lr_scheduler.LambdaLR(self.optimizer, lambda n: 1 / (1 + np.sqrt(1 + n)))
+        self.lossfn = torch.nn.CrossEntropyLoss()
 
-        # weight length = (1 << 18) << ss
-        self.num_features = 1 << 18
-
-        self.classifier = SGDClassifier(loss='log')
-        # tuple, first element are the values the second is another tuple
-        # first is row index, then colx
-        fakeX = coo_matrix(([], ([], [])), shape=(1, self.num_features))
-        fakeY = np.array([0])
-        self.classifier.partial_fit(fakeX, fakeY, classes=self.classes)
-
-    def vw_ex_to_scikit(self, ec):
+    def vw_ex_to_pytorch(self, ec):
         sparsej = []
         sparsev = []
 
@@ -45,11 +33,7 @@ class PyTorchReduction(pyvw.Copperhead):
             names = pyvw.namespace_id(ec, ns_id)
             for i in range(ec.num_features_in(names.ord_ns)):
                 f = ec.feature(names.ord_ns, i)
-                f = f & (((1 << self.num_bits) << 0) - 1)
-
-                # sanity check
-                assert(f < (self.num_features))
-
+                f = f & ((1 << self.num_bits) - 1)
                 w = ec.feature_weight(names.ord_ns, i)
                 sparsej.append(f)
                 sparsev.append(w)
@@ -57,25 +41,39 @@ class PyTorchReduction(pyvw.Copperhead):
         X = coo_matrix((sparsev, ([0]*len(sparsej), sparsej)), 
                        shape=(1, self.num_features),
                        dtype=np.float32)
-        
-        return X
+
+        values = X.data
+        indices = np.vstack((X.row, X.col))
+
+        i = torch.LongTensor(indices)
+        v = torch.FloatTensor(values)
+        shape = X.shape
+
+        return torch.sparse.FloatTensor(i, v, torch.Size(shape))
+
+        # return X
 
     def _predict(self, ec, learner):
         with torch.no_grad():
             pred = self.model.forward(self.vw_ex_to_pytorch(ec))
+            logits = self.logsoftmax(pred)
 
-        ec.set_partial_prediction(pred[0, -1] - np.log(0.5))
-        ec.set_simplelabel_prediction(pred[0, -1] - np.log(0.5))
+        ec.set_partial_prediction(logits[0, -1] - np.log(0.5))
+        ec.set_simplelabel_prediction(logits[0, -1] - np.log(0.5))
+
+        return pred
 
     def _learn(self, ec, learner):
         self.optimizer.zero_grad()
-        pred = self.model.forward(self.vw_ex_to_pytorch(ec))
-        loss = self.vw_ex_to_weight(ec) * self.lossfn(pred, self.vw_ex_to_label(ec))
+        pred = self._predict(ec, learner)
+        loss = ec.get_simplelabel_weight() * self.lossfn(pred, [ 1 if ec.get_simplelabel_label() > 0 else 0 ])
         loss.backward()
         self.optimizer.step()
         self.scheduler.step()
 
 print(os.getpid())
+
+print(torch.__version__)
 
 if sys.version_info > (3, 0):
     print("good, python3")

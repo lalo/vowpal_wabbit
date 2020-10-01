@@ -20,6 +20,7 @@ namespace RED_PYTHON
             virtual void SetBaseLearner(void* learner) = 0;
             virtual void ActualLearn(example *) = 0;
             virtual void ActualPredict(example *) = 0;
+            // virtual void ActualSaveLoad() = 0;
             virtual bool ShouldRegisterFinishExample() = 0;
             virtual void ActualFinishExample(example *) = 0;
             virtual ~ExternalBinding() {};
