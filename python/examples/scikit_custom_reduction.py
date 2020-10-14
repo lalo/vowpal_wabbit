@@ -64,6 +64,17 @@ class ScikitGDReduction(pyvw.Copperhead):
             y = [ 1 if ec.get_simplelabel_label() > 0 else 0 ],
             sample_weight = [ ec.get_simplelabel_weight() ])
 
+    # see https://scikit-learn.org/stable/modules/model_persistence.html
+    def _save_load(self, read, text):
+        import pickle
+        if read:
+            print(f'loading {read} {text}')
+            # pickle.loads(s)
+        else:
+            s = pickle.dumps(self.classifier)
+            print(f'saving {read} {text}')
+            print(s)
+
     # todo saving and loading
     #  vw vs on python (give me away of loading this thing)
 
@@ -95,17 +106,12 @@ def print_config(config):
     print(cmd_str)
 
 
-# load from a file, save to a file, save the model or save the state
-
 def run_example():
     # vw = pyvw.vw(python_reduction=ScikitGDReduction, arg_str="--loss_function logistic --binary -d /root/vw/test/train-sets/rcv1_small.dat")
-    vw = pyvw.vw(python_reduction=ScikitGDReduction, arg_str="--loss_function logistic -d /root/vowpal_wabbit/test/train-sets/rcv1_small.dat")
+    vw = pyvw.vw(python_reduction=ScikitGDReduction, arg_str="-f hola.model --save_resume --loss_function logistic -d /root/vowpal_wabbit/test/train-sets/rcv1_small.dat")
 
     vw.run_parser()
     config = vw.get_config()
-
-    # vw.get_custom_reduction_output()
-        # this guy calls Copperhead.output that forwards to custom reduction
 
     #vw.learn("-1 |f 9:6.2699720e-02 14:3.3754818e-02")
     #prediction = vw.predict("-1 |f 9:6.2699720e-02 14:3.3754818e-02")

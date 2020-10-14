@@ -80,6 +80,16 @@ class PyTorchReduction(pyvw.Copperhead):
         self.optimizer.step()
         self.scheduler.step()
 
+    # see https://pytorch.org/tutorials/beginner/saving_loading_models.html
+    def _save_load(self, read, text):
+        if read:
+            # model.load_state_dict(torch.load(PATH))
+            # model.eval()
+            print(f'loading {read} {text}')
+        else:
+            # torch.save(model.state_dict(), PATH)
+            print(f'saving {read} {text}')
+
 def sanity_check():
     print(os.getpid())
 

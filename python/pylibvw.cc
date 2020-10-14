@@ -302,8 +302,8 @@ class PyCppBridge : public RED_PYTHON::ExternalBinding {
       { this->call_py_impl_method("_finish_example", example_ptr(ec, dont_delete_me));
       }
       
-      void ActualSaveLoad()
-      { this->call_py_impl_method("_save_load");
+      void ActualSaveLoad(bool read, bool text)
+      { this->call_py_impl_method("_save_load", read, text);
       }
 
       void SetBaseLearner(void* learner)

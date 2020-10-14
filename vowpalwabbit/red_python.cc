@@ -33,7 +33,7 @@ void finish_example(vw& all, ExternalBinding& external_binding, example& ec) {
 }
 
 void save_load(ExternalBinding& external_binding, io_buf& model_file, bool read, bool text) {
-  external_binding.ActualSaveLoad();
+  external_binding.ActualSaveLoad(read, text);
 }
 
 }  // namespace RED_PYTHON

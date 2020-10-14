@@ -123,8 +123,9 @@ class Copperhead(ABC):
         pass
 
     # this method should be implemented only if needed
+    # read and text are booleans
     @no_impl
-    def _save_load(self, ec):
+    def _save_load(self, read, text):
         pass
 
     # private functions end user
