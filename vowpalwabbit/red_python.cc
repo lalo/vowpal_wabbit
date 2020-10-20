@@ -26,10 +26,28 @@ void predict(ExternalBinding& external_binding, single_learner& base, example& e
   external_binding.ActualPredict(&ec);
 }
 
+void multi_learn(ExternalBinding& external_binding, multi_learner& base, multi_ex& examples)
+{ 
+  external_binding.SetBaseLearner(&base);
+  external_binding.ActualLearn(&examples);
+}
+
+//useful for debugging
+void multi_predict(ExternalBinding& external_binding, multi_learner& base, multi_ex& examples) {
+  external_binding.SetBaseLearner(&base);
+  external_binding.ActualPredict(&examples);
+}
+
 void finish_example(vw& all, ExternalBinding& external_binding, example& ec) {
   external_binding.ActualFinishExample(&ec);
   // have to bubble this out to python?
   VW::finish_example(all, ec);
+}
+
+void finish_multiex(vw& all, ExternalBinding& external_binding, multi_ex& examples) {
+  external_binding.ActualFinishExample(&examples);
+  // have to bubble this out to python?
+  VW::finish_example(all, examples);
 }
 
 void save_load(ExternalBinding& external_binding, io_buf& model_file, bool read, bool text) {
@@ -63,6 +81,32 @@ VW::LEARNER::base_learner* red_python_setup(options_i& options, vw& all)
 }
 
 using namespace RED_PYTHON;
+VW::LEARNER::base_learner* red_python_multiline_setup(options_i& options, vw& all)
+{
+  if (!all.ext_binding)
+    return nullptr;
+
+  all.ext_binding->SetRandomNumber(4);
+
+  auto base = as_multiline(setup_base(options, all));
+
+  VW::LEARNER::learner<ExternalBinding, multi_ex>& ret =
+      learner<ExternalBinding, multi_ex>::init_learner(all.ext_binding.get(), base, multi_learn, multi_predict, 1, prediction_type_t::action_probs);
+
+  if (all.ext_binding->ShouldRegisterFinishExample())
+    ret.set_finish_example(finish_multiex);
+
+  if (all.ext_binding->ShouldRegisterSaveLoad())
+    ret.set_save_load(save_load);
+
+  // learner should delete ext_binding
+  all.ext_binding.release();
+
+  return make_base(ret);
+}
+
+
+using namespace RED_PYTHON;
 VW::LEARNER::base_learner* red_python_base_setup(options_i& options, vw& all)
 {
   //VW::LEARNER::learner<ExternalBinding, example>& ret = init_learner(all.ext_binding.get(), learn, predict, ((uint64_t)1 << all.weights.stride_shift()));
@@ -75,7 +119,7 @@ VW::LEARNER::base_learner* red_python_base_setup(options_i& options, vw& all)
   //en parte de pyvw.cc agregar scoped calloc or throw porque esta cosa uqiere freeptr
   all.ext_binding->SetRandomNumber(4);
 
-  learner<ExternalBinding, example>& l = init_learner(all.ext_binding.get(), learn, predict, 1);
+  learner<ExternalBinding, example>& l = init_learner(all.ext_binding.get(), learn, predict, 1, prediction_type_t::scalar);
 
   if (all.ext_binding->ShouldRegisterFinishExample())
     l.set_finish_example(finish_example);

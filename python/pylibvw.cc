@@ -38,6 +38,7 @@ typedef boost::shared_ptr<vw> vw_ptr;
 typedef boost::shared_ptr<example> example_ptr;
 typedef boost::shared_ptr<Search::search> search_ptr;
 typedef boost::shared_ptr<Search::predictor> predictor_ptr;
+typedef std::vector<example_ptr> ExList;
 
 class PyCppBridge ;
 typedef boost::shared_ptr<PyCppBridge> py_cpp_bridge_ptr;
@@ -301,6 +302,32 @@ class PyCppBridge : public RED_PYTHON::ExternalBinding {
       void ActualFinishExample(example* ec)
       { this->call_py_impl_method("_finish_example", example_ptr(ec, dont_delete_me));
       }
+
+      ExList multi_ex_to_boost(multi_ex* examples)
+      {
+        ExList list;
+        for (auto ec : *examples) { list.emplace_back(ec, dont_delete_me); }
+
+        return list;
+      }
+
+      void ActualLearn(multi_ex* examples)
+      { 
+        ExList list = multi_ex_to_boost(examples);
+        this->call_py_impl_method("_learn_convenience", list, py_cpp_bridge_ptr(this, dont_delete_me));
+      }
+
+      void ActualPredict(multi_ex* examples)
+      { 
+        ExList list = multi_ex_to_boost(examples);
+        this->call_py_impl_method("_predict_convenience", list, py_cpp_bridge_ptr(this, dont_delete_me));
+      }
+
+      void ActualFinishExample(multi_ex* examples)
+      { 
+        ExList list = multi_ex_to_boost(examples);
+        this->call_py_impl_method("_finish_example", list);
+      }
       
       void ActualSaveLoad(bool read, bool text)
       { this->call_py_impl_method("_save_load", read, text);
@@ -310,6 +337,12 @@ class PyCppBridge : public RED_PYTHON::ExternalBinding {
       { this->base_learner = learner;
       }
 
+      // this has to evolve to its own class
+      // 1. keep track if its single or multi
+      // 2. keep track if its learning or predicting
+      // 3. keep track of the multi_ex copy of the vector<boost pointer> copy (to avoid another copy)
+      //          both lists points to the same elements unless end user adds or removes
+      //          if that's the case we need to be able to override and force a copy
       void CallBaseLearner(example* ec, bool should_call_learn = true)
       { if (should_call_learn)
           reinterpret_cast<VW::LEARNER::single_learner *>(this->base_learner)->learn(*ec);
@@ -1188,6 +1221,10 @@ BOOST_PYTHON_MODULE(pylibvw)
   .def("get_cbandits_probability", &ex_get_cbandits_probability, "Assuming a contextual_bandits label type, get the bandits probability for a given pair (i=0.. get_cbandits_num_costs)")
   .def("get_cbandits_partial_prediction", &ex_get_cbandits_partial_prediction, "Assuming a contextual_bandits label type, get the partial prediction for a given pair (i=0.. get_cbandits_num_costs)")
   ;
+
+  // equivalent to multi_ex, might be a bit more efficient
+  py::class_<ExList>("ExList")
+    .def(py::vector_indexing_suite<ExList>() );
 
   py::class_<Search::predictor, predictor_ptr>("predictor", py::no_init)
   .def("set_input", &my_set_input, "set the input (an example) for this predictor (non-LDF mode only)")

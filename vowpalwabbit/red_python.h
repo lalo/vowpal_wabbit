@@ -7,6 +7,7 @@
 #include "reductions_fwd.h"
 
 VW::LEARNER::base_learner* red_python_setup(VW::config::options_i& options, vw& all);
+VW::LEARNER::base_learner* red_python_multiline_setup(VW::config::options_i& options, vw& all);
 VW::LEARNER::base_learner* red_python_base_setup(VW::config::options_i& options, vw& all);
 
 namespace RED_PYTHON
@@ -24,6 +25,11 @@ namespace RED_PYTHON
             virtual bool ShouldRegisterFinishExample() = 0;
             virtual bool ShouldRegisterSaveLoad() = 0;
             virtual void ActualFinishExample(example *) = 0;
+
+            virtual void ActualLearn(multi_ex *) = 0;
+            virtual void ActualPredict(multi_ex *) = 0;
+            virtual void ActualFinishExample(multi_ex *) = 0;
+
             virtual ~ExternalBinding() {};
     };
 }  // namespace RED_PYTHON

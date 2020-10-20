@@ -496,10 +496,10 @@ learner<T, E>& init_learner(
 // used only for python_red.cc
 template <class T, class E, class L>
 learner<T, E>& init_learner(
-    T* dat, void (*learn)(T&, L&, E&), void (*predict)(T&, L&, E&), size_t params_per_weight)
+    T* dat, void (*learn)(T&, L&, E&), void (*predict)(T&, L&, E&), size_t params_per_weight, prediction_type_t pred_type)
 {
   auto ret =
-      &learner<T, E>::init_learner(dat, (L*)nullptr, learn, predict, params_per_weight, prediction_type_t::scalar);
+      &learner<T, E>::init_learner(dat, (L*)nullptr, learn, predict, params_per_weight, pred_type);
 
   return *ret;
 }

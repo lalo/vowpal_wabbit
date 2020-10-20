@@ -1407,12 +1407,17 @@ void parse_reductions(options_i& options, vw& all)
     {"audit_regressor",
       [](options_i& options, vw& all) { return audit_regressor_setup("audit_regressor", options, all); }},
     {"custom_python_reduction", red_python_setup},
+    {"custom_python_multi_reduction", red_python_multiline_setup},
     {"custom_python_base_reduction", red_python_base_setup}
   };
 
+  bool python_base_reduction = false;
+
   // Base algorithms
-  all.reduction_stack.push("custom_python_base_reduction");
-  //all.reduction_stack.push("gd");  // always
+  if (python_base_reduction)
+    all.reduction_stack.push("custom_python_base_reduction");
+  else
+    all.reduction_stack.push("gd");  // always
   all.reduction_stack.push("ksvm");
   all.reduction_stack.push("ftrl");  // custom logic
   all.reduction_stack.push("svrg");
@@ -1472,6 +1477,8 @@ void parse_reductions(options_i& options, vw& all)
   all.reduction_stack.push("cb_explore_adf_first");
   all.reduction_stack.push("cb_explore_adf_cover");
   all.reduction_stack.push("cb_explore_adf_bag");
+  if (!python_base_reduction)
+    all.reduction_stack.push("custom_python_multi_reduction");
   all.reduction_stack.push("cb_dro");
   all.reduction_stack.push("cb_sample");
   all.reduction_stack.push("shared_feature_merger_setup");  // custom logic
