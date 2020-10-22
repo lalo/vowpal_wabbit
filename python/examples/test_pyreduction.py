@@ -239,20 +239,20 @@ def noop_example():
 # this should match cpp_binary() output
 # mirror implementation of the cpp, runs in python see class impl BinaryPythonReductions
 def python_binary():
-    vw = pyvw.vw(python_reduction=BinaryPythonReduction, arg_str="--loss_function logistic --active_cover --oracular -d /root/vw/test/train-sets/rcv1_small.dat")
+    vw = pyvw.vw(python_reduction=BinaryPythonReduction, arg_str="--loss_function logistic --active_cover --oracular -d /root/vowpal_wabbit/test/train-sets/rcv1_small.dat")
 
     vw.run_parser()
     vw.finish()
 
 # this should be the baseline
 def cpp_binary():
-    vw = pyvw.vw("--loss_function logistic --binary --active_cover --oracular -d /root/vw/test/train-sets/rcv1_small.dat")
+    vw = pyvw.vw("--loss_function logistic --binary --active_cover --oracular -d /root/vowpal_wabbit/test/train-sets/rcv1_small.dat")
     vw.run_parser()
     vw.finish()
 
-#print("python")
-#python_binary()
-print("noop")
-noop_example()
+print("python")
+python_binary()
+# print("noop")
+# noop_example()
 #print("cpp")
-#cpp_binary()
+cpp_binary()

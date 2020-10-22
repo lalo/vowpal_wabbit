@@ -40,8 +40,8 @@ typedef boost::shared_ptr<Search::search> search_ptr;
 typedef boost::shared_ptr<Search::predictor> predictor_ptr;
 typedef std::vector<example_ptr> ExList;
 
-class PyCppBridge ;
-typedef boost::shared_ptr<PyCppBridge> py_cpp_bridge_ptr;
+class PyCppCallback ;
+typedef boost::shared_ptr<PyCppCallback> py_cpp_callback_ptr;
 class OptionManager ;
 typedef boost::shared_ptr<OptionManager> op_manager_ptr;
 
@@ -247,6 +247,42 @@ py::object OptionManager::do_also<VW::config::typelist<>>(VW::config::base_optio
   return py::object();
 }
 
+class PyCppCallback {
+  private:
+    void* base_learner;
+    bool isMulti = false;
+    multi_ex* examples = nullptr;
+
+  public:
+    PyCppCallback(void* base_learner) : base_learner(base_learner) {}
+    PyCppCallback(void* base_learner, multi_ex* examples) : base_learner(base_learner), examples(examples)
+    {
+      isMulti = true;
+    }
+
+    void CallBaseLearner(example_ptr ec, bool should_call_learn = true)
+    { 
+      if (!isMulti)
+      {
+        if (should_call_learn)
+          reinterpret_cast<VW::LEARNER::single_learner *>(this->base_learner)->learn(*ec.get());
+        else
+          reinterpret_cast<VW::LEARNER::single_learner *>(this->base_learner)->predict(*ec.get());
+      }
+    }
+
+    void CallMultiLearner(ExList example_list, bool should_call_learn = true)
+    { 
+      if (isMulti)
+      {
+        if (should_call_learn)
+          VW::LEARNER::multiline_learn_or_predict<true>(*reinterpret_cast<VW::LEARNER::multi_learner *>(base_learner), *examples, (*examples)[0]->ft_offset);
+        else
+          VW::LEARNER::multiline_learn_or_predict<false>(*reinterpret_cast<VW::LEARNER::multi_learner *>(base_learner), *examples, (*examples)[0]->ft_offset);
+      }
+    }
+};
+
 class PyCppBridge : public RED_PYTHON::ExternalBinding {
   private:
       py::object* py_reduction_impl;
@@ -291,12 +327,13 @@ class PyCppBridge : public RED_PYTHON::ExternalBinding {
         }
       }
 
+      // todo review if dont_delete_me is still needed with this refactor
       void ActualLearn(example* ec)
-      { this->call_py_impl_method("_learn_convenience", example_ptr(ec, dont_delete_me), py_cpp_bridge_ptr(this, dont_delete_me));
+      { this->call_py_impl_method("_learn_convenience", example_ptr(ec, dont_delete_me), py_cpp_callback_ptr(new PyCppCallback(base_learner), dont_delete_me));
       }
 
       void ActualPredict(example* ec)
-      { this->call_py_impl_method("_predict_convenience", example_ptr(ec, dont_delete_me), py_cpp_bridge_ptr(this, dont_delete_me));
+      { this->call_py_impl_method("_predict_convenience", example_ptr(ec, dont_delete_me), py_cpp_callback_ptr(new PyCppCallback(base_learner), dont_delete_me));
       }
 
       void ActualFinishExample(example* ec)
@@ -314,13 +351,13 @@ class PyCppBridge : public RED_PYTHON::ExternalBinding {
       void ActualLearn(multi_ex* examples)
       { 
         ExList list = multi_ex_to_boost(examples);
-        this->call_py_impl_method("_learn_convenience", list, py_cpp_bridge_ptr(this, dont_delete_me));
+        this->call_py_impl_method("_learn_convenience", list, py_cpp_callback_ptr(new PyCppCallback(base_learner, examples), dont_delete_me));
       }
 
       void ActualPredict(multi_ex* examples)
       { 
         ExList list = multi_ex_to_boost(examples);
-        this->call_py_impl_method("_predict_convenience", list, py_cpp_bridge_ptr(this, dont_delete_me));
+        this->call_py_impl_method("_predict_convenience", list, py_cpp_callback_ptr(new PyCppCallback(base_learner, examples), dont_delete_me));
       }
 
       void ActualFinishExample(multi_ex* examples)
@@ -343,11 +380,11 @@ class PyCppBridge : public RED_PYTHON::ExternalBinding {
       // 3. keep track of the multi_ex copy of the vector<boost pointer> copy (to avoid another copy)
       //          both lists points to the same elements unless end user adds or removes
       //          if that's the case we need to be able to override and force a copy
-      void CallBaseLearner(example* ec, bool should_call_learn = true)
+      void CallBaseLearner(example_ptr ec, bool should_call_learn = true)
       { if (should_call_learn)
-          reinterpret_cast<VW::LEARNER::single_learner *>(this->base_learner)->learn(*ec);
+          reinterpret_cast<VW::LEARNER::single_learner *>(this->base_learner)->learn(*ec.get());
         else
-          reinterpret_cast<VW::LEARNER::single_learner *>(this->base_learner)->predict(*ec);
+          reinterpret_cast<VW::LEARNER::single_learner *>(this->base_learner)->predict(*ec.get());
       }
 };
 
@@ -1252,8 +1289,9 @@ BOOST_PYTHON_MODULE(pylibvw)
   .def("call_a", &OptionManager::do_something, py::return_value_policy<py::return_by_value>(), "do something")
   ;
 
-  py::class_<PyCppBridge, py_cpp_bridge_ptr>("reduction_bridge", py::no_init)
-  .def("call_base_learner", &PyCppBridge::CallBaseLearner, "Call into the current base learner set in the bridge (you don't want to call this yourself!")
+  py::class_<PyCppCallback, py_cpp_callback_ptr>("pycpp_callback", py::no_init)
+  .def("call_base_learner", &PyCppCallback::CallBaseLearner, "Callback used for custom python reductions. See Copperhead. (you don't want to call this yourself!")
+  .def("call_multi_learner", &PyCppCallback::CallMultiLearner, "Callback used for custom python reductions. See Copperhead. (you don't want to call this yourself!")
   ;
 
   py::class_<Search::search, search_ptr>("search")

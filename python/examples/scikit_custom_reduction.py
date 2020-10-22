@@ -73,7 +73,7 @@ class ScikitGDReduction(pyvw.Copperhead):
         else:
             s = pickle.dumps(self.classifier)
             print(f'saving {read} {text}')
-            print(s)
+            # print(s)
 
     # todo saving and loading
     #  vw vs on python (give me away of loading this thing)

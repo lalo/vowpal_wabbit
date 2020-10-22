@@ -96,6 +96,12 @@ class Learner:
     def predict(self, ec):
         self.vwCppBridge.call_base_learner(ec, False)
 
+    def multi_learn(self, examples, offset, id = 0):
+        self.vwCppBridge.call_multi_learner(examples, True)
+
+    def multi_predict(self, examples, offset, id = 0):
+        self.vwCppBridge.call_multi_learner(examples, False)
+
 # compatible with Python 2 *and* 3
 ABC = abc.ABCMeta('ABC', (object,), {'__slots__': ()})
 

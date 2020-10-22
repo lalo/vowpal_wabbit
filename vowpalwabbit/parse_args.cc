@@ -1494,7 +1494,8 @@ void parse_reductions(options_i& options, vw& all)
   // this string can be a constant under audit_regressor.h
   all.reduction_stack.push("audit_regressor");
   //temp this will be removed
-  //all.reduction_stack.push("custom_python_reduction");
+  // if (!python_base_reduction)
+  //   all.reduction_stack.push("custom_python_reduction");
 
 
 //&"gd", "scorer", "custom_python_reduction"

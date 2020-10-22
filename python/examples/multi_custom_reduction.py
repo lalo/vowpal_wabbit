@@ -10,9 +10,11 @@ class MultiReduction(pyvw.Copperhead):
         print("reduction init post vw init")
 
     def _predict(self, examples, learner):
+        # learner.multi_predict(examples, ..)
         print("predicting")
 
     def _learn(self, examples, learner):
+        # learner.multi_learn(examples, ..)
         print("learning")
 
 def sanity_check():
