@@ -271,6 +271,9 @@ class PyCppCallback {
       }
     }
 
+    // 3. keep track of the multi_ex copy of the vector<boost pointer> copy (to avoid another copy)
+    //          both lists points to the same elements unless end user adds or removes
+    //          if that's the case we need to be able to override and force a copy
     void CallMultiLearner(ExList example_list, bool should_call_learn = true)
     { 
       if (isMulti)
@@ -372,19 +375,6 @@ class PyCppBridge : public RED_PYTHON::ExternalBinding {
 
       void SetBaseLearner(void* learner)
       { this->base_learner = learner;
-      }
-
-      // this has to evolve to its own class
-      // 1. keep track if its single or multi
-      // 2. keep track if its learning or predicting
-      // 3. keep track of the multi_ex copy of the vector<boost pointer> copy (to avoid another copy)
-      //          both lists points to the same elements unless end user adds or removes
-      //          if that's the case we need to be able to override and force a copy
-      void CallBaseLearner(example_ptr ec, bool should_call_learn = true)
-      { if (should_call_learn)
-          reinterpret_cast<VW::LEARNER::single_learner *>(this->base_learner)->learn(*ec.get());
-        else
-          reinterpret_cast<VW::LEARNER::single_learner *>(this->base_learner)->predict(*ec.get());
       }
 };
 
