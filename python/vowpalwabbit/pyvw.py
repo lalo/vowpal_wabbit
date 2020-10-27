@@ -102,6 +102,14 @@ class Learner:
     def multi_predict(self, examples, offset, id = 0):
         self.vwCppBridge.call_multi_learner(examples, False)
 
+class ModelIO:
+    def __init__(self, vwCppBridge):
+        self.vwCppBridge = vwCppBridge
+
+    # (char* data, size_t len, const char* read_message, bool read, std::stringstream& msg, bool text)
+    def read_write(self):
+        print("read and writing")
+
 # compatible with Python 2 *and* 3
 ABC = abc.ABCMeta('ABC', (object,), {'__slots__': ()})
 
@@ -131,8 +139,11 @@ class Copperhead(ABC):
     # this method should be implemented only if needed
     # read and text are booleans
     @no_impl
-    def _save_load(self, read, text):
+    def _save_load(self, read, text, modelIO):
         pass
+
+    def _save_load_convenience(self, read, text, vwbridge):
+        self._save_load(read, text, ModelIO(vwbridge))
 
     # private functions end user
     def _learn_convenience(self, ec, vwbridge):

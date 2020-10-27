@@ -65,7 +65,8 @@ class ScikitGDReduction(pyvw.Copperhead):
             sample_weight = [ ec.get_simplelabel_weight() ])
 
     # see https://scikit-learn.org/stable/modules/model_persistence.html
-    def _save_load(self, read, text):
+    def _save_load(self, read, text, modelIO):
+        modelIO.read_write()
         import pickle
         if read:
             print(f'loading {read} {text}')

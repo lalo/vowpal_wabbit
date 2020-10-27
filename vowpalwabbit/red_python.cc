@@ -51,7 +51,7 @@ void finish_multiex(vw& all, ExternalBinding& external_binding, multi_ex& exampl
 }
 
 void save_load(ExternalBinding& external_binding, io_buf& model_file, bool read, bool text) {
-  external_binding.ActualSaveLoad(read, text);
+  external_binding.ActualSaveLoad(&model_file, read, text);
 }
 
 }  // namespace RED_PYTHON

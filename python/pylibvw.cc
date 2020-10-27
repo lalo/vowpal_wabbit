@@ -250,11 +250,15 @@ py::object OptionManager::do_also<VW::config::typelist<>>(VW::config::base_optio
 class PyCppCallback {
   private:
     void* base_learner;
+
     bool isMulti = false;
     multi_ex* examples = nullptr;
 
+    io_buf* model_file = nullptr;
+
   public:
     PyCppCallback(void* base_learner) : base_learner(base_learner) {}
+    PyCppCallback(io_buf* model_file) : model_file(model_file) {}
     PyCppCallback(void* base_learner, multi_ex* examples) : base_learner(base_learner), examples(examples)
     {
       isMulti = true;
@@ -369,8 +373,8 @@ class PyCppBridge : public RED_PYTHON::ExternalBinding {
         this->call_py_impl_method("_finish_example", list);
       }
       
-      void ActualSaveLoad(bool read, bool text)
-      { this->call_py_impl_method("_save_load", read, text);
+      void ActualSaveLoad(io_buf* model_file, bool read, bool text)
+      { this->call_py_impl_method("_save_load_convenience", read, text, py_cpp_callback_ptr(new PyCppCallback(model_file)));
       }
 
       void SetBaseLearner(void* learner)

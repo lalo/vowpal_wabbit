@@ -1411,7 +1411,7 @@ void parse_reductions(options_i& options, vw& all)
     {"custom_python_base_reduction", red_python_base_setup}
   };
 
-  bool python_base_reduction = false;
+  bool python_base_reduction = true;
 
   // Base algorithms
   if (python_base_reduction)
