@@ -10,10 +10,47 @@ class MultiReduction(pyvw.Copperhead):
         print("reduction init post vw init")
 
     def _predict(self, examples, learner):
-        # learner.multi_predict(examples, ..)
-        print("predicting")
+        #print("predicting as usual / identity")
+        learner.multi_predict(examples)
 
+    # during predict you are the identity reduction
+    # during learn you do something else:
+    # run on top of cb_adf
+    # call base predict, you get a best action ("first action returned")
+    # logged probability
+    # w = importance weight equals:
+        # 0 if logged action != best action
+        # 1/(logged probability) if logged action == best action
+    # r = reward is also in the log
+    # maintain a list of historical (w, r) pairs
     def _learn(self, examples, learner):
+        learner.multi_predict(examples)
+
+        example_with_label, labelled_action = examples.get_example_with_label()
+
+        if labelled_action != -1:
+            print(labelled_action)
+
+            logged_cost = example_with_label.get_cbandits_cost(0)
+            logged_prob = example_with_label.get_cbandits_probability(0)
+
+            action_scores = examples[0].get_action_scores()
+
+            # using cb_adf: first action is best
+            chosen_action = action_scores[0]
+
+            if chosen_action != labelled_action:
+                w = 0
+            else:
+                w = 1 / logged_prob
+            r = -logged_cost
+
+            print(f'w {w}')
+            print(f'r {r}')
+
+            # TODO mantain list 
+
+
         # learner.multi_learn(examples, ..)
         print("learning")
 

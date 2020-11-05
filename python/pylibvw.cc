@@ -904,6 +904,22 @@ float ex_get_cbandits_cost(example_ptr ec, uint32_t i) { return ec->l.cb.costs[i
 uint32_t ex_get_cbandits_class(example_ptr ec, uint32_t i) { return ec->l.cb.costs[i].action; }
 float ex_get_cbandits_probability(example_ptr ec, uint32_t i) { return ec->l.cb.costs[i].probability; }
 float ex_get_cbandits_partial_prediction(example_ptr ec, uint32_t i) { return ec->l.cb.costs[i].partial_prediction; }
+// example_ptr examples_get_cb_label_from_adf(ExList examples)
+py::tuple examples_get_cb_label_from_adf(ExList examples)
+{ 
+  auto it = std::find_if(examples.begin(), examples.end(), [](example_ptr &ex) { return !(ex->l.cb.costs.empty()); });
+  if( it != examples.end())
+  {
+    u_int32_t labelled_action = static_cast<uint32_t>(std::distance(examples.begin(), it));
+    return py::make_tuple(*it, labelled_action);
+    // return *it;
+  }
+  else
+  {
+    return py::make_tuple(py::object(), -1);
+    //return example_ptr();
+  }
+}
 
 // example_counter is being overriden by lableType!
 size_t   get_example_counter(example_ptr ec) { return ec->example_counter; }
@@ -1255,7 +1271,8 @@ BOOST_PYTHON_MODULE(pylibvw)
 
   // equivalent to multi_ex, might be a bit more efficient
   py::class_<ExList>("ExList")
-    .def(py::vector_indexing_suite<ExList>() );
+    .def(py::vector_indexing_suite<ExList>() )
+    .def("get_example_with_label", &examples_get_cb_label_from_adf, "Assuming a contextual_bandits label type,");
 
   py::class_<Search::predictor, predictor_ptr>("predictor", py::no_init)
   .def("set_input", &my_set_input, "set the input (an example) for this predictor (non-LDF mode only)")
