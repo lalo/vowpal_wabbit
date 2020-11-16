@@ -82,50 +82,58 @@ class MultiReduction(pyvw.Copperhead):
         print("learning")
 
     @staticmethod
-    def islowerbound(counts, wmin, wmax, coverage=0.9):
-        from math import fsum
+    def islowerbound(wrs, wmin, wmax, coverage=0.9):
         import numpy as np
-        
+
         assert 0 <= wmin < 1
         assert wmax > 1
 
         np.seterr(invalid='raise')
-        
-        n = fsum(c for _, c in counts.items())
-        
-        if n <= 1 or fsum( (c/n) * w * r for (w, r), c in counts.items() ) <= 0:
-            return { 'vhat': 0 }
-        
+
+        # massage into IS form
+
+        dataset = lambda: wrs
+        N = len(wrs)
+
         # solve MLE
         if True:
             from scipy import optimize
+            assert all(wmin <= w <= wmax for w, _ in dataset()), (min(w for w, _ in dataset()), max(w for w, _ in dataset()))
             def dual(beta):
-                return -fsum((c/n) * np.log(1 + beta * (w - 1)) for (w, _), c in counts.items())
-            betamin = (1e-5 - 1) / (wmax - 1)
-            betamax = (1 - 1e-5) / (1 - wmin)
+                from math import fsum
+                # example histogram version
+                #return -fsum((c/N) * np.log(1 + beta * (w - 1)) for (w, r), c in dataset())
+                return -fsum((1/N) * np.log(1 + beta * (w - 1)) for w, _ in dataset())
+            betamin = 1e-6 - 1/(wmax - 1)
+            betamax = -1e-6 + 1/(1 - wmin)
             res = optimize.minimize_scalar(fun=dual, method='bounded', bounds=(betamin, betamax))
             assert res.success, ('MLE', res)
             phiminusallentropy = res.fun
             betamle = res.x
 
         # solve bound
-        if True:
+        if True:    
             from scipy.stats import f
             from cvxopt import solvers, matrix
 
-            Delta = 0.5 * f.isf(q=1.0-coverage, dfn=1, dfd=n-1) / n
+            assert all(0 <= r for _, r in dataset()), (min(r for _, r in dataset()), max(r for _, r in dataset()))
+
+            Delta = 0.5 * f.isf(q=1.0-coverage, dfn=1, dfd=N-1) / N
             phi = phiminusallentropy - Delta
 
+            x0 = np.array([ 1.0, 1.0 - betamle, betamle ])
+
             def negdualobjective(p):
+                from math import fsum
                 from scipy import special 
 
                 (kappa, alpha, beta) = p[0], p[1], p[2]
 
-                return - (   fsum( (c/n) * w * r for (w, r), c in counts.items() ) 
-                        + beta * (-1 + fsum( (c/n) * w for (w, r), c in counts.items() )) 
-                        + kappa * phi
-                        - fsum( (c/n) * special.kl_div(kappa, alpha + beta * w + w * r) for (w, r), c in counts.items() )
-                        )
+                return - ( fsum( (1/N) * w * r for w, r in dataset() ) + 
+                           beta * (-1 + sum((1/N) * w for w, r in dataset())) + 
+                           kappa * phi
+                           - fsum( (1/N) * special.kl_div(kappa, alpha + beta * w + w * r) for w, r in dataset() )
+                         )
 
             def dkldivdx(x, y):
                 # x log(x/y) - x + y
@@ -135,14 +143,14 @@ class MultiReduction(pyvw.Copperhead):
                 return 1 - x / y
 
             def jacnegdualobjective(p):
+                from math import fsum
+
                 (kappa, alpha, beta) = p[0], p[1], p[2]
                 jacobj = np.empty(3)
 
-                jacobj[0] = -phi + fsum( (c/n) * dkldivdx(kappa, alpha + beta * w + w * r) for (w, r), c in counts.items() )
-                jacobj[1] = fsum( (c/n) * dkldivdy(kappa, alpha + beta * w + w * r) for (w, r), c in counts.items() )
-                jacobj[2] = -(-1 + fsum( (c/n) * w for (w, r), c in counts.items() ) 
-                            - fsum( (c/n) * w * dkldivdy(kappa, alpha + beta * w + w * r) for (w, r), c in counts.items() )
-                            )
+                jacobj[0] = -phi + fsum( (1/N) * dkldivdx(kappa, alpha + beta * w + w * r) for w, r in dataset() )
+                jacobj[1] = fsum( (1/N) * dkldivdy(kappa, alpha + beta * w + w * r) for w, r in dataset() )
+                jacobj[2] = -(-1 + fsum( (1/N) * w for w, r in dataset() )) + fsum( (1/N) * w * dkldivdy(kappa, alpha + beta * w + w * r) for w, r in dataset() )
 
                 return jacobj
 
@@ -156,29 +164,30 @@ class MultiReduction(pyvw.Copperhead):
                 return x / y**2
 
             def hessnegdualobjective(p):
+                from math import fsum
+
                 (kappa, alpha, beta) = p[0], p[1], p[2]
                 hessobj = np.empty((3, 3))
 
-                hessobj[0][0] = fsum( (c/n) * d2kldivdx2(kappa, alpha + beta * w + w * r) for (w, r), c in counts.items() )
-                hessobj[0][1] = fsum( (c/n) * d2kldivdxdy(kappa, alpha + beta * w + w * r) for (w, r), c in counts.items() )
-                hessobj[0][2] = fsum( (c/n) * w * d2kldivdxdy(kappa, alpha + beta * w + w * r) for (w, r), c in counts.items() )
+                hessobj[0][0] = fsum( (1/N) * d2kldivdx2(kappa, alpha + beta * w + w * r) for w, r in dataset() )
+                hessobj[0][1] = fsum( (1/N) * d2kldivdxdy(kappa, alpha + beta * w + w * r) for w, r in dataset() )
+                hessobj[0][2] = fsum( (1/N) * w * d2kldivdxdy(kappa, alpha + beta * w + w * r) for w, r in dataset() )
                 hessobj[1][0] = hessobj[0][1]
-                hessobj[1][1] = fsum( (c/n) * d2kldivdy2(kappa, alpha + beta * w + w * r) for (w, r), c in counts.items() )
-                hessobj[1][2] = fsum( (c/n) * w * d2kldivdy2(kappa, alpha + beta * w + w * r) for (w, r), c in counts.items() )
+                hessobj[1][1] = fsum( (1/N) * d2kldivdy2(kappa, alpha + beta * w + w * r) for w, r in dataset() )
+                hessobj[1][2] = fsum( (1/N) * w * d2kldivdy2(kappa, alpha + beta * w + w * r) for w, r in dataset() )
                 hessobj[2][0] = hessobj[0][2]
                 hessobj[2][1] = hessobj[1][2]
-                hessobj[2][2] = fsum( (c/n) * w**2 * d2kldivdy2(kappa, alpha + beta * w + w * r) for (w, r), c in counts.items() )
+                hessobj[2][2] = fsum( (1/N) * w**2 * d2kldivdy2(kappa, alpha + beta * w + w * r) for w, r in dataset() )
 
                 return hessobj
 
-            tiny = 1e-5
-            x0 = np.array([ 1.0, 1.0 - betamle, betamle ])
+            tiny = 1e-6
             def F(x=None, z=None):
                 if x is None: return 0, matrix(x0)
 
                 kappa, alpha, beta = x[0], x[1], x[2]
 
-                if kappa < tiny or any(alpha + beta * w + w * r < tiny for (w, r), c in counts.items() ):
+                if kappa < tiny or any(alpha + beta * w + w * r < tiny for w, r in dataset()):
                     return None
 
                 f = negdualobjective(x)
@@ -190,20 +199,20 @@ class MultiReduction(pyvw.Copperhead):
                 return f, Df, H
 
             consE = np.array([ [ 1.0, 0.0, 0.0 ],
-                            [ 0.0, 1.0, wmin ],
-                            [ 0.0, 1.0 / wmax, 1.0 ],
-                            ])
-            d = np.array([ tiny, tiny, tiny / wmax ])
+                               [ 0.0, 1.0, wmin ],
+                               [ 0.0, 1.0, wmax ]
+                             ])
+            d = np.array([ tiny, tiny, tiny ])
 
             soln = solvers.cp(F,
-                            G = -matrix(consE, consE.shape),
-                            h = -matrix(d),
-                            options = { 'show_progress': False })
+                              G = -matrix(consE, consE.shape),
+                              h = -matrix(d),
+                              options = { 'show_progress': False })
 
             from pprint import pformat
             assert soln['status'] == 'optimal', pformat(soln)
             kappastar, alphastar, betastar = soln['x']
-            vhat = -soln['primal objective'] 
+            vhat = -soln['primal objective']
 
         pstarfunc = lambda w, r: kappastar / (alphastar + betastar * (w - 1) + w * r)
 
