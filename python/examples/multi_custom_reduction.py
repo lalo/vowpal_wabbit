@@ -1,11 +1,13 @@
 import sys, os
+import numpy as np
 
 from vowpalwabbit import pyvw
+# from collections import namedtuple
 
 class MultiReduction(pyvw.Copperhead):
     def __init__(self):
         super(MultiReduction, self).__init__()
-        self.allwrs = []
+        self.allwrs = {}
         self.wmax = 2
 
     def reduction_init(self, vw):
@@ -48,8 +50,8 @@ class MultiReduction(pyvw.Copperhead):
             # r = -logged_cost
             r = 1.5 - logged_cost
 
-            print(f'w {w}')
-            print(f'r {r}')
+            # print(f'w {w}')
+            # print(f'r {r}')
 
             # TODO: this will get butt slow after a while
             # the fix is to approximate the history with a histogram of ((w, r), c) i.e. a count for each (w, r) pair
@@ -62,7 +64,20 @@ class MultiReduction(pyvw.Copperhead):
             # TIP #2: discretize on log(1+w) rather than w
             #         np.log(np.geomspace(1, wmax + 1, 50)) => array of 50 points in log(1+w) space
 
-            self.allwrs.append((w, r))
+            wprime = int(20 * np.log1p(w))/20
+            # decode h = np.expm1(wprime)
+
+            if abs(r) < 1:
+                r = round(r)
+
+            temp = (wprime, r)
+
+            if temp in self.allwrs:
+               self.allwrs[temp] = self.allwrs[temp] + 1
+            else:
+                self.allwrs[temp] = 1
+
+            # self.allwrs.append((w, r))
             self.wmax = max(self.wmax, w)
             if w > 0 and len(self.allwrs) > 1:
                 lb = MultiReduction.islowerbound(self.allwrs, 0, self.wmax)
@@ -84,7 +99,6 @@ class MultiReduction(pyvw.Copperhead):
     @staticmethod
     def islowerbound(counts, wmin, wmax, coverage=0.9):
         from math import fsum
-        import numpy as np
         
         assert 0 <= wmin < 1
         assert wmax > 1
