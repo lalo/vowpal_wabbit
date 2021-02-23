@@ -29,4 +29,4 @@ fi
 
 docker --version
 sudo docker login perrlbousweppeacr.azurecr.io --username perrlbousweppeacr --password $ppid
-sudo docker pull perrlbousweppeacr.azurecr.io/personalization-rlbakeoff-experiment-vw
+sudo docker pull perrlbousweppeacr.azurecr.io/personalization-rlbakeoff-experiment-vw:8.9.0
