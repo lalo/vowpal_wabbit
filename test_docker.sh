@@ -28,5 +28,5 @@ if [ ! -f $INSTALL_MARKER_FILE ]; then
 fi
 
 docker --version
-docker login perrlbousweppeacr.azurecr.io --username perrlbousweppeacr --password $ppid
-docker pull perrlbousweppeacr.azurecr.io/personalization-rlbakeoff-experiment-vw
+sudo docker login perrlbousweppeacr.azurecr.io --username perrlbousweppeacr --password $ppid
+sudo docker pull perrlbousweppeacr.azurecr.io/personalization-rlbakeoff-experiment-vw
