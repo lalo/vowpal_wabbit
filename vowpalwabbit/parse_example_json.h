@@ -1728,6 +1728,8 @@ bool parse_line_json(vw* all, char* line, size_t num_chars, v_array<example*>& e
       examples.push_back(&VW::get_unused_example(all));
       return false;
     }
+
+    all->metrics->LastEventId=interaction.eventId;
   }
   else
     VW::template read_line_json<audit>(

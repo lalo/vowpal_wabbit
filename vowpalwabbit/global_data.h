@@ -358,6 +358,7 @@ struct Metrics
   uint64_t number_examples_per_pass = 0;
   uint64_t total_feature_number = 0;
   uint64_t NumberOfSkippedEvents = 0;
+  std::string LastEventId = "";
 };
 
 struct vw

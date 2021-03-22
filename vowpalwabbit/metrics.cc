@@ -15,6 +15,8 @@ void Serialize(Writer<FileWriteStream>& writer, const Metrics& metrics) {
     writer.Int(metrics.total_feature_number);
     writer.Key("NumberOfSkippedEvents");
     writer.Int(metrics.NumberOfSkippedEvents);
+    writer.Key("LastEventId");
+    writer.String(metrics.LastEventId.c_str());
     writer.EndObject();
 }
 
