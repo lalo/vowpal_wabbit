@@ -13,6 +13,8 @@ void Serialize(Writer<FileWriteStream>& writer, const Metrics& metrics) {
     writer.Int(metrics.number_examples_per_pass);
     writer.Key("number_of_features");
     writer.Int(metrics.total_feature_number);
+    writer.Key("NumberOfSkippedEvents");
+    writer.Int(metrics.NumberOfSkippedEvents);
     writer.EndObject();
 }
 
