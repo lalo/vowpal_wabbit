@@ -1726,6 +1726,7 @@ bool parse_line_json(vw* all, char* line, size_t num_chars, v_array<example*>& e
     {
       VW::return_multiple_example(*all, examples);
       examples.push_back(&VW::get_unused_example(all));
+      all->metrics->NumberOfDanglingObservations++;
       return false;
     }
 

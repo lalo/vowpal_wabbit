@@ -17,6 +17,8 @@ void Serialize(Writer<FileWriteStream>& writer, const Metrics& metrics) {
     writer.Int(metrics.NumberOfSkippedEvents);
     writer.Key("LastEventId");
     writer.String(metrics.LastEventId.c_str());
+    writer.Key("NumberOfDanglingObservations");
+    writer.Int(metrics.NumberOfDanglingObservations);
     writer.EndObject();
 }
 
