@@ -1709,6 +1709,13 @@ bool parse_line_json(vw* all, char* line, size_t num_chars, v_array<example*>& e
     DecisionServiceInteraction interaction;
     VW::template read_line_decision_service_json<audit>(*all, examples, line, num_chars, false,
         reinterpret_cast<VW::example_factory_t>(&VW::get_unused_example), all, &interaction);
+      
+    if (all->metrics->NumberOfEvents == 0)
+      all->metrics->FirstEventId=interaction.eventId;
+
+    all->metrics->NumberOfEvents++;
+
+    all->metrics->LastEventId=interaction.eventId;
 
     // TODO: In refactoring the parser to be usable standalone, we need to ensure that we
     // stop suppressing "skipLearn" interactions. Also, not sure if this is the right logic
@@ -1729,8 +1736,6 @@ bool parse_line_json(vw* all, char* line, size_t num_chars, v_array<example*>& e
       all->metrics->NumberOfDanglingObservations++;
       return false;
     }
-
-    all->metrics->LastEventId=interaction.eventId;
   }
   else
     VW::template read_line_json<audit>(
