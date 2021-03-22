@@ -142,6 +142,7 @@ set(vw_all_headers
   multilabel_oaa.h
   multilabel.h
   mwt.h
+  metrics.h
   numeric_casts.h
   named_labels.h
   network.h
@@ -296,6 +297,7 @@ set(vw_all_sources
   multilabel_oaa.cc
   multilabel.cc
   mwt.cc
+  metrics.cc
   named_labels.cc
   network.cc
   kskip_ngram_transformer.cc

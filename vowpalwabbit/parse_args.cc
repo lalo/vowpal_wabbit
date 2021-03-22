@@ -102,6 +102,7 @@
 #include "sample_pdf.h"
 #include "named_labels.h"
 #include "kskip_ngram_transformer.h"
+#include "metrics.h"
 
 #include "io/io_adapter.h"
 #include "io/custom_streambuf.h"
@@ -1934,6 +1935,10 @@ void sync_stats(vw& all)
 
 void finish(vw& all, bool delete_all)
 {
+  all.metrics->number_examples_per_pass = all.sd->example_number;
+  all.metrics->total_feature_number = all.sd->total_features;
+  metrics_to_file(*all.metrics);
+
   // also update VowpalWabbit::PerformanceStatistics::get() (vowpalwabbit.cpp)
   if (!all.logger.quiet && !all.options->was_supplied("audit_regressor"))
   {

@@ -353,6 +353,12 @@ struct trace_message_wrapper
   ~trace_message_wrapper() = default;
 };
 
+struct Metrics
+{
+  uint64_t number_examples_per_pass = 0;
+  uint64_t total_feature_number = 0;
+};
+
 struct vw
 {
 private:
@@ -548,6 +554,8 @@ public:
   float progress_arg;  // next update progress dump multiplier
 
   std::map<uint64_t, std::string> index_name_map;
+
+  std::unique_ptr<Metrics> metrics;
 
   vw();
   ~vw();

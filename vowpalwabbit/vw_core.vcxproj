@@ -212,6 +212,7 @@
     <ClInclude Include="multilabel_oaa.h" />
     <ClInclude Include="multilabel.h" />
     <ClInclude Include="mwt.h" />
+    <ClInclude Include="metrics.h" />
     <ClInclude Include="named_labels.h" />
     <ClInclude Include="network.h" />
     <ClInclude Include="nn.h" />
@@ -365,6 +366,7 @@
     <ClCompile Include="multilabel_oaa.cc" />
     <ClCompile Include="multilabel.cc" />
     <ClCompile Include="mwt.cc" />
+    <ClCompile Include="metrics.cc" />
     <ClCompile Include="named_labels.cc" />
     <ClCompile Include="network.cc" />
     <ClCompile Include="nn.cc" />

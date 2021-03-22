@@ -364,6 +364,7 @@ vw::vw() : options(nullptr, nullptr)
   sd->report_multiclass_log_loss = false;
   sd->multiclass_log_loss = 0;
   sd->holdout_multiclass_log_loss = 0;
+  metrics = std::unique_ptr<Metrics>(new Metrics());
 }
 VW_WARNING_STATE_POP
 
