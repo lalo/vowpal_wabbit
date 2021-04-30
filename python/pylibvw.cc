@@ -420,6 +420,36 @@ vw_ptr my_initialize_with_log(std::string args, py_log_wrapper_ptr py_log)
   return boost::shared_ptr<vw>(foo);
 }
 
+vw_ptr my_initialize_with_pyred(std::string args, py_log_wrapper_ptr py_log,  py::object with_reduction)
+{
+  if (args.find_first_of("--no_stdin") == std::string::npos) args += " --no_stdin";
+
+  trace_message_t trace_listener = nullptr;
+  void* trace_context = nullptr;
+
+  if (py_log)
+  {
+    trace_listener = (py_log_wrapper::trace_listener_py);
+    trace_context = py_log.get();
+  }
+
+  vw* foo;
+
+  if (with_reduction)
+  { 
+    //auto ext_binding = scoped_calloc_or_throw<RED_PYTHON::ExternalBinding>(new PyCppBridge(&with_reduction));
+    auto ext_binding = std::unique_ptr<RED_PYTHON::ExternalBinding>(new PyCppBridge(&with_reduction));
+    foo = VW::initialize_with_reduction(args, nullptr, false, trace_listener, trace_context, std::move(ext_binding));
+  }
+  else
+  {
+    foo = VW::initialize(args, nullptr, false, trace_listener, trace_context);
+  }
+
+  // return boost::shared_ptr<vw>(foo, [](vw *all){VW::finish(*all);});
+  return boost::shared_ptr<vw>(foo);
+}
+
 vw_ptr my_initialize(std::string args) { return my_initialize_with_log(args, nullptr); }
 
 void my_run_parser(vw_ptr all)
@@ -1314,6 +1344,7 @@ BOOST_PYTHON_MODULE(pylibvw)
       "vw", "the basic VW object that holds with weight vector, parser, etc.", py::no_init)
       .def("__init__", py::make_constructor(my_initialize))
       .def("__init__", py::make_constructor(my_initialize_with_log))
+      .def("__init__", py::make_constructor(my_initialize_with_pyred))
       //      .def("__del__", &my_finish, "deconstruct the VW object by calling finish")
       .def("run_parser", &my_run_parser, "parse external data file")
       .def("finish", &my_finish, "stop VW by calling finish (and, eg, write weights to disk)")
@@ -1405,6 +1436,7 @@ BOOST_PYTHON_MODULE(pylibvw)
       .def("get_updated_prediction", &get_updated_prediction,
           "Returns the partial prediction as if we had updated it after learning")
       .def("get_loss", &get_loss, "Returns the loss associated with this example")
+      .def("set_loss", &set_loss, "Sets the loss associated with this example")
       .def("get_total_sum_feat_sq", &get_total_sum_feat_sq, "The total sum of feature-value squared for this example")
 
       .def("num_namespaces", &ex_num_namespaces, "The total number of namespaces associated with this example")
@@ -1436,12 +1468,15 @@ BOOST_PYTHON_MODULE(pylibvw)
           "Assuming a simple_label label type, return the initial (baseline) prediction")
       .def("get_simplelabel_prediction", &ex_get_simplelabel_prediction,
           "Assuming a simple_label label type, return the final prediction")
+      .def("set_simplelabel_prediction", &ex_set_simplelabel_prediction,
+          "Assuming a simple_label label type, set the final prediction")
       .def("get_multiclass_label", &ex_get_multiclass_label, "Assuming a multiclass label type, get the true label")
       .def("get_multiclass_weight", &ex_get_multiclass_weight,
           "Assuming a multiclass label type, get the importance weight")
       .def("get_multiclass_prediction", &ex_get_multiclass_prediction,
           "Assuming a multiclass label type, get the prediction")
       .def("get_prob", &ex_get_prob, "Get probability from example prediction")
+      .def("get_scalar", &ex_get_scalar, "Get scalar value from example prediction")
       .def("get_scalars", &ex_get_scalars, "Get scalar values from example prediction")
       .def("get_action_scores", &ex_get_action_scores, "Get action scores from example prediction")
       .def("get_decision_scores", &ex_get_decision_scores, "Get decision scores from example prediction")

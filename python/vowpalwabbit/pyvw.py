@@ -414,6 +414,8 @@ class vw(pylibvw.vw):
         if enable_logging:
             self.log_fwd = log_forward()
             self.log_wrapper = pylibvw.vw_log(self.log_fwd)
+        else:
+            self.log_wrapper = None
 
         # if self.log_wrapper:
         #     super(vw, self).__init__(" ".join(l), self.log_wrapper)
@@ -421,11 +423,11 @@ class vw(pylibvw.vw):
         #     super(vw, self).__init__(" ".join(l))
 
         if python_reduction is None:
-            super(vw, self).__init__(" ".join(l), None)
+            super(vw, self).__init__(" ".join(l), self.log_wrapper)
         else:
             if issubclass(python_reduction, Copperhead):
                 self._py_reduction = python_reduction()
-                super(vw, self).__init__(" ".join(l), self._py_reduction)
+                super(vw, self).__init__(" ".join(l), self.log_wrapper, self._py_reduction)
                 self._py_reduction.reduction_init(self)
             else:
                 raise TypeError("The python_reduction argument must be a class that inherits from Copperhead")

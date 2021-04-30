@@ -239,20 +239,41 @@ def noop_example():
 # this should match cpp_binary() output
 # mirror implementation of the cpp, runs in python see class impl BinaryPythonReductions
 def python_binary():
-    vw = pyvw.vw(python_reduction=BinaryPythonReduction, arg_str="--loss_function logistic --active_cover --oracular -d /root/vowpal_wabbit/test/train-sets/rcv1_small.dat")
-
+    vw = pyvw.vw(enable_logging=True, python_reduction=BinaryPythonReduction, arg_str="--loss_function logistic --active_cover --oracular -d /root/vowpal_wabbit/test/train-sets/rcv1_small.dat")
     vw.run_parser()
     vw.finish()
+    return vw.get_log()
 
 # this should be the baseline
 def cpp_binary():
-    vw = pyvw.vw("--loss_function logistic --binary --active_cover --oracular -d /root/vowpal_wabbit/test/train-sets/rcv1_small.dat")
+    vw = pyvw.vw("--loss_function logistic --binary --active_cover --oracular -d /root/vowpal_wabbit/test/train-sets/rcv1_small.dat", enable_logging=True)
     vw.run_parser()
     vw.finish()
+    return vw.get_log()
 
-print("python")
-python_binary()
+# print("python")
+# python_binary()
 # print("noop")
 # noop_example()
-#print("cpp")
-cpp_binary()
+# print("cpp")
+# cpp_binary()
+
+import pytest
+import os
+print(os.getpid())
+
+def test_python_binary_reduction():
+    python_binary_log = python_binary()
+    native_binary_log = cpp_binary()
+    assert len(python_binary_log) == len(native_binary_log)
+
+    line_number = 0
+    for j, i in zip(python_binary_log, native_binary_log):
+        if line_number == 7:
+            assert "Enabled reductions" in j
+            assert "Enabled reductions" in i
+            line_number += 1
+            continue
+
+        assert i == j, "line mismatch should be: " + j + " output: " + i
+        line_number += 1
