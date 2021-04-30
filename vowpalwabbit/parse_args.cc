@@ -652,7 +652,7 @@ void parse_feature_tweaks(
                      "wildcard in S.")
                .keep())
       //check why default value is not set here as usual
-      .add(make_option("bit_precision", new_bits).default_value(18).short_name("b").help("number of bits in the feature table"))
+      .add(make_option("bit_precision", new_bits).short_name("b").help("number of bits in the feature table"))
       .add(make_option("noconstant", noconstant).help("Don't add a constant feature"))
       .add(make_option("constant", all.initial_constant).short_name("C").help("Set initial value of constant"))
       .add(make_option("ngram", ngram_strings)
