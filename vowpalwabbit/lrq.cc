@@ -97,8 +97,13 @@ void predict_or_learn(LRQstate& lrq, single_learner& base, example& ec)
             weight* lw = &lrq.all->weights[lwindex];
 
             // perturb away from saddle point at (0, 0)
-            if (is_learn && !example_is_test(ec) && *lw == 0)
-              *lw = cheesyrand(lwindex);  // not sure if lw needs a weight mask?
+            if (is_learn)
+            {
+              if (!example_is_test(ec) && *lw == 0)
+              {
+                *lw = cheesyrand(lwindex);  // not sure if lw needs a weight mask?
+              }
+            }
 
             features& right_fs = ec.feature_space[right];
             for (unsigned int rfn = 0; rfn < lrq.orig_size[right]; ++rfn)
@@ -154,7 +159,7 @@ void predict_or_learn(LRQstate& lrq, single_learner& base, example& ec)
       unsigned char right = i[(which + 1) % 2];
       ec.feature_space[right].truncate_to(lrq.orig_size[right]);
     }
-  }
+  }  // end for(max_iter)
 }
 
 base_learner* lrq_setup(options_i& options, vw& all)
@@ -178,8 +183,8 @@ base_learner* lrq_setup(options_i& options, vw& all)
 
   if (!all.logger.quiet)
   {
-    all.trace_message << "creating low rank quadratic features for pairs: ";
-    if (lrq->dropout) all.trace_message << "(using dropout) ";
+    *(all.trace_message) << "creating low rank quadratic features for pairs: ";
+    if (lrq->dropout) *(all.trace_message) << "(using dropout) ";
   }
 
   for (std::string const& i : lrq->lrpairs)
@@ -189,7 +194,7 @@ base_learner* lrq_setup(options_i& options, vw& all)
       if ((i.length() < 3) || !valid_int(i.c_str() + 2))
         THROW("error, low-rank quadratic features must involve two sets and a rank.");
 
-      all.trace_message << i << " ";
+      *(all.trace_message) << i << " ";
     }
     // TODO: colon-syntax
 
@@ -201,11 +206,12 @@ base_learner* lrq_setup(options_i& options, vw& all)
     maxk = std::max(k, k);
   }
 
-  if (!all.logger.quiet) all.trace_message << std::endl;
+  if (!all.logger.quiet) *(all.trace_message) << std::endl;
 
   all.wpp = all.wpp * (uint64_t)(1 + maxk);
-  learner<LRQstate, example>& l = init_learner(
-      lrq, as_singleline(setup_base(options, all)), predict_or_learn<true>, predict_or_learn<false>, 1 + maxk);
+  auto base = setup_base(options, all);
+  learner<LRQstate, example>& l = init_learner(lrq, as_singleline(base), predict_or_learn<true>,
+      predict_or_learn<false>, 1 + maxk, all.get_setupfn_name(lrq_setup), base->learn_returns_prediction);
   l.set_end_pass(reset_seed);
 
   // TODO: leaks memory ?

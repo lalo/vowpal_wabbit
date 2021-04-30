@@ -3,11 +3,11 @@
 // license as described in the file LICENSE.
 
 #ifdef _WIN32
-#define NOMINMAX
-#include <WinSock2.h>
+#  define NOMINMAX
+#  include <WinSock2.h>
 #else
-#include <sys/socket.h>
-#include <arpa/inet.h>
+#  include <sys/socket.h>
+#  include <arpa/inet.h>
 #endif
 #include <sys/timeb.h>
 #include "parse_args.h"
@@ -42,39 +42,6 @@ vw* setup(options_i& options)
   }
   all->vw_is_main = true;
 
-  auto skip_driver = options.get_typed_option<bool>("what_if").value();
-
-  /*
-  right now we are abusing the api, to generate the options but in theory we should seperate to
-  re-use same options and same vw without a delete could be added as experimental as a debugging tool
-  */
-  if (!all->logger.quiet && !options.was_supplied("audit_regressor") && !all->enabled_reductions.empty())
-  {
-    const char* const delim = ", ";
-    std::ostringstream imploded;
-    std::copy(all->enabled_reductions.begin(), all->enabled_reductions.end()-1, std::ostream_iterator<std::string>(imploded, delim));
-
-    all->trace_message << "Enabled reductions: " << imploded.str() << all->enabled_reductions.back() << std::endl;
-  }
-
-  if (!skip_driver && !all->logger.quiet && !all->bfgs && !all->searchstr && !options.was_supplied("audit_regressor"))
-  {
-    all->trace_message << std::left << std::setw(shared_data::col_avg_loss) << std::left << "average"
-                       << " " << std::setw(shared_data::col_since_last) << std::left << "since"
-                       << " " << std::right << std::setw(shared_data::col_example_counter) << "example"
-                       << " " << std::setw(shared_data::col_example_weight) << "example"
-                       << " " << std::setw(shared_data::col_current_label) << "current"
-                       << " " << std::setw(shared_data::col_current_predict) << "current"
-                       << " " << std::setw(shared_data::col_current_features) << "current" << std::endl;
-    all->trace_message << std::left << std::setw(shared_data::col_avg_loss) << std::left << "loss"
-                       << " " << std::setw(shared_data::col_since_last) << std::left << "last"
-                       << " " << std::right << std::setw(shared_data::col_example_counter) << "counter"
-                       << " " << std::setw(shared_data::col_example_weight) << "weight"
-                       << " " << std::setw(shared_data::col_current_label) << "label"
-                       << " " << std::setw(shared_data::col_current_predict) << "predict"
-                       << " " << std::setw(shared_data::col_current_features) << "features" << std::endl;
-  }
-
   return all;
 }
 
@@ -92,10 +59,7 @@ int main(int argc, char* argv[])
     if (argc == 3 && !std::strcmp(argv[1], "--args"))
     {
       std::fstream arg_file(argv[2]);
-      if (!arg_file)
-      {
-        THROW("Could not open file: " << argv[2]);
-      }
+      if (!arg_file) { THROW("Could not open file: " << argv[2]); }
 
       int line_count = 1;
       std::string line;
@@ -127,14 +91,11 @@ int main(int argc, char* argv[])
 
     vw& all = *alls[0];
 
-    auto skip_driver = all.options->get_typed_option<bool>("what_if").value();
+    auto skip_driver = all.options->get_typed_option<bool>("dry_run").value();
 
     if (skip_driver)
     {
-      for (vw* v : alls)
-      {
-        VW::finish(*v);
-      }
+      for (vw* v : alls) { VW::finish(*v); }
       return 0;
     }
 
@@ -157,10 +118,7 @@ int main(int argc, char* argv[])
 
     for (vw* v : alls)
     {
-      if (v->p->exc_ptr)
-      {
-        std::rethrow_exception(v->p->exc_ptr);
-      }
+      if (v->example_parser->exc_ptr) { std::rethrow_exception(v->example_parser->exc_ptr); }
 
       VW::sync_stats(*v);
       VW::finish(*v);
@@ -168,7 +126,8 @@ int main(int argc, char* argv[])
   }
   catch (VW::vw_exception& e)
   {
-    std::cerr << "vw (" << e.Filename() << ":" << e.LineNumber() << "): " << e.what() << std::endl;
+    // TODO: If loggers are instantiated within struct vw, this line lives outside of that. Log as critical for now
+    std::cerr << "[critical] vw (" << e.Filename() << ":" << e.LineNumber() << "): " << e.what() << std::endl;
     exit(1);
   }
   catch (std::exception& e)
@@ -177,7 +136,8 @@ int main(int argc, char* argv[])
     // error 'handling' everywhere.  To reduce stderr pollution
     // everything gets caught here & the error message is printed
     // sans the excess exception noise, and core dump.
-    std::cerr << "vw: " << e.what() << std::endl;
+    // TODO: If loggers are instantiated within struct vw, this line lives outside of that. Log as critical for now
+    std::cerr << "[critical] vw: " << e.what() << std::endl;
     // cin.ignore();
     exit(1);
   }

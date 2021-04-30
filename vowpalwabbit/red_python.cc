@@ -5,10 +5,10 @@
 #include "red_python.h"
 
 #include "reductions.h"
-#include "learner.h"
+// #include "learner.h"
 #include "vw.h"
 
-using namespace LEARNER;
+using namespace VW::LEARNER;
 using namespace VW::config;
 
 namespace RED_PYTHON
@@ -66,7 +66,7 @@ VW::LEARNER::base_learner* red_python_setup(options_i& options, vw& all)
   auto base = as_singleline(setup_base(options, all));
 
   VW::LEARNER::learner<ExternalBinding, example>& ret =
-      learner<ExternalBinding, example>::init_learner(all.ext_binding.get(), base, learn, predict, 1, base->pred_type);
+      learner<ExternalBinding, example>::init_learner(all.ext_binding.get(), base, learn, predict, 1, base->pred_type, all.get_setupfn_name(red_python_setup), base->learn_returns_prediction);
 
   if (all.ext_binding->ShouldRegisterFinishExample())
     ret.set_finish_example(finish_example);
@@ -91,7 +91,7 @@ VW::LEARNER::base_learner* red_python_multiline_setup(options_i& options, vw& al
   auto base = as_multiline(setup_base(options, all));
 
   VW::LEARNER::learner<ExternalBinding, multi_ex>& ret =
-      learner<ExternalBinding, multi_ex>::init_learner(all.ext_binding.get(), base, multi_learn, multi_predict, 1, prediction_type_t::action_probs);
+      learner<ExternalBinding, multi_ex>::init_learner(all.ext_binding.get(), base, multi_learn, multi_predict, 1, prediction_type_t::action_probs, all.get_setupfn_name(red_python_multiline_setup), base->learn_returns_prediction);
 
   if (all.ext_binding->ShouldRegisterFinishExample())
     ret.set_finish_example(finish_multiex);
@@ -119,7 +119,11 @@ VW::LEARNER::base_learner* red_python_base_setup(options_i& options, vw& all)
   //en parte de pyvw.cc agregar scoped calloc or throw porque esta cosa uqiere freeptr
   all.ext_binding->SetRandomNumber(4);
 
-  learner<ExternalBinding, example>& l = init_learner(all.ext_binding.get(), learn, predict, 1, prediction_type_t::scalar);
+  // learner<ExternalBinding, example>& l = init_learner(all.ext_binding.get(), learn, predict, 1, prediction_type_t::scalar, "", true);
+  learner<ExternalBinding, example>& l = init_learner_py(all.ext_binding.get(), learn, predict, 1, prediction_type_t::scalar, all.get_setupfn_name(red_python_base_setup), true);
+  // gd* bare = g.get();
+  // learner<gd, example>& ret = init_learner(
+  //     g, g->learn, bare->predict, ((uint64_t)1 << all.weights.stride_shift()), all.get_setupfn_name(setup), true);
 
   if (all.ext_binding->ShouldRegisterFinishExample())
     l.set_finish_example(finish_example);

@@ -11,16 +11,23 @@
 #include <iterator>
 #include <utility>
 
+#include <boost/exception/exception.hpp>
+#include <boost/throw_exception.hpp>
+
 using namespace VW::config;
+
+std::ostream& std::operator<<(std::ostream& os, const std::vector<bool>& vec)
+{
+  // The lack of & is the only different bit to the template in the header.
+  for (auto const item : vec) { os << item << ", "; }
+  return os;
+}
 
 bool is_number(const VW::string_view& s)
 {
   size_t endidx = 0;
   auto f = parseFloat(s.begin(), endidx, s.end());
-  if ((endidx == 0 && !s.empty()) || std::isnan(f))
-  {
-    return false;
-  }
+  if ((endidx == 0 && !s.empty()) || std::isnan(f)) { return false; }
 
   return true;
 }
@@ -31,9 +38,7 @@ po::typed_value<std::vector<bool>>* options_boost_po::convert_to_boost_value(std
   auto value = get_base_boost_value(opt);
 
   if (opt->default_value_supplied())
-  {
-    THROW("Using a bool option type acts as a switch, no explicit default value is allowed.")
-  }
+  { THROW("Using a bool option type acts as a switch, no explicit default value is allowed.") }
 
   value->default_value({false});
   value->zero_tokens();
@@ -48,21 +53,9 @@ void options_boost_po::add_to_description(
   add_to_description_impl<supported_options_types>(std::move(opt), options_description);
 }
 
-void options_boost_po::add_to_option_group_collection(const option_group_definition& group)
-{
-  if (m_option_group_dic.count(m_current_reduction_tint) > 0)
-  {
-    m_option_group_dic[m_current_reduction_tint].push_back(group);
-  }
-  else
-  {
-    m_option_group_dic.insert({m_current_reduction_tint, {group}});
-  }
-}
-
 void options_boost_po::add_and_parse(const option_group_definition& group)
 {
-  this->add_to_option_group_collection(group);
+  m_option_group_dic[m_current_reduction_tint].push_back(group);
 
   po::options_description new_options(group.m_name);
 
@@ -76,15 +69,16 @@ void options_boost_po::add_and_parse(const option_group_definition& group)
     // The last definition is kept. There was a bug where using .insert at a later pointer changed the command line but
     // the previously defined option's default value was serialized into the model. This resolves that state info.
     m_options[opt_ptr->m_name] = opt_ptr;
-
-    // only add to string when it's being defined
-    if (m_required_options.count(opt_ptr->m_name) || m_required_options.count(opt_ptr->m_short_name))
-    { this->insert(opt_ptr->m_name, m_required_options[opt_ptr->m_name]);
-    };
   }
 
-  // Add the help for the given options.
-  new_options.print(m_help_stringstream);
+  // setup functions can call multiply times into add_and_parse,
+  // we have to guard to avoid adding help multiple times
+  if (m_added_help_group_names.count(group.m_name) == 0)
+  {
+    // Add the help for the given options.
+    new_options.print(m_help_stringstream[m_current_reduction_tint]);
+    m_added_help_group_names.insert(group.m_name);
+  }
 
   try
   {
@@ -99,18 +93,12 @@ void options_boost_po::add_and_parse(const option_group_definition& group)
     {
       // If the supplied option is interpreted as a number, then ignore it. There are no options like this and it is
       // just a false positive.
-      if (is_number(option.string_key))
-      {
-        m_ignore_supplied.insert(option.string_key);
-      }
+      if (is_number(option.string_key)) { m_ignore_supplied.insert(option.string_key); }
 
       m_supplied_options.insert(option.string_key);
 
       // If a std::string is later determined to be a value the erase it. This happens for negative numbers "-2"
-      for (auto& val : option.value)
-      {
-        m_ignore_supplied.insert(val);
-      }
+      for (auto& val : option.value) { m_ignore_supplied.insert(val); }
 
       // Parsed options can contain short options in the form -k, we can only check these as the group definitions come
       // in.
@@ -119,10 +107,7 @@ void options_boost_po::add_and_parse(const option_group_definition& group)
         auto short_name = option.string_key.substr(1);
         for (const auto& opt_ptr : group.m_options)
         {
-          if (opt_ptr->m_short_name == short_name)
-          {
-            m_supplied_options.insert(short_name);
-          }
+          if (opt_ptr->m_short_name == short_name) { m_supplied_options.insert(short_name); }
         }
       }
     }
@@ -130,6 +115,13 @@ void options_boost_po::add_and_parse(const option_group_definition& group)
     po::store(parsed_options, vm);
     po::notify(vm);
   }
+// It seems as though boost::wrapexcept was introduced in 1.69 and it later started to be thrown out of Boost PO.
+#if BOOST_VERSION >= 106900
+  catch (boost::wrapexcept<boost::program_options::invalid_option_value>& ex)
+  {
+    THROW_EX(VW::vw_argument_invalid_value_exception, ex.what());
+  }
+#endif
   catch (boost::exception_detail::clone_impl<
       boost::exception_detail::error_info_injector<boost::program_options::invalid_option_value>>& ex)
   {
@@ -149,69 +141,6 @@ void options_boost_po::add_and_parse(const option_group_definition& group)
     THROW(ex.what());
   }
 }
-  std::vector<std::string> options_boost_po::get_data_values()
-  {
-    /*
-    po::positional_options_description p;
-    //p.add("data", -1);
-    auto copied_description = master_description;
-    p.add("data,d", 1);
-    copied_description.add_options()("data,d", po::value<std::vector<std::string>>()->composing(), "Example set");
-    //copied_description.add_options()("csoaa_ldf", po::value<std::string>(), "Example set");
-    po::parsed_options pos = po::command_line_parser(m_command_line)
-                                 .style(po::command_line_style::default_style ^ po::command_line_style::allow_guessing)
-                                 .options(copied_description)
-                                 .allow_unregistered()
-                                 .positional(p)
-                                 .run();
-
-    auto it = std::find_if(
-        pos.options.begin(), pos.options.end(), [](po::option const& o) { return o.string_key == "data"; });
-
-    /*
-    if (it == pos.options.end())
-    {
-      // fail: no --data or -d
-    }
-    else
-    {
-      return it->value;
-    }
-    */
-
-    po::positional_options_description p;
-    p.add("__positional__", -1);
-    auto copied_description = master_description;
-    copied_description.add_options()("__positional__", po::value<std::vector<std::string>>()->composing(), "");
-    po::parsed_options pos = po::command_line_parser(m_command_line)
-                                 .style(po::command_line_style::default_style ^ po::command_line_style::allow_guessing)
-                                 .options(copied_description)
-                                 .allow_unregistered()
-                                 .positional(p)
-                                 .run();
-
-    po::variables_map vm;
-    po::store(pos, vm);
-
-    // keep track that data was actually defined via positional args
-    this->m_defined_options.insert("data");
-    this->m_defined_options.insert("d");
-    this->m_defined_options.insert("-d");
-
-    // add to help
-
-    if (vm.count("__positional__") != 0)
-    {
-      //agregar que se proceso
-      this->m_supplied_options.insert("data");
-      this->m_ignore_supplied.insert("data");
-      this->m_supplied_options.insert("d");
-      this->m_ignore_supplied.insert("d");
-
-      return vm["__positional__"].as<std::vector<std::string>>();
-    }
-    return std::vector<std::string>();
-  }
 
 bool options_boost_po::add_parse_and_check_necessary(const option_group_definition& group)
 {
@@ -222,32 +151,41 @@ bool options_boost_po::add_parse_and_check_necessary(const option_group_definiti
 bool options_boost_po::was_supplied(const std::string& key) const
 {
   // Best check, only valid after options parsed.
-  if (m_supplied_options.count(key) > 0)
-  {
-    return true;
-  }
+  if (m_supplied_options.count(key) > 0) { return true; }
 
   // Basic check, std::string match against command line.
-  auto it = std::find(m_command_line.begin(), m_command_line.end(), std::string("--" + key));
-  return it != m_command_line.end();
+  auto keys = {std::string("--" + key), std::string("-" + key)};
+  return std::find_first_of(std::begin(m_command_line), std::end(m_command_line), std::begin(keys), std::end(keys)) !=
+      std::end(m_command_line);
 }
 
-bool options_boost_po::ensure_default_dependency(const std::string& key) {
-  return this->ensure_default_dependency(key, "");
-}
-
-bool options_boost_po::ensure_default_dependency(const std::string& key, const std::string& value)
+std::string options_boost_po::help(const std::vector<std::string>& enabled_reductions = {}) const
 {
-  if (!this->was_supplied(key))
+  std::stringstream help;
+
+  // add general help
+  help << m_help_stringstream.find(m_default_tint)->second.rdbuf();
+
+  // check if user only supplied --help or -h
+  if (m_supplied_options.size() <= 2)
   {
-    this->require(key, value);
-    return true;
+    for (const auto& curr : m_help_stringstream)
+    {
+      if (curr.first.compare(m_default_tint) != 0) help << curr.second.rdbuf();
+    }
+  }
+  else
+  {
+    // add help message of only enabled reductions
+    for (auto reduction : enabled_reductions)
+    {
+      auto it = m_help_stringstream.find(reduction);
+      if (it != m_help_stringstream.end()) { help << it->second.rdbuf(); }
+    }
   }
 
-  return false;
+  return help.str();
 }
-
-std::string options_boost_po::help() const { return m_help_stringstream.str(); }
 
 std::vector<std::shared_ptr<base_option>> options_boost_po::get_all_options()
 {
