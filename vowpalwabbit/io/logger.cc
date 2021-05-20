@@ -16,11 +16,18 @@ namespace logger
 namespace detail{
   std::shared_ptr<spdlog::logger> _stderr_logger = spdlog::stderr_logger_st("stderr");
   const constexpr char* default_pattern = "[%l] %v";
+  size_t max_limit;
+  size_t log_count;
 }
 
 void log_set_level(log_level lvl)
 {
   spdlog::set_level(static_cast<spdlog::level::level_enum>(lvl));
+}
+
+void set_max_output(size_t max)
+{
+  detail::max_limit = max;
 }
 
 pattern_guard::pattern_guard(const std::string& pattern)
@@ -35,6 +42,7 @@ pattern_guard::~pattern_guard()
 
 void initialize_logger()
 {
+  detail::max_limit = SIZE_MAX;
   spdlog::set_pattern(detail::default_pattern);
 }
   
