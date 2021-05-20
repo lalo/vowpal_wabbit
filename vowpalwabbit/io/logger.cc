@@ -44,6 +44,14 @@ void initialize_logger()
 }
 
 size_t get_log_count() { return detail::log_count; }
+
+void log_summary()
+{
+  if (detail::max_limit != SIZE_MAX && detail::log_count > detail::max_limit)
+  {
+    logger::errlog_critical("Ommitted some log lines. Re-run without --limit_output N for full log. Total {}", detail::log_count);
+  }
+}
 }
 }
 }

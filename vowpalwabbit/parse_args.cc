@@ -1997,6 +1997,7 @@ void finish(vw& all, bool delete_all)
   }
 
   metrics::output_metrics(all);
+  logger::log_summary();
 
   if (delete_all) delete &all;
 
