@@ -17,8 +17,9 @@ loss     last          counter         weight    label  predict features
 -0.278719 -0.023500           32           32.0  1:-0.42        1       39
 [warning] JSON parser error at 43: Missing a comma or '}' after an object member.. Handler:  State: DecisionService
 -0.463219 -0.647719           64           64.0      1:0        1       39
+[error] JSON parser error at 43: Missing a comma or '}' after an object member.. Handler:  State: DecisionService
 -0.463219 -0.647719           64           64.0      1:0        1       35
-[warning] JSON parser error at 67: Terminate parsing due to Handler error.. Handler: Unexpected token: uint (0) State: StringToStringState
+[error] JSON parser error at 67: Terminate parsing due to Handler error.. Handler: Unexpected token: uint (0) State: StringToStringState
 
 finished run
 number of examples = 68
