@@ -64,11 +64,10 @@ namespace logger
   // This can go away once we move to an object-based logger
   namespace detail
   {
-    extern std::shared_ptr<spdlog::logger> _stderr_logger;
-    extern size_t max_limit;
-    extern size_t log_count;
-  }
-  
+  extern std::shared_ptr<spdlog::logger> _stderr_logger;
+  extern size_t max_limit;
+  extern size_t log_count;
+  }  // namespace detail
 
   // do we need the rest of the levels?
   template<typename FormatString, typename... Args>

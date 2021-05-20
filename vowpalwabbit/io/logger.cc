@@ -25,10 +25,7 @@ void log_set_level(log_level lvl)
   spdlog::set_level(static_cast<spdlog::level::level_enum>(lvl));
 }
 
-void set_max_output(size_t max)
-{
-  detail::max_limit = max;
-}
+void set_max_output(size_t max) { detail::max_limit = max; }
 
 pattern_guard::pattern_guard(const std::string& pattern)
 {
