@@ -42,7 +42,8 @@ void initialize_logger()
   detail::max_limit = SIZE_MAX;
   spdlog::set_pattern(detail::default_pattern);
 }
-  
+
+size_t get_log_count() { return detail::log_count; }
 }
 }
 }

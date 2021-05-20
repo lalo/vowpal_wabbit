@@ -146,6 +146,7 @@ namespace logger
 
   void initialize_logger();
   void set_max_output(size_t max);
+  size_t get_log_count();
 }
 }
 }
