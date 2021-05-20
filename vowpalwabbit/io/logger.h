@@ -95,6 +95,7 @@ namespace logger
     void log_critical(const FormatString &fmt, Args&&...args)
   {
     detail::log_count++;
+    // we ignore max_limit with critical log
     spdlog::default_logger_raw()->critical(fmt, std::forward<Args>(args)...);
   }
 
@@ -126,6 +127,7 @@ namespace logger
     void errlog_critical(const FormatString &fmt, Args&&...args)
   {
     detail::log_count++;
+    // we ignore max_limit with critical log
     detail::_stderr_logger->critical(fmt, std::forward<Args>(args)...);
   }
 
