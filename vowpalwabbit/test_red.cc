@@ -21,7 +21,7 @@ namespace test_red
 struct tr_data
 {
   //problem multiplier
-  size_t pm = 2;
+  size_t pm = 1;
   std::vector<std::vector<namespace_index>>* backup = nullptr;
   std::vector<std::vector<namespace_index>> interactions_1;
   std::vector<std::vector<namespace_index>> interactions_2;
@@ -49,12 +49,12 @@ void configure_interactions(tr_data& data, example* ec, size_t config_number)
   if (ec == nullptr) return;
   if (ec->interactions == nullptr) return;
 
-  if (config_number == 1)
+  if (config_number == 0)
   {
     ec->interactions = &(data.interactions_1);
     // std::cerr << config_number << "int:" << ec->interactions <<"s"<< ec->interactions->size() << std::endl;
   }
-  else if (config_number == 0)
+  else if (config_number == 1)
   {
     // std::cerr << config_number << "int:" << ec->interactions <<"s"<< ec->interactions->size() << std::endl;
   }
@@ -62,7 +62,7 @@ void configure_interactions(tr_data& data, example* ec, size_t config_number)
 
 void restore_interactions(tr_data& data, example* ec, size_t config_number)
 {
-  if (config_number == 1)
+  if (config_number == 0)
   {
     ec->interactions = data.backup;
   }
