@@ -73,10 +73,7 @@ void print_interactions(example* ec)
 
   for (std::vector<namespace_index> v : *(ec->interactions))
   {
-    for (namespace_index c : v)
-    {
-      std::cerr << "interaction:" << c << std::endl;
-    }
+    for (namespace_index c : v) { std::cerr << "interaction:" << c << std::endl; }
   }
 }
 
@@ -86,16 +83,14 @@ void print_all_namespaces_in_examples(multi_ex& exs)
 {
   for (example* ex : exs)
   {
-    for (auto i : ex->indices)
-    {
-      std::cerr << i << ", ";
-    }
+    for (auto i : ex->indices) { std::cerr << i << ", "; }
     std::cerr << std::endl;
   }
 }
 
 // add an interaction to an existing instance
-void add_interaction(std::vector<std::vector<namespace_index>>& interactions, namespace_index first, namespace_index second)
+void add_interaction(
+    std::vector<std::vector<namespace_index>>& interactions, namespace_index first, namespace_index second)
 {
   std::vector<namespace_index> vect;
   vect.push_back(first);
