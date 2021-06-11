@@ -45,11 +45,11 @@ void predict_or_learn(tr_data& data, T& base, example& ec)
 void configure_interactions(tr_data& data, example* ec, size_t config_number)
 {
   if (ec == nullptr) return;
-  if (ec->interactions == nullptr) return;
+  if (ec->interactions_ == nullptr) return;
 
   if (config_number == 0)
   {
-    ec->interactions = &(data.interactions_1);
+    ec->interactions_ = &(data.interactions_1);
     // std::cerr << config_number << "int:" << ec->interactions <<"s"<< ec->interactions->size() << std::endl;
   }
   else if (config_number == 1)
@@ -60,18 +60,18 @@ void configure_interactions(tr_data& data, example* ec, size_t config_number)
 
 void restore_interactions(tr_data& data, example* ec, size_t config_number)
 {
-  if (config_number == 0) { ec->interactions = data.backup; }
+  if (config_number == 0) { ec->interactions_ = data.backup; }
 }
 
 // for debugging purposes
 void print_interactions(example* ec)
 {
   if (ec == nullptr) return;
-  if (ec->interactions == nullptr) return;
+  if (ec->interactions_ == nullptr) return;
 
-  if (ec->interactions->size()) std::cerr << "p:" << ec->interactions;
+  if (ec->interactions_->size()) std::cerr << "p:" << ec->interactions_;
 
-  for (std::vector<namespace_index> v : *(ec->interactions))
+  for (std::vector<namespace_index> v : *(ec->interactions_))
   {
     for (namespace_index c : v) { std::cerr << "interaction:" << c << std::endl; }
   }

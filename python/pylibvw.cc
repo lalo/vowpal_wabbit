@@ -436,7 +436,7 @@ example* my_empty_example0(vw_ptr vw, size_t labelType)
   label_parser* lp = get_label_parser(&*vw, labelType);
   example* ec = VW::alloc_examples(1);
   lp->default_label(&ec->l);
-  ec->interactions = &vw->_interactions;
+  ec->interactions_ = &vw->_interactions;
   if (labelType == lCOST_SENSITIVE)
   {
     COST_SENSITIVE::wclass zero = {0., 1, 0., 0.};

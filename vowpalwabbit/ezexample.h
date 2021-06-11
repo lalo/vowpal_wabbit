@@ -223,7 +223,7 @@ public:
     ec->reset_total_sum_feat_sq();
     ec->num_features = 0;
     for (const features& fs : *ec) { ec->num_features += fs.size(); }
-    ec->interactions = &vw_ref->_interactions;
+    ec->interactions_ = &vw_ref->_interactions;
   }
 
   size_t get_num_features() { return ec->get_num_features(); }

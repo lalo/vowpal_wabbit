@@ -58,11 +58,11 @@ void predict(mf& data, single_learner& base, example& ec)
   ec.indices.clear();
   ec.indices.push_back(0);
 
-  auto* saved_interactions = ec.interactions;
-  auto restore_guard = VW::scope_exit([saved_interactions, &ec] { ec.interactions = saved_interactions; });
+  auto* saved_interactions = ec.interactions_;
+  auto restore_guard = VW::scope_exit([saved_interactions, &ec] { ec.interactions_ = saved_interactions; });
 
   std::vector<std::vector<namespace_index>> empty_interactions;
-  ec.interactions = &empty_interactions;
+  ec.interactions_ = &empty_interactions;
 
   // add interaction terms to prediction
   for (auto& i : *saved_interactions)
@@ -119,9 +119,9 @@ void learn(mf& data, single_learner& base, example& ec)
   ec.indices.clear();
   ec.indices.push_back(0);
 
-  auto* saved_interactions = ec.interactions;
+  auto* saved_interactions = ec.interactions_;
   std::vector<std::vector<namespace_index>> empty_interactions;
-  ec.interactions = &empty_interactions;
+  ec.interactions_ = &empty_interactions;
 
   // update interaction terms
   // looping over all pairs of non-empty namespaces
@@ -182,7 +182,7 @@ void learn(mf& data, single_learner& base, example& ec)
 
   // restore original prediction
   ec.pred.scalar = predicted;
-  ec.interactions = saved_interactions;
+  ec.interactions_ = saved_interactions;
 }
 
 base_learner* mf_setup(options_i& options, vw& all)

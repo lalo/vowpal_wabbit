@@ -78,7 +78,7 @@ void initialize(Search::search &sch, size_t & /*num_actions*/, options_i &option
   data->ex->indices.push_back(val_namespace);
   for (size_t i = 1; i < 14; i++) data->ex->indices.push_back(static_cast<unsigned char>(i) + 'A');
   data->ex->indices.push_back(constant_namespace);
-  data->ex->interactions = &sch.get_vw_pointer_unsafe()._interactions;
+  data->ex->interactions_ = &sch.get_vw_pointer_unsafe()._interactions;
 
   if (data->one_learner)
     sch.set_num_learners(1);

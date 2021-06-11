@@ -737,7 +737,7 @@ void setup_example(vw& all, example* ae)
   }
 
   // Set the interactions for this example to the global set.
-  ae->interactions = &all._interactions;
+  ae->interactions_ = &all._interactions;
 }
 }  // namespace VW
 

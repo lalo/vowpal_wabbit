@@ -82,7 +82,7 @@ void initialize(Search::search& sch, size_t& /*num_actions*/, options_i& options
     for (size_t a = 0; a < NUM_LDF_ENTITY_EXAMPLES; a++)
     {
       ldf_examples[a].l.cs.costs.push_back(default_wclass);
-      ldf_examples[a].interactions = &sch.get_vw_pointer_unsafe()._interactions;
+      ldf_examples[a].interactions_ = &sch.get_vw_pointer_unsafe()._interactions;
     }
     my_task_data->ldf_entity = ldf_examples;
     my_task_data->ldf_relation = ldf_examples + 4;

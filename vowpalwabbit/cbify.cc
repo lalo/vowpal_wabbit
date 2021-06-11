@@ -119,7 +119,7 @@ void cbify_adf_data::init_adf_data(
     ecs[a] = VW::alloc_examples(1);
     auto& lab = ecs[a]->l.cb;
     CB::default_label(lab);
-    ecs[a]->interactions = &interactions;
+    ecs[a]->interactions_ = &interactions;
   }
 
   // cache mask for copy routine
