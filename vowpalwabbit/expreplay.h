@@ -101,7 +101,7 @@ VW::LEARNER::base_learner* expreplay_setup(VW::config::options_i& options, vw& a
   er->all = &all;
   er->_random_state = all.get_random_state();
   er->buf = VW::alloc_examples(er->N);
-  er->buf->interactions = &all.interactions;
+  er->buf->interactions = &all._interactions;
   VW_WARNING_STATE_PUSH
   VW_WARNING_DISABLE_CPP_17_LANG_EXT
   if VW_STD17_CONSTEXPR (er_level == 'c')

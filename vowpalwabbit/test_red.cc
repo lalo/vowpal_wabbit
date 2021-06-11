@@ -152,9 +152,9 @@ VW::LEARNER::base_learner* test_red_setup(options_i& options, vw& all)
 
   // override and clear all the global interactions
   // see parser.cc line 740
-  all.interactions.clear();
+  all._interactions.clear();
   // hard code test 312 from RunTests
-  add_interaction(all.interactions, 'G', 'T');
+  add_interaction(all._interactions, 'G', 'T');
 
   if (base_learner->is_multiline)
   {

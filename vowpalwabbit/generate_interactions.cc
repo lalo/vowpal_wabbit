@@ -71,7 +71,7 @@ VW::LEARNER::base_learner* generate_interactions_setup(options_i& options, vw& a
   options.add_and_parse(new_options);
 
   auto interactions_spec_contains_wildcards = false;
-  for (const auto& inter : all.interactions)
+  for (const auto& inter : all._interactions)
   {
     if (INTERACTIONS::contains_wildcard(inter))
     {

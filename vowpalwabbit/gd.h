@@ -156,10 +156,10 @@ inline void generate_interactions(vw& all, example_predict& ec, R& dat, size_t& 
 {
   if (all.weights.sparse)
     generate_interactions<R, S, T, sparse_parameters>(
-        all.interactions, all.permutations, ec, dat, all.weights.sparse_weights, num_interacted_features);
+        all._interactions, all.permutations, ec, dat, all.weights.sparse_weights, num_interacted_features);
   else
     generate_interactions<R, S, T, dense_parameters>(
-        all.interactions, all.permutations, ec, dat, all.weights.dense_weights, num_interacted_features);
+        all._interactions, all.permutations, ec, dat, all.weights.dense_weights, num_interacted_features);
 }
 
 }  // namespace INTERACTIONS

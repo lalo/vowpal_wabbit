@@ -78,7 +78,7 @@ void initialize(Search::search &sch, size_t & /*num_actions*/, options_i &option
   data->ex->indices.push_back(val_namespace);
   for (size_t i = 1; i < 14; i++) data->ex->indices.push_back(static_cast<unsigned char>(i) + 'A');
   data->ex->indices.push_back(constant_namespace);
-  data->ex->interactions = &sch.get_vw_pointer_unsafe().interactions;
+  data->ex->interactions = &sch.get_vw_pointer_unsafe()._interactions;
 
   if (data->one_learner)
     sch.set_num_learners(1);
@@ -92,9 +92,9 @@ void initialize(Search::search &sch, size_t & /*num_actions*/, options_i &option
       {'B', 'C', 'D'}, {'B', 'E', 'L'}, {'E', 'L', 'M'}, {'B', 'H', 'I'}, {'B', 'C', 'C'}, {'B', 'E', 'J'},
       {'B', 'E', 'H'}, {'B', 'J', 'K'}, {'B', 'E', 'N'}};
 
-  all.interactions.clear();
-  all.interactions.insert(std::end(all.interactions), std::begin(newpairs), std::end(newpairs));
-  all.interactions.insert(std::end(all.interactions), std::begin(newtriples), std::end(newtriples));
+  all._interactions.clear();
+  all._interactions.insert(std::end(all._interactions), std::begin(newpairs), std::end(newpairs));
+  all._interactions.insert(std::end(all._interactions), std::begin(newtriples), std::end(newtriples));
 
   if (data->cost_to_go)
     sch.set_options(AUTO_CONDITION_FEATURES | NO_CACHING | ACTION_COSTS);

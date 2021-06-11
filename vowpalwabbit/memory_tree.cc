@@ -1210,7 +1210,7 @@ void save_load_memory_tree(memory_tree& b, io_buf& model_file, bool read, bool t
     for (uint32_t i = 0; i < n_examples; i++)
     {
       save_load_example(b.examples[i], model_file, read, text, msg, b.oas);
-      b.examples[i]->interactions = &b.all->interactions;
+      b.examples[i]->interactions = &b.all->_interactions;
     }
     // std::cout<<"done loading...."<< std::endl;
   }
