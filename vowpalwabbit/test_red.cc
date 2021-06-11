@@ -22,6 +22,7 @@ struct tr_data
 {
   // problem multiplier
   size_t pm = 1;
+  // backup of the original interactions that come from example parser probably
   std::vector<std::vector<namespace_index>>* backup = nullptr;
   std::vector<std::vector<namespace_index>> interactions_1;
   std::vector<std::vector<namespace_index>> interactions_2;
@@ -62,15 +63,58 @@ void restore_interactions(tr_data& data, example* ec, size_t config_number)
   if (config_number == 0) { ec->interactions = data.backup; }
 }
 
+// for debugging purposes
+void print_interactions(example* ec)
+{
+  if (ec == nullptr) return;
+  if (ec->interactions == nullptr) return;
+
+  if (ec->interactions->size()) std::cerr << "p:" << ec->interactions;
+
+  for (std::vector<namespace_index> v : *(ec->interactions))
+  {
+    for (namespace_index c : v)
+    {
+      std::cerr << "interaction:" << c << std::endl;
+    }
+  }
+}
+
+// useful to understand what namespaces are used in the examples we are given
+// this can evolve to feed in data to generate possible interactions
+void print_all_namespaces_in_examples(multi_ex& exs)
+{
+  for (example* ex : exs)
+  {
+    for (auto i : ex->indices)
+    {
+      std::cerr << i << ", ";
+    }
+    std::cerr << std::endl;
+  }
+}
+
+// add an interaction to an existing instance
+void add_interaction(std::vector<std::vector<namespace_index>>& interactions, namespace_index first, namespace_index second)
+{
+  std::vector<namespace_index> vect;
+  vect.push_back(first);
+  vect.push_back(second);
+  interactions.push_back(vect);
+}
+
 template <bool is_learn, typename T>
 void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
 {
+  // print_interactions(ec[0]);
+  // print_all_namespaces_in_examples(ec);
+
   for (uint32_t i = 0; i < data.pm; i++)
   {
     if (ec[0]->interactions != nullptr)
     {
       data.backup = ec[0]->interactions;
-      for (example* ex : ec) configure_interactions(data, ex, i);
+      for (example* ex : ec) configure_interactions(data, ex, 1);
     }
 
     if (is_learn) { base.learn(ec, i); }
@@ -81,7 +125,7 @@ void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
 
     if (ec[0]->interactions != nullptr)
     {
-      for (example* ex : ec) restore_interactions(data, ex, i);
+      for (example* ex : ec) restore_interactions(data, ex, 1);
 
       data.backup = nullptr;
     }
@@ -105,6 +149,12 @@ VW::LEARNER::base_learner* test_red_setup(options_i& options, vw& all)
   if (!options.add_parse_and_check_necessary(new_options)) return nullptr;
 
   auto* base_learner = setup_base(options, all);
+
+  // override and clear all the global interactions
+  // see parser.cc line 740
+  all.interactions.clear();
+  // hard code test 312 from RunTests
+  add_interaction(all.interactions, 'G', 'T');
 
   if (base_learner->is_multiline)
   {
