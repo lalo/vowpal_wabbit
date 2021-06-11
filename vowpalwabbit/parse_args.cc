@@ -26,6 +26,7 @@
 #include "rand48.h"
 #include "bs.h"
 #include "topk.h"
+#include "test_red.h"
 #include "ect.h"
 #include "csoaa.h"
 #include "cb_algs.h"
@@ -1375,6 +1376,7 @@ void parse_reductions(options_i& options, vw& all)
   reductions.push_back(ExpReplay::expreplay_setup<'c', COST_SENSITIVE::cs_label>);
   reductions.push_back(Search::setup);
   reductions.push_back(audit_regressor_setup);
+  reductions.push_back(VW::test_red::test_red_setup);
   reductions.push_back(VW::metrics::metrics_setup);
 
   register_reductions(all, reductions);
