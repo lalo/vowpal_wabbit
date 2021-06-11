@@ -143,11 +143,14 @@ VW::LEARNER::base_learner* test_red_setup(options_i& options, vw& all)
 
   if (!options.add_parse_and_check_necessary(new_options)) return nullptr;
 
-  auto* base_learner = setup_base(options, all);
-
   // override and clear all the global interactions
   // see parser.cc line 740
   all._interactions.clear();
+
+  // make sure we setup the rest of the stack with cleared interactions
+  // to make sure there are not subtle bugs
+  auto* base_learner = setup_base(options, all);
+
   // hard code test 312 from RunTests
   add_interaction(all._interactions, 'G', 'T');
 
