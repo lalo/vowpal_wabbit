@@ -20,7 +20,7 @@ namespace test_red
 {
 struct tr_data
 {
-  //problem multiplier
+  // problem multiplier
   size_t pm = 1;
   std::vector<std::vector<namespace_index>>* backup = nullptr;
   std::vector<std::vector<namespace_index>> interactions_1;
@@ -33,10 +33,7 @@ void predict_or_learn(tr_data& data, T& base, example& ec)
 {
   for (uint32_t i = 0; i < data.pm; i++)
   {
-    if (is_learn)
-    {
-      base.learn(ec, i);
-    }
+    if (is_learn) { base.learn(ec, i); }
     else
     {
       base.predict(ec, i);
@@ -62,10 +59,7 @@ void configure_interactions(tr_data& data, example* ec, size_t config_number)
 
 void restore_interactions(tr_data& data, example* ec, size_t config_number)
 {
-  if (config_number == 0)
-  {
-    ec->interactions = data.backup;
-  }
+  if (config_number == 0) { ec->interactions = data.backup; }
 }
 
 template <bool is_learn, typename T>
@@ -79,10 +73,7 @@ void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
       for (example* ex : ec) configure_interactions(data, ex, i);
     }
 
-    if (is_learn)
-    {
-      base.learn(ec, i);
-    }
+    if (is_learn) { base.learn(ec, i); }
     else
     {
       base.predict(ec, i);
@@ -97,7 +88,7 @@ void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
   }
 }
 
-void persist(tr_data& , metric_sink& )
+void persist(tr_data&, metric_sink&)
 {
   // metrics.int_metrics_list.emplace_back("total_predict_calls", data.predict_count);
   // metrics.int_metrics_list.emplace_back("total_learn_calls", data.learn_count);
@@ -109,9 +100,7 @@ VW::LEARNER::base_learner* test_red_setup(options_i& options, vw& all)
   auto data = scoped_calloc_or_throw<tr_data>();
 
   option_group_definition new_options("Debug: test reduction");
-  new_options.add(make_option("test_red", test_red)
-                      .necessary()
-                      .help("blah blah"));
+  new_options.add(make_option("test_red", test_red).necessary().help("blah blah"));
 
   if (!options.add_parse_and_check_necessary(new_options)) return nullptr;
 
