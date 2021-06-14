@@ -8,6 +8,7 @@
 #include <cfloat>
 
 #include "io/logger.h"
+#include "vw.h"
 
 using namespace VW::config;
 using namespace VW::LEARNER;
@@ -24,6 +25,8 @@ struct tr_data
   vw* all;
   // problem multiplier
   size_t pm = 2;
+  // to simulate printing in cb_explore_adf
+  multi_learner* adf_learner;
   // backup of the original interactions that come from example parser probably
   std::vector<std::vector<namespace_index>>* backup = nullptr;
   std::vector<std::vector<namespace_index>> interactions_1;
@@ -73,7 +76,7 @@ void print_interactions(example* ec)
   if (ec == nullptr) return;
   if (ec->interactions_ == nullptr) return;
 
-  std::cerr << "p:" << ec->interactions_;
+  std::cerr << "p:";  // << ec->interactions_;
 
   for (std::vector<namespace_index> v : *(ec->interactions_))
   {
@@ -146,14 +149,26 @@ void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
       data.backup = nullptr;
     });
 
+    // if (is_learn) { base.learn(ec, i); }
+    // else
+    // {
+    //   base.predict(ec, i);
+    // print_interactions((ec[0]));
+    // print_all_preds(*(ec[0]), i);
+    // // temp print line as if it were finish_example
+    // data.adf_learner->print_example(*(data.all), ec);
+    // std::cerr << std::endl;
+    // }
+
+    if (!base.learn_returns_prediction || !is_learn) { base.predict(ec, i); }
+
     if (is_learn) { base.learn(ec, i); }
-    else
-    {
-      base.predict(ec, i);
-      print_interactions((ec[0]));
-      print_all_preds(*(ec[0]), i);
-      std::cerr << std::endl;
-    }
+
+    print_interactions((ec[0]));
+    print_all_preds(*(ec[0]), i);
+    // temp print line as if it were finish_example
+    data.adf_learner->print_example(*(data.all), ec);
+    std::cerr << std::endl;
   }
 }
 
@@ -162,6 +177,8 @@ void persist(tr_data&, metric_sink&)
   // metrics.int_metrics_list.emplace_back("total_predict_calls", data.predict_count);
   // metrics.int_metrics_list.emplace_back("total_learn_calls", data.learn_count);
 }
+
+void _finish_example(vw& all, tr_data&, multi_ex& ec) { VW::finish_example(all, ec); }
 
 VW::LEARNER::base_learner* test_red_setup(options_i& options, vw& all)
 {
@@ -235,17 +252,21 @@ VW::LEARNER::base_learner* test_red_setup(options_i& options, vw& all)
 
   if (base_learner->is_multiline)
   {
+    // fetch cb_explore_adf to call directly into the print routine twice
+    data->adf_learner = as_multiline(base_learner->get_learner_by_name_prefix("cb_explore_adf_"));
+
     learner<tr_data, multi_ex>* l = &init_learner(data, as_multiline(base_learner),
         predict_or_learn_m<true, multi_learner>, predict_or_learn_m<false, multi_learner>, data->pm,
-        base_learner->pred_type, all.get_setupfn_name(test_red_setup), base_learner->learn_returns_prediction);
+        base_learner->pred_type, all.get_setupfn_name(test_red_setup), true);
     l->set_persist_metrics(persist);
+    l->set_finish_example(_finish_example);
     return make_base(*l);
   }
   else
   {
     learner<tr_data, example>* l = &init_learner(data, as_singleline(base_learner),
         predict_or_learn<true, single_learner>, predict_or_learn<false, single_learner>, data->pm,
-        base_learner->pred_type, all.get_setupfn_name(test_red_setup), base_learner->learn_returns_prediction);
+        base_learner->pred_type, all.get_setupfn_name(test_red_setup), true);
     l->set_persist_metrics(persist);
     return make_base(*l);
   }
