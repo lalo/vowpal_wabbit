@@ -23,7 +23,7 @@ struct tr_data
   // all is not needed but good to have for testing purposes
   vw* all;
   // problem multiplier
-  size_t pm = 1;
+  size_t pm = 2;
   // backup of the original interactions that come from example parser probably
   std::vector<std::vector<namespace_index>>* backup = nullptr;
   std::vector<std::vector<namespace_index>> interactions_1;
@@ -73,12 +73,13 @@ void print_interactions(example* ec)
   if (ec == nullptr) return;
   if (ec->interactions_ == nullptr) return;
 
-  if (ec->interactions_->size()) std::cerr << "p:" << ec->interactions_;
+  std::cerr << "p:" << ec->interactions_;
 
   for (std::vector<namespace_index> v : *(ec->interactions_))
   {
-    for (namespace_index c : v) { std::cerr << "interaction:" << c << std::endl; }
+    for (namespace_index c : v) { std::cerr << " interaction:" << c << ","; }
   }
+  std::cerr << std::endl;
 }
 
 // useful to understand what namespaces are used in the examples we are given
@@ -90,6 +91,14 @@ void print_all_namespaces_in_examples(multi_ex& exs)
     for (auto i : ex->indices) { std::cerr << i << ", "; }
     std::cerr << std::endl;
   }
+}
+
+void print_all_preds(example& ex, size_t i)
+{
+  const auto& preds = ex.pred.a_s;
+  std::cerr << "config_" << i << ": ";
+  for (uint32_t i = 0; i < preds.size(); i++) { std::cerr << preds[i].action << ", "; }
+  std::cerr << std::endl;
 }
 
 // add an interaction to an existing instance
@@ -141,6 +150,9 @@ void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
     else
     {
       base.predict(ec, i);
+      print_interactions((ec[0]));
+      print_all_preds(*(ec[0]), i);
+      std::cerr << std::endl;
     }
   }
 }
