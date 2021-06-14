@@ -49,14 +49,14 @@ void predict_or_learn(tr_data& data, T& base, example& ec)
 void configure_interactions(tr_data& data, example* ec, size_t config_number)
 {
   if (ec == nullptr) return;
-  if (ec->interactions_ == nullptr) return;
+  // if (ec->interactions_ == nullptr) return;
 
-  if (config_number == 0)
+  if (config_number == 1)
   {
     ec->interactions_ = &(data.interactions_1);
     // std::cerr << config_number << "int:" << ec->interactions <<"s"<< ec->interactions->size() << std::endl;
   }
-  else if (config_number == 1)
+  else if (config_number == 0)
   {
     // std::cerr << config_number << "int:" << ec->interactions <<"s"<< ec->interactions->size() << std::endl;
   }
@@ -120,16 +120,17 @@ void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
   }
   else
   {
+    assert(false);
     data.backup = ec[0]->interactions_;
   }
 
   // test this works if interactions turns out to be nullptr
   for (uint32_t i = 0; i < data.pm; i++)
   {
-    assert(ec[0]->interactions_ != nullptr);
+    // assert(ec[0]->interactions_ != nullptr);
     assert(data.backup == nullptr);
 
-    for (example* ex : ec) { configure_interactions(data, ex, 1); }
+    for (example* ex : ec) { configure_interactions(data, ex, i); }
 
     auto restore_guard = VW::scope_exit([&data, &ec, &i] {
       for (example* ex : ec) { restore_interactions(data, ex, 0); }
