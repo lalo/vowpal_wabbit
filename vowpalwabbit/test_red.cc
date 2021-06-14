@@ -25,10 +25,11 @@ struct tr_data
   // backup of the original interactions that come from example parser probably
   std::vector<std::vector<namespace_index>>* backup = nullptr;
   std::vector<std::vector<namespace_index>> interactions_1;
-  std::vector<std::vector<namespace_index>> interactions_2;
+  std::vector<std::vector<namespace_index>> empty_interactions;
 };
 
-// not implemented yet
+// see predict_or_learn_m,
+// this one not impl yet
 template <bool is_learn, typename T>
 void predict_or_learn(tr_data& data, T& base, example& ec)
 {
@@ -37,7 +38,8 @@ void predict_or_learn(tr_data& data, T& base, example& ec)
     if (is_learn) { base.learn(ec, i); }
     else
     {
-      base.predict(ec, i);
+      // base.predict(ec, i);
+      THROW("not implemented yet");
     }
   }
 }
@@ -104,25 +106,38 @@ void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
   // print_interactions(ec[0]);
   // print_all_namespaces_in_examples(ec);
 
+  // we force parser to set always as nullptr
+  assert(ec[0]->interactions_ == nullptr);
+  // that way we can modify all.interactions without parser caring
+  if (ec[0]->interactions_ == nullptr)
+  { 
+    data.backup = &data.empty_interactions;
+    // ec[0]->interactions_ = &data.empty_interactions;
+    for (example* ex : ec) { restore_interactions(data, ex, 0); }
+    data.backup = nullptr;
+  }
+  else
+  {
+    data.backup = ec[0]->interactions_;
+  }
+
+  // test this works if interactions turns out to be nullptr
   for (uint32_t i = 0; i < data.pm; i++)
   {
-    if (ec[0]->interactions != nullptr)
-    {
-      data.backup = ec[0]->interactions;
-      for (example* ex : ec) configure_interactions(data, ex, 1);
-    }
+    assert(ec[0]->interactions_ != nullptr);
+    assert(data.backup == nullptr);
+
+    for (example* ex : ec) { configure_interactions(data, ex, 1); }
+
+    auto restore_guard = VW::scope_exit([&data, &ec, &i] {
+      for (example* ex : ec) { restore_interactions(data, ex, 0); }
+      data.backup = nullptr;
+    });
 
     if (is_learn) { base.learn(ec, i); }
     else
     {
       base.predict(ec, i);
-    }
-
-    if (ec[0]->interactions != nullptr)
-    {
-      for (example* ex : ec) restore_interactions(data, ex, 1);
-
-      data.backup = nullptr;
     }
   }
 }
@@ -153,6 +168,26 @@ VW::LEARNER::base_learner* test_red_setup(options_i& options, vw& all)
 
   // hard code test 312 from RunTests
   add_interaction(all._interactions, 'G', 'T');
+  add_interaction(data->empty_interactions, 'G', 'T');
+
+  // fail if incompatible reductions got setup
+  // inefficient, address later
+  // references global all interactions
+  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(),"ccb_explore_adf")!=all.enabled_reductions.end()) THROW("plz no bad stack");
+  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(),"audit_regressor")!=all.enabled_reductions.end()) THROW("plz no bad stack");
+  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(),"baseline")!=all.enabled_reductions.end()) THROW("plz no bad stack");
+  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(),"cb_explore_adf_rnd")!=all.enabled_reductions.end()) THROW("plz no bad stack");
+  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(),"cb_to_cb_adf")!=all.enabled_reductions.end()) THROW("plz no bad stack");
+  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(),"cbify")!=all.enabled_reductions.end()) THROW("plz no bad stack");
+  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(),"replay_c")!=all.enabled_reductions.end()) THROW("plz no bad stack");
+  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(),"replay_b")!=all.enabled_reductions.end()) THROW("plz no bad stack");
+  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(),"replay_m")!=all.enabled_reductions.end()) THROW("plz no bad stack");
+  // if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(),"gd")!=all.enabled_reductions.end()) THROW("plz no gd");
+  // if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(),"generate_interactions")!=all.enabled_reductions.end()) THROW("plz no gd");
+  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(),"memory_tree")!=all.enabled_reductions.end()) THROW("plz no bad stack");
+  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(),"new_mf")!=all.enabled_reductions.end()) THROW("plz no bad stack");
+  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(),"nn")!=all.enabled_reductions.end()) THROW("plz no bad stack");
+  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(),"stage_poly")!=all.enabled_reductions.end()) THROW("plz no bad stack");
 
   if (base_learner->is_multiline)
   {
