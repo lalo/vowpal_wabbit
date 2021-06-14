@@ -741,7 +741,10 @@ void setup_example(vw& all, example* ae)
   // this might be a perf hit, verify later (the lookup in the options object)
   // disable when test_red was supplied
   if (!all.options->was_supplied("test_red")) { ae->interactions_ = &all._interactions; }
-  else { ae->interactions_ = nullptr; }
+  else
+  {
+    ae->interactions_ = nullptr;
+  }
 }
 }  // namespace VW
 

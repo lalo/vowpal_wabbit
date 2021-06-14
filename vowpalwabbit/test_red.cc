@@ -112,7 +112,7 @@ void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
   assert(ec[0]->interactions_ == nullptr);
   // that way we can modify all.interactions without parser caring
   if (ec[0]->interactions_ == nullptr)
-  { 
+  {
     data.backup = &data.empty_interactions;
     // ec[0]->interactions_ = &data.empty_interactions;
     for (example* ex : ec) { restore_interactions(data, ex, 0); }
@@ -180,21 +180,45 @@ VW::LEARNER::base_learner* test_red_setup(options_i& options, vw& all)
   // fail if incompatible reductions got setup
   // inefficient, address later
   // references global all interactions
-  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(),"ccb_explore_adf")!=all.enabled_reductions.end()) THROW("plz no bad stack");
-  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(),"audit_regressor")!=all.enabled_reductions.end()) THROW("plz no bad stack");
-  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(),"baseline")!=all.enabled_reductions.end()) THROW("plz no bad stack");
-  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(),"cb_explore_adf_rnd")!=all.enabled_reductions.end()) THROW("plz no bad stack");
-  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(),"cb_to_cb_adf")!=all.enabled_reductions.end()) THROW("plz no bad stack");
-  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(),"cbify")!=all.enabled_reductions.end()) THROW("plz no bad stack");
-  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(),"replay_c")!=all.enabled_reductions.end()) THROW("plz no bad stack");
-  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(),"replay_b")!=all.enabled_reductions.end()) THROW("plz no bad stack");
-  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(),"replay_m")!=all.enabled_reductions.end()) THROW("plz no bad stack");
-  // if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(),"gd")!=all.enabled_reductions.end()) THROW("plz no gd");
-  // if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(),"generate_interactions")!=all.enabled_reductions.end()) THROW("plz no gd");
-  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(),"memory_tree")!=all.enabled_reductions.end()) THROW("plz no bad stack");
-  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(),"new_mf")!=all.enabled_reductions.end()) THROW("plz no bad stack");
-  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(),"nn")!=all.enabled_reductions.end()) THROW("plz no bad stack");
-  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(),"stage_poly")!=all.enabled_reductions.end()) THROW("plz no bad stack");
+  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(), "ccb_explore_adf") !=
+      all.enabled_reductions.end())
+    THROW("plz no bad stack");
+  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(), "audit_regressor") !=
+      all.enabled_reductions.end())
+    THROW("plz no bad stack");
+  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(), "baseline") !=
+      all.enabled_reductions.end())
+    THROW("plz no bad stack");
+  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(), "cb_explore_adf_rnd") !=
+      all.enabled_reductions.end())
+    THROW("plz no bad stack");
+  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(), "cb_to_cb_adf") !=
+      all.enabled_reductions.end())
+    THROW("plz no bad stack");
+  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(), "cbify") != all.enabled_reductions.end())
+    THROW("plz no bad stack");
+  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(), "replay_c") !=
+      all.enabled_reductions.end())
+    THROW("plz no bad stack");
+  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(), "replay_b") !=
+      all.enabled_reductions.end())
+    THROW("plz no bad stack");
+  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(), "replay_m") !=
+      all.enabled_reductions.end())
+    THROW("plz no bad stack");
+  // if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(),"gd")!=all.enabled_reductions.end())
+  // THROW("plz no gd"); if (std::find(all.enabled_reductions.begin(),
+  // all.enabled_reductions.end(),"generate_interactions")!=all.enabled_reductions.end()) THROW("plz no gd");
+  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(), "memory_tree") !=
+      all.enabled_reductions.end())
+    THROW("plz no bad stack");
+  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(), "new_mf") != all.enabled_reductions.end())
+    THROW("plz no bad stack");
+  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(), "nn") != all.enabled_reductions.end())
+    THROW("plz no bad stack");
+  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(), "stage_poly") !=
+      all.enabled_reductions.end())
+    THROW("plz no bad stack");
 
   if (base_learner->is_multiline)
   {
