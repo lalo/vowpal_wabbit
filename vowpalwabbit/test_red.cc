@@ -20,6 +20,8 @@ namespace test_red
 {
 struct tr_data
 {
+  // all is not needed but good to have for testing purposes
+  vw* all;
   // problem multiplier
   size_t pm = 1;
   // backup of the original interactions that come from example parser probably
@@ -103,10 +105,10 @@ void add_interaction(
 template <bool is_learn, typename T>
 void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
 {
-  // print_interactions(ec[0]);
-  // print_all_namespaces_in_examples(ec);
+  // extra assert just bc
+  assert(data.all->_interactions.empty() == true);
 
-  // we force parser to set always as nullptr
+  // we force parser to set always as nullptr, see change in parser.cc
   assert(ec[0]->interactions_ == nullptr);
   // that way we can modify all.interactions without parser caring
   if (ec[0]->interactions_ == nullptr)
@@ -158,6 +160,9 @@ VW::LEARNER::base_learner* test_red_setup(options_i& options, vw& all)
 
   if (!options.add_parse_and_check_necessary(new_options)) return nullptr;
 
+  // all is not needed but good to have for testing purposes
+  data->all = &all;
+
   // override and clear all the global interactions
   // see parser.cc line 740
   all._interactions.clear();
@@ -167,7 +172,9 @@ VW::LEARNER::base_learner* test_red_setup(options_i& options, vw& all)
   auto* base_learner = setup_base(options, all);
 
   // hard code test 312 from RunTests
-  add_interaction(all._interactions, 'G', 'T');
+  // if we comment this following line it works ?? why ??
+  // add_interaction(all._interactions, 'G', 'T');
+  assert(all._interactions.empty() == true);
   add_interaction(data->empty_interactions, 'G', 'T');
 
   // fail if incompatible reductions got setup
