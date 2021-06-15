@@ -102,7 +102,11 @@ void print_all_preds(example& ex, size_t i)
 {
   const auto& preds = ex.pred.a_s;
   std::cerr << "config_" << i << ": ";
-  for (uint32_t i = 0; i < preds.size(); i++) { std::cerr << preds[i].action << "(" << preds[i].score << ")" << ", "; }
+  for (uint32_t i = 0; i < preds.size(); i++)
+  {
+    std::cerr << preds[i].action << "(" << preds[i].score << ")"
+              << ", ";
+  }
   std::cerr << std::endl;
 }
 
@@ -171,9 +175,7 @@ void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
     // if (!is_learn) print_all_preds(*(ec[0]), i);
 
     // cache the first prediction, (with interaction)
-    if (data.county > 2000 && i == 0){
-      data.a_s = std::move(ec[0]->pred.a_s);
-    }
+    if (data.county > 2000 && i == 0) { data.a_s = std::move(ec[0]->pred.a_s); }
 
     // temp print line as if it were finish_example
     // data.adf_learner->print_example(*(data.all), ec);
@@ -182,9 +184,7 @@ void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
   // std::cerr << "(" << data.a_s[0].action << ", " << ec[0]->pred.a_s[0].action << ")" << std::endl;
 
   // replace with prediction of running with interaction
-  if (data.county > 2000){
-    ec[0]->pred.a_s = std::move(data.a_s);
-  }
+  if (data.county > 2000) { ec[0]->pred.a_s = std::move(data.a_s); }
 }
 
 void persist(tr_data&, metric_sink&)
