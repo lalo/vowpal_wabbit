@@ -100,7 +100,7 @@ def run_simulation(vw, num_iterations, users, times_of_day, actions, cost_functi
     return ctr
 
 def test_with_interaction():
-    vw = pyvw.vw("--cb_explore_adf -q UA --quiet --epsilon 0.2")
+    vw = pyvw.vw("--cb_explore_adf -q GT --quiet --epsilon 0.2")
     num_iterations = 3000
     ctr = run_simulation(vw, num_iterations, users, times_of_day, actions, get_cost)
 
@@ -115,8 +115,6 @@ def test_without_interaction():
     assert(ctr[-1] >= 0.35)
 
 def test_blah_blah():
-    # vw = pyvw.vw("--cb_explore_adf -q GT --quiet --epsilon 0.2")
-    # vw = pyvw.vw("--cb_explore_adf --quiet --epsilon 0.2")
     vw = pyvw.vw("--test_red --cb_explore_adf --quiet --epsilon 0.2")
     num_iterations = 5000
     ctr = run_simulation(vw, num_iterations, users, times_of_day, actions, get_cost)
