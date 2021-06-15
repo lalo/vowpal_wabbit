@@ -21,12 +21,14 @@ namespace test_red
 {
 struct tr_data
 {
+  size_t county = 0;
   // all is not needed but good to have for testing purposes
   vw* all;
   // problem multiplier
   size_t pm = 2;
   // to simulate printing in cb_explore_adf
   multi_learner* adf_learner;
+  ACTION_SCORE::action_scores a_s;  // a sequence of classes with scores.  Also used for probabilities.
   // backup of the original interactions that come from example parser probably
   std::vector<std::vector<namespace_index>>* backup = nullptr;
   std::vector<std::vector<namespace_index>> interactions_1;
@@ -100,7 +102,7 @@ void print_all_preds(example& ex, size_t i)
 {
   const auto& preds = ex.pred.a_s;
   std::cerr << "config_" << i << ": ";
-  for (uint32_t i = 0; i < preds.size(); i++) { std::cerr << preds[i].action << ", "; }
+  for (uint32_t i = 0; i < preds.size(); i++) { std::cerr << preds[i].action << "(" << preds[i].score << ")" << ", "; }
   std::cerr << std::endl;
 }
 
@@ -117,6 +119,7 @@ void add_interaction(
 template <bool is_learn, typename T>
 void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
 {
+  data.county++;
   // extra assert just bc
   assert(data.all->_interactions.empty() == true);
 
@@ -164,11 +167,23 @@ void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
 
     if (is_learn) { base.learn(ec, i); }
 
-    print_interactions((ec[0]));
-    print_all_preds(*(ec[0]), i);
+    // print_interactions((ec[0]));
+    // if (!is_learn) print_all_preds(*(ec[0]), i);
+
+    // cache the first prediction, (with interaction)
+    if (data.county > 2000 && i == 0){
+      data.a_s = std::move(ec[0]->pred.a_s);
+    }
+
     // temp print line as if it were finish_example
-    data.adf_learner->print_example(*(data.all), ec);
-    std::cerr << std::endl;
+    // data.adf_learner->print_example(*(data.all), ec);
+    // std::cerr << std::endl;
+  }
+  // std::cerr << "(" << data.a_s[0].action << ", " << ec[0]->pred.a_s[0].action << ")" << std::endl;
+
+  // replace with prediction of running with interaction
+  if (data.county > 2000){
+    ec[0]->pred.a_s = std::move(data.a_s);
   }
 }
 
