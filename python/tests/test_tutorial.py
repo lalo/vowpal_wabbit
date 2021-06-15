@@ -1,15 +1,13 @@
 from vowpalwabbit import pyvw
 
 import pytest
-
 import random
-import matplotlib.pyplot as plt
 
+# this test was adapted from this tutorial: https://vowpalwabbit.org/tutorials/cb_simulation.html
 
 # VW tries to minimize loss/cost, therefore we will pass cost as -reward
 USER_LIKED_ARTICLE = -1.0
 USER_DISLIKED_ARTICLE = 0.0
-
 
 def get_cost(context,action):
     if context['user'] == "Tom":
@@ -58,7 +56,6 @@ def get_action(vw, context, actions):
     chosen_action_index, prob = sample_custom_pmf(pmf)
     return actions[chosen_action_index], prob
 
-
 users = ['Tom', 'Anna']
 times_of_day = ['morning', 'afternoon']
 actions = ["politics", "sports", "music", "food", "finance", "health", "camping"]
@@ -101,6 +98,21 @@ def run_simulation(vw, num_iterations, users, times_of_day, actions, cost_functi
         ctr.append(-1*cost_sum/i)
 
     return ctr
+
+def test_with_interaction():
+    vw = pyvw.vw("--cb_explore_adf -q UA --quiet --epsilon 0.2")
+    num_iterations = 3000
+    ctr = run_simulation(vw, num_iterations, users, times_of_day, actions, get_cost)
+
+    assert(ctr[-1] >= 0.70)
+
+def test_without_interaction():
+    vw = pyvw.vw("--cb_explore_adf --quiet --epsilon 0.2")
+    num_iterations = 3000
+    ctr = run_simulation(vw, num_iterations, users, times_of_day, actions, get_cost)
+
+    assert(ctr[-1] < 0.50)
+    assert(ctr[-1] >= 0.35)
 
 def test_blah_blah():
     # vw = pyvw.vw("--cb_explore_adf -q GT --quiet --epsilon 0.2")
