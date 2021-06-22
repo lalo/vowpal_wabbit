@@ -222,6 +222,10 @@ VW::LEARNER::base_learner* test_red_setup(options_i& options, vw& all)
   assert(all._interactions.empty() == true);
   add_interaction(data->empty_interactions, 'G', 'T');
 
+
+  // ask jack about flushing the cache, after mutating reductions
+  // that might change
+
   // fail if incompatible reductions got setup
   // inefficient, address later
   // references global all interactions
