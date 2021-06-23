@@ -3,6 +3,8 @@ from vowpalwabbit import pyvw
 import pytest
 import random
 
+random.seed(10)
+
 # this test was adapted from this tutorial: https://vowpalwabbit.org/tutorials/cb_simulation.html
 
 # VW tries to minimize loss/cost, therefore we will pass cost as -reward

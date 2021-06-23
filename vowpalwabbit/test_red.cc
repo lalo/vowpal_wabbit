@@ -123,7 +123,10 @@ void add_interaction(
 template <bool is_learn, typename T>
 void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
 {
-  data.county++;
+  if (is_learn)
+  {
+    data.county++;
+  }
   // extra assert just bc
   assert(data.all->_interactions.empty() == true);
 
@@ -150,6 +153,15 @@ void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
     assert(data.backup == nullptr);
 
     for (example* ex : ec) { configure_interactions(data, ex, i); }
+
+    if (i == 0)
+    {
+      assert(ec[0]->interactions_->empty() != true);
+    }
+    else if (i == 1)
+    {
+      assert(ec[0]->interactions_->empty() == true);
+    }
 
     auto restore_guard = VW::scope_exit([&data, &ec, &i] {
       for (example* ex : ec) { restore_interactions(data, ex, 0); }
