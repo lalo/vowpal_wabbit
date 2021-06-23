@@ -64,6 +64,7 @@ struct cb_dro_data
         const float w = logged.probability > 0 ? 1 / logged.probability : 0;
         const float r = -logged.cost;
 
+        // chisq is what we want
         chisq.update(chosen_action == labelled_action ? w : 0, r);
 
         float qlb = static_cast<float>(w > 0 ? chisq.effn() * chisq.qlb(w, r) / w : 1);

@@ -150,9 +150,11 @@ ChiSquared::Duals ChiSquared::recompute_duals()
     }
   }
 
+  // the bound is rmin in this if
   if (candidates.empty()) { duals = {true, 0, 0, 0, n}; }
   else
   {
+  // the bound is std::get<0>(*it);
     auto it = std::min_element(candidates.begin(), candidates.end(),
         [](const ScoredDual& x, const ScoredDual& y) { return std::get<0>(x) < std::get<0>(y); });
 
