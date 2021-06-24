@@ -59,7 +59,7 @@ def get_action(vw, context, actions):
     pmf = vw.predict(vw_text_example)
     print("pmf:" +str(pmf), file=curr_file)
     chosen_action_index, prob = sample_custom_pmf(pmf)
-    print(str(chosen_action_index), file=curr_file)
+    print(str(chosen_action_index)+" "+str(prob), file=curr_file)
     return actions[chosen_action_index], prob
 
 users = ['Tom', 'Anna']

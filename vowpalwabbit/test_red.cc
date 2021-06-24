@@ -123,10 +123,7 @@ void add_interaction(
 template <bool is_learn, typename T>
 void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
 {
-  if (is_learn)
-  {
-    data.county++;
-  }
+  if (is_learn) { data.county++; }
   // extra assert just bc
   assert(data.all->_interactions.empty() == true);
 
@@ -182,10 +179,10 @@ void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
 
     if (!base.learn_returns_prediction || !is_learn) { base.predict(ec, i); }
 
-// if (i!=1)
-// { // this fixes the lower bound bug
+    // if (i!=1)
+    // { // this fixes the lower bound bug
     if (is_learn) { base.learn(ec, i); }
-// }
+    // }
 
     // print_interactions((ec[0]));
     // if (!is_learn) print_all_preds(*(ec[0]), i);
@@ -237,15 +234,11 @@ VW::LEARNER::base_learner* test_red_setup(options_i& options, vw& all)
   // add_interaction(all._interactions, 'G', 'T');
   assert(all._interactions.empty() == true);
 
-  if (test_red == 0)
-  {
-    add_interaction(data->interactions_1, 'G', 'T');
-  }
+  if (test_red == 0) { add_interaction(data->interactions_1, 'G', 'T'); }
   else
   {
     add_interaction(data->empty_interactions, 'G', 'T');
   }
-
 
   // ask jack about flushing the cache, after mutating reductions
   // that might change
