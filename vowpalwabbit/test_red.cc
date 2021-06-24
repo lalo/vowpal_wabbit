@@ -209,6 +209,15 @@ void persist(tr_data&, metric_sink&)
 
 void _finish_example(vw& all, tr_data&, multi_ex& ec) { VW::finish_example(all, ec); }
 
+// fail if incompatible reductions got setup
+// inefficient, address later
+// references global all interactions
+void fail_if_enabled(vw& all, std::string name)
+{
+  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(), name) != all.enabled_reductions.end())
+    THROW("plz no bad stack" + name);
+}
+
 VW::LEARNER::base_learner* test_red_setup(options_i& options, vw& all)
 {
   size_t test_red;
@@ -244,49 +253,23 @@ VW::LEARNER::base_learner* test_red_setup(options_i& options, vw& all)
   // ask jack about flushing the cache, after mutating reductions
   // that might change
 
-  // fail if incompatible reductions got setup
-  // inefficient, address later
-  // references global all interactions
-  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(), "ccb_explore_adf") !=
-      all.enabled_reductions.end())
-    THROW("plz no bad stack");
-  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(), "audit_regressor") !=
-      all.enabled_reductions.end())
-    THROW("plz no bad stack");
-  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(), "baseline") !=
-      all.enabled_reductions.end())
-    THROW("plz no bad stack");
-  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(), "cb_explore_adf_rnd") !=
-      all.enabled_reductions.end())
-    THROW("plz no bad stack");
-  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(), "cb_to_cb_adf") !=
-      all.enabled_reductions.end())
-    THROW("plz no bad stack");
-  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(), "cbify") != all.enabled_reductions.end())
-    THROW("plz no bad stack");
-  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(), "replay_c") !=
-      all.enabled_reductions.end())
-    THROW("plz no bad stack");
-  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(), "replay_b") !=
-      all.enabled_reductions.end())
-    THROW("plz no bad stack");
-  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(), "replay_m") !=
-      all.enabled_reductions.end())
-    THROW("plz no bad stack");
-  // if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(),"gd")!=all.enabled_reductions.end())
-  // THROW("plz no gd"); if (std::find(all.enabled_reductions.begin(),
-  // all.enabled_reductions.end(),"generate_interactions")!=all.enabled_reductions.end()) THROW("plz no gd");
-  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(), "memory_tree") !=
-      all.enabled_reductions.end())
-    THROW("plz no bad stack");
-  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(), "new_mf") != all.enabled_reductions.end())
-    THROW("plz no bad stack");
-  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(), "nn") != all.enabled_reductions.end())
-    THROW("plz no bad stack");
-  if (std::find(all.enabled_reductions.begin(), all.enabled_reductions.end(), "stage_poly") !=
-      all.enabled_reductions.end())
-    THROW("plz no bad stack");
+  fail_if_enabled(all, "ccb_explore_adf");
+  fail_if_enabled(all, "audit_regressor");
+  fail_if_enabled(all, "baseline");
+  fail_if_enabled(all, "cb_explore_adf_rnd");
+  fail_if_enabled(all, "cb_to_cb_adf");
+  fail_if_enabled(all, "cbify");
+  fail_if_enabled(all, "replay_c");
+  fail_if_enabled(all, "replay_b");
+  fail_if_enabled(all, "replay_m");
+  // fail_if_enabled(all, "gd");
+  // fail_if_enabled(all, "generate_interactions");
+  fail_if_enabled(all, "memory_tree");
+  fail_if_enabled(all, "new_mf");
+  fail_if_enabled(all, "nn");
+  fail_if_enabled(all, "stage_poly");
 
+  // only this has been tested
   if (base_learner->is_multiline)
   {
     // fetch cb_explore_adf to call directly into the print routine twice
@@ -299,6 +282,7 @@ VW::LEARNER::base_learner* test_red_setup(options_i& options, vw& all)
     l->set_finish_example(_finish_example);
     return make_base(*l);
   }
+  // not implemented yet
   else
   {
     learner<tr_data, example>* l = &init_learner(data, as_singleline(base_learner),
