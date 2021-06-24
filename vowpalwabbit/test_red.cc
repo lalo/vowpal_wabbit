@@ -124,6 +124,7 @@ template <bool is_learn, typename T>
 void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
 {
   if (is_learn) { data.county++; }
+  assert(data.county <= 2000);
   // extra assert just bc
   assert(data.all->_interactions.empty() == true);
 
