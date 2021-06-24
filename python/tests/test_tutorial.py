@@ -9,6 +9,8 @@ import random
 USER_LIKED_ARTICLE = -1.0
 USER_DISLIKED_ARTICLE = 0.0
 
+curr_file = None
+
 def get_cost(context,action):
     if context['user'] == "Tom":
         if context['time_of_day'] == "morning" and action == 'politics':
@@ -44,16 +46,20 @@ def sample_custom_pmf(pmf):
     scale = 1 / total
     pmf = [x * scale for x in pmf]
     draw = random.random()
+    print("draw="+str(draw), file=curr_file)
     sum_prob = 0.0
     for index, prob in enumerate(pmf):
         sum_prob += prob
         if(sum_prob > draw):
+            print("sum_prob="+str(sum_prob), file=curr_file)
             return index, prob
 
 def get_action(vw, context, actions):
     vw_text_example = to_vw_example_format(context,actions)
     pmf = vw.predict(vw_text_example)
+    print("pmf:" +str(pmf), file=curr_file)
     chosen_action_index, prob = sample_custom_pmf(pmf)
+    print(str(chosen_action_index), file=curr_file)
     return actions[chosen_action_index], prob
 
 users = ['Tom', 'Anna']
@@ -71,6 +77,7 @@ def run_simulation(vw, num_iterations, users, times_of_day, actions, cost_functi
     ctr = []
 
     for i in range(1, num_iterations+1):
+        print(f"id:{i}",file=curr_file)
         # 1. In each simulation choose a user
         user = choose_user(users)
         # 2. Choose time of day for a given user
@@ -100,21 +107,50 @@ def run_simulation(vw, num_iterations, users, times_of_day, actions, cost_functi
     return ctr
 
 def test_with_interaction():
+    vw = pyvw.vw("--random_seed 5 --cb_explore_adf -q GT --quiet --epsilon 0.2")
+    num_iterations = 2000
     random.seed(10)
+    global curr_file
+    curr_file = open('with_inter.txt', 'w')
     ctr = run_simulation(vw, num_iterations, users, times_of_day, actions, get_cost)
+    curr_file.close()
 
-    assert(ctr[-1] >= 0.70)
+    print("with interaction")
+    print(ctr[-1])
+    # assert(ctr[-1] >= 0.70)
 
 def test_without_interaction():
+    vw = pyvw.vw("--random_seed 5 --cb_explore_adf --quiet --epsilon 0.2")
+    num_iterations = 2000
     random.seed(10)
+    global curr_file
+    curr_file = open('without_inter.txt', 'w')
     ctr = run_simulation(vw, num_iterations, users, times_of_day, actions, get_cost)
+    curr_file.close()
 
-    assert(ctr[-1] < 0.50)
-    assert(ctr[-1] >= 0.35)
+    print("without interaction")
+    print(ctr[-1])
+    # assert(ctr[-1] < 0.50)
+    # assert(ctr[-1] >= 0.35)
 
-def test_blah_blah():
+def test_custom_reduction(config=0):
+    # set test_red to 1 for with interaction
+    # set test_red to 0 for no interaction
+    vw = pyvw.vw(f"--random_seed 5 --test_red {config} --cb_explore_adf --quiet --epsilon 0.2")
+    num_iterations = 2000
     random.seed(10)
+    global curr_file
+    curr_file = open(f"custom_reduc_{config}.txt", 'w')
     ctr = run_simulation(vw, num_iterations, users, times_of_day, actions, get_cost)
+    curr_file.close()
+
+    print("custom reduction")
     print(ctr[-1])
 
-test_blah_blah()
+test_with_interaction()
+test_without_interaction()
+
+with_interaction = 1
+without_interaction = 0
+test_custom_reduction(with_interaction)
+test_custom_reduction(without_interaction)

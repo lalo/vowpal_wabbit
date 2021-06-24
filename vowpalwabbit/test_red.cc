@@ -154,14 +154,15 @@ void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
 
     for (example* ex : ec) { configure_interactions(data, ex, i); }
 
-    if (i == 0)
-    {
-      assert(ec[0]->interactions_->empty() != true);
-    }
-    else if (i == 1)
-    {
-      assert(ec[0]->interactions_->empty() == true);
-    }
+    // assert current config - outdated
+    // if (i == 1)
+    // {
+    //   assert(ec[0]->interactions_->empty() != true);
+    // }
+    // else if (i == 0)
+    // {
+    //   assert(ec[0]->interactions_->empty() == true);
+    // }
 
     auto restore_guard = VW::scope_exit([&data, &ec, &i] {
       for (example* ex : ec) { restore_interactions(data, ex, 0); }
@@ -181,13 +182,16 @@ void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
 
     if (!base.learn_returns_prediction || !is_learn) { base.predict(ec, i); }
 
+// if (i!=1)
+// { // this fixes the lower bound bug
     if (is_learn) { base.learn(ec, i); }
+// }
 
     // print_interactions((ec[0]));
     // if (!is_learn) print_all_preds(*(ec[0]), i);
 
     // cache the first prediction, (with interaction)
-    if (data.county > 2000 && i == 0) { data.a_s = std::move(ec[0]->pred.a_s); }
+    if (data.county <= 2000 && i == 0) { data.a_s = std::move(ec[0]->pred.a_s); }
 
     // temp print line as if it were finish_example
     // data.adf_learner->print_example(*(data.all), ec);
@@ -196,7 +200,7 @@ void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
   // std::cerr << "(" << data.a_s[0].action << ", " << ec[0]->pred.a_s[0].action << ")" << std::endl;
 
   // replace with prediction of running with interaction
-  if (data.county > 2000) { ec[0]->pred.a_s = std::move(data.a_s); }
+  if (data.county <= 2000) { ec[0]->pred.a_s = std::move(data.a_s); }
 }
 
 void persist(tr_data&, metric_sink&)
@@ -209,7 +213,7 @@ void _finish_example(vw& all, tr_data&, multi_ex& ec) { VW::finish_example(all, 
 
 VW::LEARNER::base_learner* test_red_setup(options_i& options, vw& all)
 {
-  bool test_red;
+  size_t test_red;
   auto data = scoped_calloc_or_throw<tr_data>();
 
   option_group_definition new_options("Debug: test reduction");
@@ -232,7 +236,15 @@ VW::LEARNER::base_learner* test_red_setup(options_i& options, vw& all)
   // if we comment this following line it works ?? why ??
   // add_interaction(all._interactions, 'G', 'T');
   assert(all._interactions.empty() == true);
-  add_interaction(data->empty_interactions, 'G', 'T');
+
+  if (test_red == 0)
+  {
+    add_interaction(data->interactions_1, 'G', 'T');
+  }
+  else
+  {
+    add_interaction(data->empty_interactions, 'G', 'T');
+  }
 
 
   // ask jack about flushing the cache, after mutating reductions
