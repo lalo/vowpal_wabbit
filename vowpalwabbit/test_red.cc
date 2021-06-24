@@ -165,17 +165,6 @@ void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
       data.backup = nullptr;
     });
 
-    // if (is_learn) { base.learn(ec, i); }
-    // else
-    // {
-    //   base.predict(ec, i);
-    // print_interactions((ec[0]));
-    // print_all_preds(*(ec[0]), i);
-    // // temp print line as if it were finish_example
-    // data.adf_learner->print_example(*(data.all), ec);
-    // std::cerr << std::endl;
-    // }
-
     if (!base.learn_returns_prediction || !is_learn) { base.predict(ec, i); }
 
     // if (i!=1)
@@ -183,17 +172,13 @@ void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
     if (is_learn) { base.learn(ec, i); }
     // }
 
-    // print_interactions((ec[0]));
-    // if (!is_learn) print_all_preds(*(ec[0]), i);
-
-    // cache the first prediction, (with interaction)
+    // cache the first prediction, if we need to return it (it will get replaced by the second run)
     if (data.which_to_return == 0 && i == 0) { data.a_s = std::move(ec[0]->pred.a_s); }
 
     // temp print line as if it were finish_example
     // data.adf_learner->print_example(*(data.all), ec);
     // std::cerr << std::endl;
   }
-  // std::cerr << "(" << data.a_s[0].action << ", " << ec[0]->pred.a_s[0].action << ")" << std::endl;
 
   // replace with prediction of running with interaction
   if (data.which_to_return == 0) { ec[0]->pred.a_s = std::move(data.a_s); }
@@ -271,6 +256,7 @@ VW::LEARNER::base_learner* test_red_setup(options_i& options, vw& all)
     // fetch cb_explore_adf to call directly into the print routine twice
     data->adf_learner = as_multiline(base_learner->get_learner_by_name_prefix("cb_explore_adf_"));
 
+    // problem multiplier is set to data->pm
     learner<tr_data, multi_ex>* l = &init_learner(data, as_multiline(base_learner),
         predict_or_learn_m<true, multi_learner>, predict_or_learn_m<false, multi_learner>, data->pm,
         base_learner->pred_type, all.get_setupfn_name(test_red_setup), true);
@@ -281,6 +267,7 @@ VW::LEARNER::base_learner* test_red_setup(options_i& options, vw& all)
   // not implemented yet
   else
   {
+    // problem multiplier is set to data->pm
     learner<tr_data, example>* l = &init_learner(data, as_singleline(base_learner),
         predict_or_learn<true, single_learner>, predict_or_learn<false, single_learner>, data->pm,
         base_learner->pred_type, all.get_setupfn_name(test_red_setup), true);
