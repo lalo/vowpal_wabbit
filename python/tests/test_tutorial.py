@@ -134,8 +134,8 @@ def test_without_interaction():
     # assert(ctr[-1] >= 0.35)
 
 def test_custom_reduction(config=0):
-    # set test_red to 1 for with interaction
-    # set test_red to 0 for no interaction
+    # set test_red to 1 to return pred of with interaction
+    # set test_red to 0 to return pred of no interaction
     vw = pyvw.vw(f"--random_seed 5 --test_red {config} --cb_explore_adf --quiet --epsilon 0.2")
     num_iterations = 2000
     random.seed(10)
@@ -144,7 +144,7 @@ def test_custom_reduction(config=0):
     ctr = run_simulation(vw, num_iterations, users, times_of_day, actions, get_cost)
     curr_file.close()
 
-    print("custom reduction")
+    print(f"custom reduction - {config}")
     print(ctr[-1])
 
 test_with_interaction()

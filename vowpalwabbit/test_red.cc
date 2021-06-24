@@ -21,6 +21,7 @@ namespace test_red
 {
 struct tr_data
 {
+  size_t which_to_return = 0;
   size_t county = 0;
   // all is not needed but good to have for testing purposes
   vw* all;
@@ -152,15 +153,12 @@ void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
 
     for (example* ex : ec) { configure_interactions(data, ex, i); }
 
-    // assert current config - outdated
-    // if (i == 1)
-    // {
-    //   assert(ec[0]->interactions_->empty() != true);
-    // }
-    // else if (i == 0)
-    // {
-    //   assert(ec[0]->interactions_->empty() == true);
-    // }
+    // assert that the config is set correctly
+    if (i == 1) { assert(ec[0]->interactions_->empty() != true); }
+    else if (i == 0)
+    {
+      assert(ec[0]->interactions_->empty() == true);
+    }
 
     auto restore_guard = VW::scope_exit([&data, &ec, &i] {
       for (example* ex : ec) { restore_interactions(data, ex, 0); }
@@ -189,7 +187,7 @@ void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
     // if (!is_learn) print_all_preds(*(ec[0]), i);
 
     // cache the first prediction, (with interaction)
-    if (data.county <= 2000 && i == 0) { data.a_s = std::move(ec[0]->pred.a_s); }
+    if (data.which_to_return == 0 && i == 0) { data.a_s = std::move(ec[0]->pred.a_s); }
 
     // temp print line as if it were finish_example
     // data.adf_learner->print_example(*(data.all), ec);
@@ -198,7 +196,7 @@ void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
   // std::cerr << "(" << data.a_s[0].action << ", " << ec[0]->pred.a_s[0].action << ")" << std::endl;
 
   // replace with prediction of running with interaction
-  if (data.county <= 2000) { ec[0]->pred.a_s = std::move(data.a_s); }
+  if (data.which_to_return == 0) { ec[0]->pred.a_s = std::move(data.a_s); }
 }
 
 void persist(tr_data&, metric_sink&)
@@ -231,6 +229,8 @@ VW::LEARNER::base_learner* test_red_setup(options_i& options, vw& all)
   // all is not needed but good to have for testing purposes
   data->all = &all;
 
+  data->which_to_return = test_red;
+
   // override and clear all the global interactions
   // see parser.cc line 740
   all._interactions.clear();
@@ -244,11 +244,7 @@ VW::LEARNER::base_learner* test_red_setup(options_i& options, vw& all)
   // add_interaction(all._interactions, 'G', 'T');
   assert(all._interactions.empty() == true);
 
-  if (test_red == 0) { add_interaction(data->interactions_1, 'G', 'T'); }
-  else
-  {
-    add_interaction(data->empty_interactions, 'G', 'T');
-  }
+  add_interaction(data->interactions_1, 'G', 'T');
 
   // ask jack about flushing the cache, after mutating reductions
   // that might change
