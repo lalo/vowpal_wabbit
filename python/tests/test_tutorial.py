@@ -3,8 +3,6 @@ from vowpalwabbit import pyvw
 import pytest
 import random
 
-random.seed(10)
-
 # this test was adapted from this tutorial: https://vowpalwabbit.org/tutorials/cb_simulation.html
 
 # VW tries to minimize loss/cost, therefore we will pass cost as -reward
@@ -102,23 +100,20 @@ def run_simulation(vw, num_iterations, users, times_of_day, actions, cost_functi
     return ctr
 
 def test_with_interaction():
-    vw = pyvw.vw("--cb_explore_adf -q GT --quiet --epsilon 0.2")
-    num_iterations = 3000
+    random.seed(10)
     ctr = run_simulation(vw, num_iterations, users, times_of_day, actions, get_cost)
 
     assert(ctr[-1] >= 0.70)
 
 def test_without_interaction():
-    vw = pyvw.vw("--cb_explore_adf --quiet --epsilon 0.2")
-    num_iterations = 3000
+    random.seed(10)
     ctr = run_simulation(vw, num_iterations, users, times_of_day, actions, get_cost)
 
     assert(ctr[-1] < 0.50)
     assert(ctr[-1] >= 0.35)
 
 def test_blah_blah():
-    vw = pyvw.vw("--test_red --cb_explore_adf --quiet --epsilon 0.2")
-    num_iterations = 5000
+    random.seed(10)
     ctr = run_simulation(vw, num_iterations, users, times_of_day, actions, get_cost)
     print(ctr[-1])
 
