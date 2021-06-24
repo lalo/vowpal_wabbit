@@ -77,7 +77,7 @@ def run_simulation(vw, num_iterations, users, times_of_day, actions, cost_functi
     ctr = []
 
     for i in range(1, num_iterations+1):
-        print(f"id:{i}",file=curr_file)
+        print("id:"+str(i),file=curr_file)
         # 1. In each simulation choose a user
         user = choose_user(users)
         # 2. Choose time of day for a given user
@@ -89,7 +89,7 @@ def run_simulation(vw, num_iterations, users, times_of_day, actions, cost_functi
 
         # 4. Get cost of the action we chose
         cost = cost_function(context, action)
-        print(f"cost={cost}", file=curr_file)
+        print("cost="+str(cost), file=curr_file)
         cost_sum += cost
 
         if do_learn:
@@ -118,7 +118,7 @@ def test_with_interaction():
 
     print("with interaction")
     print(ctr[-1])
-    # assert(ctr[-1] >= 0.70)
+    assert(ctr[-1] == 0.765)
 
 def test_without_interaction():
     vw = pyvw.vw("--random_seed 5 --cb_explore_adf --quiet --epsilon 0.2")
@@ -131,22 +131,27 @@ def test_without_interaction():
 
     print("without interaction")
     print(ctr[-1])
-    # assert(ctr[-1] < 0.50)
-    # assert(ctr[-1] >= 0.35)
+    assert(ctr[-1] == 0.4035)
 
 def test_custom_reduction(config=0):
     # set test_red to 1 to return pred of with interaction
     # set test_red to 0 to return pred of no interaction
-    vw = pyvw.vw(f"--random_seed 5 --test_red {config} --cb_explore_adf --quiet --epsilon 0.2")
+    vw = pyvw.vw("--random_seed 5 --test_red "+ str(config) +" --cb_explore_adf --quiet --epsilon 0.2")
     num_iterations = 2000
     random.seed(10)
     global curr_file
-    curr_file = open(f"custom_reduc_{config}.txt", 'w')
+    curr_file = open("custom_reduc_"+str(config)+".txt", 'w')
     ctr = run_simulation(vw, num_iterations, users, times_of_day, actions, get_cost)
     curr_file.close()
 
-    print(f"custom reduction - {config}")
+    print("custom reduction - "+str(config))
     print(ctr[-1])
+    if config == 0:
+        assert(ctr[-1] == 0.371)
+    elif config == 1:
+        assert(ctr[-1] == 0.766)
+    else:
+        assert(false)
 
 test_with_interaction()
 test_without_interaction()
