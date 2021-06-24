@@ -89,6 +89,7 @@ def run_simulation(vw, num_iterations, users, times_of_day, actions, cost_functi
 
         # 4. Get cost of the action we chose
         cost = cost_function(context, action)
+        print(f"cost={cost}", file=curr_file)
         cost_sum += cost
 
         if do_learn:
