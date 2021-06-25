@@ -229,7 +229,9 @@ VW::LEARNER::base_learner* test_red_setup(options_i& options, vw& all)
   // add_interaction(all._interactions, 'G', 'T');
   assert(all._interactions.empty() == true);
 
+  // useful for switching the order around - what params learn'ed first
   add_interaction(data->interactions_1, 'G', 'T');
+  // add_interaction(data->empty_interactions, 'G', 'T');
 
   // ask jack about flushing the cache, after mutating reductions
   // that might change
