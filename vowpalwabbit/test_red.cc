@@ -69,10 +69,7 @@ void configure_interactions(tr_data& data, example* ec, size_t config_number)
   }
 }
 
-void restore_interactions(tr_data& data, example* ec)
-{
-  ec->interactions_ = data.backup;
-}
+void restore_interactions(tr_data& data, example* ec) { ec->interactions_ = data.backup; }
 
 // for debugging purposes
 void print_interactions(example* ec)
