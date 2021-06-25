@@ -64,13 +64,14 @@ void configure_interactions(tr_data& data, example* ec, size_t config_number)
   }
   else if (config_number == 0)
   {
+    ec->interactions_ = &(data.empty_interactions);
     // std::cerr << config_number << "int:" << ec->interactions <<"s"<< ec->interactions->size() << std::endl;
   }
 }
 
-void restore_interactions(tr_data& data, example* ec, size_t config_number)
+void restore_interactions(tr_data& data, example* ec)
 {
-  if (config_number == 0) { ec->interactions_ = data.backup; }
+  ec->interactions_ = data.backup;
 }
 
 // for debugging purposes
@@ -124,6 +125,9 @@ void add_interaction(
 template <bool is_learn, typename T>
 void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
 {
+  // assert we learn twice
+  assert(data.pm == 2);
+
   if (is_learn) { data.county++; }
   assert(data.county <= 2000);
   // extra assert just bc
@@ -132,18 +136,6 @@ void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
   // we force parser to set always as nullptr, see change in parser.cc
   assert(ec[0]->interactions_ == nullptr);
   // that way we can modify all.interactions without parser caring
-  if (ec[0]->interactions_ == nullptr)
-  {
-    data.backup = &data.empty_interactions;
-    // ec[0]->interactions_ = &data.empty_interactions;
-    for (example* ex : ec) { restore_interactions(data, ex, 0); }
-    data.backup = nullptr;
-  }
-  else
-  {
-    assert(false);
-    data.backup = ec[0]->interactions_;
-  }
 
   // test this works if interactions turns out to be nullptr
   for (uint32_t i = 0; i < data.pm; i++)
@@ -161,7 +153,8 @@ void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
     }
 
     auto restore_guard = VW::scope_exit([&data, &ec, &i] {
-      for (example* ex : ec) { restore_interactions(data, ex, 0); }
+      assert(data.backup == nullptr);
+      for (example* ex : ec) { restore_interactions(data, ex); }
       data.backup = nullptr;
     });
 
@@ -182,6 +175,10 @@ void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
 
   // replace with prediction of running with interaction
   if (data.which_to_return == 0) { ec[0]->pred.a_s = std::move(data.a_s); }
+
+  // assert again just like at the top
+  assert(data.all->_interactions.empty() == true);
+  assert(ec[0]->interactions_ == nullptr);
 }
 
 void persist(tr_data&, metric_sink&)
@@ -219,6 +216,7 @@ VW::LEARNER::base_learner* test_red_setup(options_i& options, vw& all)
   // override and clear all the global interactions
   // see parser.cc line 740
   all._interactions.clear();
+  assert(all._interactions.empty() == true);
 
   // make sure we setup the rest of the stack with cleared interactions
   // to make sure there are not subtle bugs
