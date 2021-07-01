@@ -14,6 +14,7 @@ namespace VW
 {
 namespace distributionally_robust
 {
+// https://en.wikipedia.org/wiki/Divergence_(statistics)
 class ChiSquared
 {
 public:
@@ -102,6 +103,7 @@ public:
       wmin = std::min(wmin, w);
       wmax = std::max(wmax, w);
 
+      // it lazily recomputes when its stale
       duals_stale = true;
     }
 

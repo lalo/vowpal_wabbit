@@ -77,6 +77,7 @@ def run_simulation(vw, num_iterations, users, times_of_day, actions, cost_functi
     ctr = []
 
     for i in range(1, num_iterations+1):
+        print("", file=curr_file)
         print("id:"+str(i),file=curr_file)
         # 1. In each simulation choose a user
         user = choose_user(users)

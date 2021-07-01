@@ -51,6 +51,10 @@ static bool isclose(double x, double y, double atol = 1e-8)
   return std::abs(x - y) <= (atol + rtol * std::abs(y));
 }
 
+// split this guy
+// one fn to recompute
+// one fn to fulfill contract of this current fn
+// another fn to extract the first, and plug in with automl
 ChiSquared::Duals ChiSquared::recompute_duals()
 {
   if (n <= 0)
@@ -151,13 +155,20 @@ ChiSquared::Duals ChiSquared::recompute_duals()
   }
 
   // the bound is rmin in this if
+  // in this case, the get<0> is the minimal ever observed (rmin)
+  // we already have it, so just return rmin
   if (candidates.empty()) { duals = {true, 0, 0, 0, n}; }
   else
   {
     // the bound is std::get<0>(*it);
+    // second element <1> is duals, corresponds to distribution over examples
+    // given dataset, streaming at us, lower bound corresponds to computing the average policy value on a different dataset
+    // with reweighting the points (on different), the duals tell you how to change example weights
+    // this is needed for training, set the example weight
     auto it = std::min_element(candidates.begin(), candidates.end(),
         [](const ScoredDual& x, const ScoredDual& y) { return std::get<0>(x) < std::get<0>(y); });
 
+    // return star it
     duals = std::get<1>(*it);
   }
 
