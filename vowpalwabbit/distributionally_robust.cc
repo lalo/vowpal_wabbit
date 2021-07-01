@@ -1,6 +1,5 @@
 #include <cmath>
 #include <list>
-#include <tuple>
 #include <type_traits>
 
 #include "distributionally_robust.h"
@@ -55,11 +54,11 @@ static bool isclose(double x, double y, double atol = 1e-8)
 // one fn to recompute
 // one fn to fulfill contract of this current fn
 // another fn to extract the first, and plug in with automl
-ChiSquared::Duals ChiSquared::recompute_duals()
+ScoredDual ChiSquared::recompute_duals()
 {
   if (n <= 0)
   {
-    duals = {true, 0, 0, 0, 0};
+    duals = std::make_pair(rmin, Duals(true, 0, 0, 0, 0));
 
     return duals;
   }
@@ -82,7 +81,6 @@ ChiSquared::Duals ChiSquared::recompute_duals()
   double r = rmin;
   double sign = 1;
 
-  typedef std::pair<double, Duals> ScoredDual;
   std::list<ScoredDual> candidates;
 
   for (auto wfake : {wmin, wmax})
@@ -157,7 +155,7 @@ ChiSquared::Duals ChiSquared::recompute_duals()
   // the bound is rmin in this if
   // in this case, the get<0> is the minimal ever observed (rmin)
   // we already have it, so just return rmin
-  if (candidates.empty()) { duals = {true, 0, 0, 0, n}; }
+  if (candidates.empty()) { duals = std::make_pair(rmin, Duals(true, 0, 0, 0, n)); }
   else
   {
     // the bound is std::get<0>(*it);
@@ -169,7 +167,7 @@ ChiSquared::Duals ChiSquared::recompute_duals()
         [](const ScoredDual& x, const ScoredDual& y) { return std::get<0>(x) < std::get<0>(y); });
 
     // return star it
-    duals = std::get<1>(*it);
+    duals = *it;
   }
 
   return duals;
