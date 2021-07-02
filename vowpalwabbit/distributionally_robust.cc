@@ -160,9 +160,9 @@ ScoredDual ChiSquared::recompute_duals()
   {
     // the bound is std::get<0>(*it);
     // second element <1> is duals, corresponds to distribution over examples
-    // given dataset, streaming at us, lower bound corresponds to computing the average policy value on a different dataset
-    // with reweighting the points (on different), the duals tell you how to change example weights
-    // this is needed for training, set the example weight
+    // given dataset, streaming at us, lower bound corresponds to computing the average policy value on a different
+    // dataset with reweighting the points (on different), the duals tell you how to change example weights this is
+    // needed for training, set the example weight
     auto it = std::min_element(candidates.begin(), candidates.end(),
         [](const ScoredDual& x, const ScoredDual& y) { return std::get<0>(x) < std::get<0>(y); });
 
