@@ -7,6 +7,7 @@
 #include "learner.h"
 #include <cfloat>
 
+#include "distributionally_robust.h"
 #include "io/logger.h"
 #include "vw.h"
 
@@ -21,6 +22,11 @@ namespace test_red
 {
 struct tr_data
 {
+  tr_data()
+      : chisq_1(0.05, 0.999, 0, std::numeric_limits<double>::infinity())
+      , chisq_2(0.05, 0.999, 0, std::numeric_limits<double>::infinity())
+  {
+  }
   size_t which_to_return = 0;
   size_t county = 0;
   // all is not needed but good to have for testing purposes
@@ -34,6 +40,10 @@ struct tr_data
   std::vector<std::vector<namespace_index>>* backup = nullptr;
   std::vector<std::vector<namespace_index>> interactions_1;
   std::vector<std::vector<namespace_index>> empty_interactions;
+
+private:
+  VW::distributionally_robust::ChiSquared chisq_1;
+  VW::distributionally_robust::ChiSquared chisq_2;
 };
 
 // see predict_or_learn_m,
