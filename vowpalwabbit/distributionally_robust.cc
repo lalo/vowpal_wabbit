@@ -50,10 +50,6 @@ static bool isclose(double x, double y, double atol = 1e-8)
   return std::abs(x - y) <= (atol + rtol * std::abs(y));
 }
 
-// split this guy
-// one fn to recompute
-// one fn to fulfill contract of this current fn
-// another fn to extract the first, and plug in with automl
 ScoredDual ChiSquared::recompute_duals()
 {
   if (n <= 0)
@@ -166,7 +162,6 @@ ScoredDual ChiSquared::recompute_duals()
     auto it = std::min_element(candidates.begin(), candidates.end(),
         [](const ScoredDual& x, const ScoredDual& y) { return std::get<0>(x) < std::get<0>(y); });
 
-    // return star it
     duals = *it;
   }
 
