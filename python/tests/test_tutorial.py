@@ -160,5 +160,9 @@ test_without_interaction()
 
 with_interaction = 1
 without_interaction = 0
+print()
+print("pred with interaction")
 test_custom_reduction(with_interaction)
+print()
+print("pred without interaction")
 test_custom_reduction(without_interaction)

@@ -224,7 +224,7 @@ void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
   {
     std::cerr << "empty_0:" << data.chisq_1.recompute_duals().first << std::endl;
     std::cerr << "interac_1:" << data.chisq_2.recompute_duals().first << std::endl;
-    std::cerr << std::endl;
+    std::cerr << data.county << std::endl;
   }
 
   // replace with prediction of running with interaction
