@@ -41,7 +41,6 @@ struct tr_data
   std::vector<std::vector<namespace_index>> interactions_1;
   std::vector<std::vector<namespace_index>> empty_interactions;
 
-private:
   VW::distributionally_robust::ChiSquared chisq_1;
   VW::distributionally_robust::ChiSquared chisq_2;
 };
@@ -129,20 +128,37 @@ void add_interaction(
   interactions.push_back(vect);
 }
 
-template <bool is_learn, typename T>
+template <bool is_learn, bool is_explore, typename T>
 void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
 {
   // assert we learn twice
   assert(data.pm == 2);
 
   if (is_learn) { data.county++; }
-  assert(data.county <= 2000);
+  // assert(data.county <= 2000);
   // extra assert just bc
   assert(data.all->_interactions.empty() == true);
 
   // we force parser to set always as nullptr, see change in parser.cc
   assert(ec[0]->interactions_ == nullptr);
   // that way we can modify all.interactions without parser caring
+
+  CB::cb_class logged{};
+  uint32_t labelled_action = 0;
+  if (is_learn)
+  {
+    // we are above shared_feature_merger boohoo?
+    // see std::next()
+    const auto it =
+        std::find_if(std::next(ec.begin()), ec.end(), [](example* item) { return !item->l.cb.costs.empty(); });
+
+    if (it != ec.end())
+    {
+      logged = (*it)->l.cb.costs[0];
+      labelled_action = static_cast<uint32_t>(std::distance(ec.begin(), it));
+      // if (labelled_action != 0) std::cerr<<labelled_action<<std::endl;
+    }
+  }
 
   // test this works if interactions turns out to be nullptr
   for (uint32_t i = 0; i < data.pm; i++)
@@ -172,12 +188,43 @@ void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
     if (is_learn) { base.learn(ec, i); }
     // }
 
+    if (is_learn)
+    {
+      const auto action_scores = ec[0]->pred.a_s;
+
+      // cb_explore_adf => want maximum probability
+      // cb_adf => first action is a greedy action
+
+      const auto maxit = is_explore ? std::max_element(action_scores.begin(), action_scores.end(),
+                                          [](const ACTION_SCORE::action_score& a, const ACTION_SCORE::action_score& b) {
+                                            return ACTION_SCORE::score_comp(&a, &b) < 0;
+                                          })
+                                    : action_scores.begin();
+      const uint32_t chosen_action = maxit->action;
+
+      const float w = logged.probability > 0 ? 1 / logged.probability : 0;
+      const float r = -logged.cost;
+
+      if (i == 0) { data.chisq_1.update(chosen_action == labelled_action ? w : 0, r); }
+      else if (i == 1)
+      {
+        data.chisq_2.update(chosen_action == labelled_action ? w : 0, r);
+      }
+    }
+
     // cache the first prediction, if we need to return it (it will get replaced by the second run)
     if (data.which_to_return == 0 && i == 0) { data.a_s = std::move(ec[0]->pred.a_s); }
 
     // temp print line as if it were finish_example
     // data.adf_learner->print_example(*(data.all), ec);
     // std::cerr << std::endl;
+  }
+
+  if (is_learn && data.county % 500 == 0)
+  {
+    std::cerr << "empty_0:" << data.chisq_1.recompute_duals().first << std::endl;
+    std::cerr << "interac_1:" << data.chisq_2.recompute_duals().first << std::endl;
+    std::cerr << std::endl;
   }
 
   // replace with prediction of running with interaction
@@ -265,7 +312,7 @@ VW::LEARNER::base_learner* test_red_setup(options_i& options, vw& all)
 
     // problem multiplier is set to data->pm
     learner<tr_data, multi_ex>* l = &init_learner(data, as_multiline(base_learner),
-        predict_or_learn_m<true, multi_learner>, predict_or_learn_m<false, multi_learner>, data->pm,
+        predict_or_learn_m<true, true, multi_learner>, predict_or_learn_m<false, true, multi_learner>, data->pm,
         base_learner->pred_type, all.get_setupfn_name(test_red_setup), true);
     l->set_persist_metrics(persist);
     l->set_finish_example(_finish_example);

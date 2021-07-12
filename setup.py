@@ -152,7 +152,7 @@ class BuildPyLibVWBindingsModule(_build_ext):
                 '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + str(lib_output_dir),
             ]
             build_args += [
-                '--', '-j{}'.format(multiprocessing.cpu_count()),
+                '--', '-j{}'.format(1),
                 # Build the pylibvw target
                 "pylibvw"
             ]
