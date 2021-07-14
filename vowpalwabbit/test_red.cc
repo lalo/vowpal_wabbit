@@ -208,17 +208,18 @@ void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
       const float w = logged.probability > 0 ? 1 / logged.probability : 0;
       const float r = -logged.cost;
 
-      if (i == 0) { 
-        data.chisq_1.update(chosen_action == labelled_action ? w : 0, r); 
+      if (i == 0)
+      {
+        data.chisq_1.update(chosen_action == labelled_action ? w : 0, r);
         data.ipsone += r * (chosen_action == labelled_action ? w : 0);
-        data.w1 = chosen_action==labelled_action ? w : 0;
+        data.w1 = chosen_action == labelled_action ? w : 0;
         data.r1 = r;
       }
       else if (i == 1)
       {
         data.chisq_2.update(chosen_action == labelled_action ? w : 0, r);
         data.ipstwo += r * (chosen_action == labelled_action ? w : 0);
-        data.w2 = chosen_action==labelled_action ? w : 0;
+        data.w2 = chosen_action == labelled_action ? w : 0;
         data.r2 = r;
       }
     }
@@ -235,8 +236,8 @@ void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
   {
     std::cerr << "empty_0:" << data.chisq_1.recompute_duals().first << std::endl;
     std::cerr << "interac_1:" << data.chisq_2.recompute_duals().first << std::endl;
-    std::cerr << "ips_0:" << data.ipsone/data.county << std::endl;
-    std::cerr << "ips_1:" << data.ipstwo/data.county << std::endl;
+    std::cerr << "ips_0:" << data.ipsone / data.county << std::endl;
+    std::cerr << "ips_1:" << data.ipstwo / data.county << std::endl;
     std::cerr << data.county << std::endl << std::endl;
   }
 
