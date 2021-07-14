@@ -235,7 +235,7 @@ void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
   assert(ec[0]->interactions_ == nullptr);
 }
 
-void persist(tr_data& data, metric_sink&metrics)
+void persist(tr_data& data, metric_sink& metrics)
 {
   metrics.float_metrics_list.emplace_back("test_bound_firstm", data.chisq_1.recompute_duals().first);
   metrics.float_metrics_list.emplace_back("test_bound_secondm", data.chisq_2.recompute_duals().first);
