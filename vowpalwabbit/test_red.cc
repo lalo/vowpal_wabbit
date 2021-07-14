@@ -43,6 +43,8 @@ struct tr_data
 
   VW::distributionally_robust::ChiSquared chisq_1;
   VW::distributionally_robust::ChiSquared chisq_2;
+  float ipsone = 0.0;
+  float ipstwo = 0.0;
 };
 
 // see predict_or_learn_m,
@@ -192,23 +194,23 @@ void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
     {
       const auto action_scores = ec[0]->pred.a_s;
 
-      // cb_explore_adf => want maximum probability
+      // NOT FOR NOW cb_explore_adf => want maximum probability
       // cb_adf => first action is a greedy action
 
-      const auto maxit = is_explore ? std::max_element(action_scores.begin(), action_scores.end(),
-                                          [](const ACTION_SCORE::action_score& a, const ACTION_SCORE::action_score& b) {
-                                            return ACTION_SCORE::score_comp(&a, &b) < 0;
-                                          })
-                                    : action_scores.begin();
+      const auto maxit = action_scores.begin();
       const uint32_t chosen_action = maxit->action;
 
       const float w = logged.probability > 0 ? 1 / logged.probability : 0;
       const float r = -logged.cost;
 
-      if (i == 0) { data.chisq_1.update(chosen_action == labelled_action ? w : 0, r); }
+      if (i == 0) { 
+        data.chisq_1.update(chosen_action == labelled_action ? w : 0, r); 
+        data.ipsone += r * (chosen_action == labelled_action ? w : 0);
+      }
       else if (i == 1)
       {
         data.chisq_2.update(chosen_action == labelled_action ? w : 0, r);
+        data.ipstwo += r * (chosen_action == labelled_action ? w : 0);
       }
     }
 
@@ -224,10 +226,12 @@ void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
   {
     std::cerr << "empty_0:" << data.chisq_1.recompute_duals().first << std::endl;
     std::cerr << "interac_1:" << data.chisq_2.recompute_duals().first << std::endl;
-    std::cerr << data.county << std::endl;
+    std::cerr << "ips_0:" << data.ipsone/data.county << std::endl;
+    std::cerr << "ips_1:" << data.ipstwo/data.county << std::endl;
+    std::cerr << data.county << std::endl << std::endl;
   }
 
-  // replace with prediction of running with interaction
+  // replace with prediction depending on which_to_return
   if (data.which_to_return == 0) { ec[0]->pred.a_s = std::move(data.a_s); }
 
   // assert again just like at the top
