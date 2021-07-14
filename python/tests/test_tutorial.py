@@ -138,12 +138,16 @@ def test_without_interaction():
 def test_custom_reduction(config=0):
     # set test_red to 1 to return pred of with interaction
     # set test_red to 0 to return pred of no interaction
-    vw = pyvw.vw("--random_seed 5 --test_red "+ str(config) +" --cb_explore_adf --quiet --epsilon 0.2")
+    vw = pyvw.vw("--random_seed 5 --test_red "+ str(config) +" --cb_explore_adf --quiet --epsilon 0.2 --extra_metrics metrics.json")
     num_iterations = 5000
     random.seed(10)
     global curr_file
     curr_file = open("custom_reduc_"+str(config)+".txt", 'w')
     ctr = run_simulation(vw, num_iterations, users, times_of_day, actions, get_cost)
+    metrics = vw.get_learner_metrics()
+    print(metrics["test_bound_firstm"])
+    print(metrics["test_bound_secondm"])
+
     curr_file.close()
 
     print("custom reduction - "+str(config))

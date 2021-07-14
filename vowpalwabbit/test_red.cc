@@ -235,10 +235,10 @@ void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
   assert(ec[0]->interactions_ == nullptr);
 }
 
-void persist(tr_data&, metric_sink&)
+void persist(tr_data& data, metric_sink&metrics)
 {
-  // metrics.int_metrics_list.emplace_back("total_predict_calls", data.predict_count);
-  // metrics.int_metrics_list.emplace_back("total_learn_calls", data.learn_count);
+  metrics.float_metrics_list.emplace_back("test_bound_firstm", data.chisq_1.recompute_duals().first);
+  metrics.float_metrics_list.emplace_back("test_bound_secondm", data.chisq_2.recompute_duals().first);
 }
 
 void _finish_example(vw& all, tr_data&, multi_ex& ec) { VW::finish_example(all, ec); }
