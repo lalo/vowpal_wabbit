@@ -45,6 +45,11 @@ struct tr_data
   VW::distributionally_robust::ChiSquared chisq_2;
   float ipsone = 0.0;
   float ipstwo = 0.0;
+
+  float w1 = 0.0;
+  float w2 = 0.0;
+  float r1 = 0.0;
+  float r2 = 0.0;
 };
 
 // see predict_or_learn_m,
@@ -206,11 +211,15 @@ void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
       if (i == 0) { 
         data.chisq_1.update(chosen_action == labelled_action ? w : 0, r); 
         data.ipsone += r * (chosen_action == labelled_action ? w : 0);
+        data.w1 = chosen_action==labelled_action ? w : 0;
+        data.r1 = r;
       }
       else if (i == 1)
       {
         data.chisq_2.update(chosen_action == labelled_action ? w : 0, r);
         data.ipstwo += r * (chosen_action == labelled_action ? w : 0);
+        data.w2 = chosen_action==labelled_action ? w : 0;
+        data.r2 = r;
       }
     }
 
@@ -243,6 +252,10 @@ void persist(tr_data& data, metric_sink& metrics)
 {
   metrics.float_metrics_list.emplace_back("test_bound_firstm", data.chisq_1.recompute_duals().first);
   metrics.float_metrics_list.emplace_back("test_bound_secondm", data.chisq_2.recompute_duals().first);
+  metrics.float_metrics_list.emplace_back("test_w1", data.w1);
+  metrics.float_metrics_list.emplace_back("test_r1", data.r1);
+  metrics.float_metrics_list.emplace_back("test_w2", data.w2);
+  metrics.float_metrics_list.emplace_back("test_r2", data.r2);
 }
 
 void _finish_example(vw& all, tr_data&, multi_ex& ec) { VW::finish_example(all, ec); }
