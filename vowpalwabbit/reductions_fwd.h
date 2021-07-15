@@ -31,7 +31,14 @@ struct options_i;
 
 struct setup_base_fn
 {
-  virtual VW::LEARNER::base_learner* operator()(VW::config::options_i&, vw&) = 0;
+  virtual VW::LEARNER::base_learner* operator()() = 0;
+
+  // this one we can share freely
+  virtual VW::config::options_i* get_options() = 0;
+
+  // in reality we would want to be more specific than this
+  // to start hiding global state away
+  virtual vw* get_all_pointer() = 0;
 
   virtual ~setup_base_fn() = default;
 };
