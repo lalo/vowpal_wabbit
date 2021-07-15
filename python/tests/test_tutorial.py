@@ -79,9 +79,9 @@ def run_simulation(vw, num_iterations, users, times_of_day, actions, cost_functi
 
     # keep track if simulation is under new reduction
     # this is only used to obtain more specific metrics
-    has_special_reduction = "test_red" in vw.get_enabled_reductions()
+    has_aml = "test_red" in vw.get_enabled_reductions()
 
-    if has_special_reduction:
+    if has_aml:
         ocrl = dro.OnlineDRO.OnlineCressieReadLB(alpha=0.05, tau=0.999)
         ocrl2 = dro.OnlineDRO.OnlineCressieReadLB(alpha=0.05, tau=0.999)
 
@@ -115,7 +115,7 @@ def run_simulation(vw, num_iterations, users, times_of_day, actions, cost_functi
         # We negate this so that on the plot instead of minimizing cost, we are maximizing reward
         ctr.append(-1*cost_sum/i)
 
-        if has_special_reduction:
+        if has_aml:
             metrics = vw.get_learner_metrics()
             vw_b = metrics["test_bound_firstm"]
             vw_b_2 = metrics["test_bound_secondm"]
