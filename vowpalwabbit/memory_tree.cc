@@ -1250,7 +1250,7 @@ base_learner* memory_tree_setup(VW::setup_base_fn& setup_base)
   if (tree->oas == false)
   {
     num_learners = tree->max_nodes + 1;
-    learner<memory_tree, example>& l = init_multiclass_learner(tree, as_singleline(setup_base(options, all)), learn,
+    learner<memory_tree, example>& l = init_multiclass_learner(tree, as_singleline(setup_base()), learn,
         predict, all.example_parser, num_learners, all.get_setupfn_name(memory_tree_setup));
     all.example_parser->lbl_parser.label_type = label_type_t::multiclass;
     // srand(time(0));
@@ -1262,7 +1262,7 @@ base_learner* memory_tree_setup(VW::setup_base_fn& setup_base)
   else
   {
     num_learners = tree->max_nodes + 1 + tree->max_num_labels;
-    learner<memory_tree, example>& l = init_learner(tree, as_singleline(setup_base(options, all)), learn, predict,
+    learner<memory_tree, example>& l = init_learner(tree, as_singleline(setup_base()), learn, predict,
         num_learners, prediction_type_t::multilabels, all.get_setupfn_name(memory_tree_setup));
 
     l.set_end_pass(end_pass);

@@ -102,7 +102,7 @@ VW::LEARNER::base_learner* shared_feature_merger_setup(
 
   if (options.was_supplied("extra_metrics")) data->_metrics = VW::make_unique<sfm_metrics>();
 
-  auto* base = VW::LEARNER::as_multiline(setup_base(options, all));
+  auto* base = VW::LEARNER::as_multiline(setup_base());
 
   auto& learner = VW::LEARNER::init_learner(data, base, predict_or_learn<true>, predict_or_learn<false>,
       all.get_setupfn_name(shared_feature_merger_setup), base->learn_returns_prediction);

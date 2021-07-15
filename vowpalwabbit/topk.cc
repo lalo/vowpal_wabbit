@@ -133,7 +133,7 @@ VW::LEARNER::base_learner* topk_setup(VW::setup_base_fn& setup_base)
 
   auto data = scoped_calloc_or_throw<VW::topk>(K);
 
-  VW::LEARNER::learner<VW::topk, multi_ex>& l = init_learner(data, as_singleline(setup_base(options, all)),
+  VW::LEARNER::learner<VW::topk, multi_ex>& l = init_learner(data, as_singleline(setup_base()),
       predict_or_learn<true>, predict_or_learn<false>, all.get_setupfn_name(topk_setup), true);
   l.set_finish_example(finish_example);
 

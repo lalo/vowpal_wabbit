@@ -179,7 +179,7 @@ LEARNER::base_learner* setup(setup_base_fn& setup_base, config::options_i& optio
   if (!options.was_supplied("get_pmf")) options.insert("get_pmf", "");
   options.insert("cats_tree", std::to_string(num_actions));
 
-  LEARNER::base_learner* p_base = setup_base(options, all);
+  LEARNER::base_learner* p_base = setup_base();
   bool always_predict = all.final_prediction_sink.size() > 0;
   auto p_reduction = scoped_calloc_or_throw<cats_pdf>(as_singleline(p_base), always_predict);
 

@@ -92,7 +92,7 @@ VW::LEARNER::base_learner* classweight_setup(VW::setup_base_fn& setup_base)
 
   if (!all.logger.quiet) *(all.trace_message) << "parsed " << cweights->weights.size() << " class weights" << std::endl;
 
-  VW::LEARNER::single_learner* base = as_singleline(setup_base(options, all));
+  VW::LEARNER::single_learner* base = as_singleline(setup_base());
 
   VW::LEARNER::learner<classweights, example>* ret;
   if (base->pred_type == prediction_type_t::scalar)

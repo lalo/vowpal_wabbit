@@ -139,6 +139,9 @@ void return_active_example(vw& all, active& a, example& ec)
 
 base_learner* active_setup(VW::setup_base_fn& setup_base)
 {
+  options_i& options = *setup_base.get_options();
+  vw& all = *setup_base.get_all_pointer();
+
   auto data = scoped_calloc_or_throw<active>();
 
   bool active_option = false;
@@ -158,7 +161,7 @@ base_learner* active_setup(VW::setup_base_fn& setup_base)
 
   if (options.was_supplied("lda")) THROW("error: you can't combine lda and active learning");
 
-  auto base = as_singleline(setup_base(options, all));
+  auto base = as_singleline(setup_base());
 
   // Create new learner
   learner<active, example>* l;

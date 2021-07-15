@@ -639,7 +639,7 @@ base_learner* ccb_explore_adf_setup(VW::setup_base_fn& setup_base)
     options.add_and_parse(new_options);
   }
 
-  auto* base = as_multiline(setup_base(options, all));
+  auto* base = as_multiline(setup_base());
   all.example_parser->lbl_parser = CCB::ccb_label_parser;
 
   // Stash the base learners stride_shift so we can properly add a feature

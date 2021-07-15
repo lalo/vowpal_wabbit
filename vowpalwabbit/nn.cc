@@ -451,7 +451,7 @@ base_learner* nn_setup(VW::setup_base_fn& setup_base)
   n->hidden_units_pred = calloc_or_throw<polyprediction>(n->k);
   n->hiddenbias_pred = calloc_or_throw<polyprediction>(n->k);
 
-  auto base = as_singleline(setup_base(options, all));
+  auto base = as_singleline(setup_base());
   n->increment = base->increment;  // Indexing of output layer is odd.
   nn& nv = *n.get();
   learner<nn, example>& l = init_learner(n, base, predict_or_learn_multi<true, true>,

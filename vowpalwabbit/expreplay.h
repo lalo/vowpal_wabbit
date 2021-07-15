@@ -108,7 +108,7 @@ VW::LEARNER::base_learner* expreplay_setup(VW::setup_base_fn& setup_base)
     *(all.trace_message) << "experience replay level=" << er_level << ", buffer=" << er->N << ", replay count=" << er->replay_count
               << std::endl;
 
-  er->base = VW::LEARNER::as_singleline(setup_base(options, all));
+  er->base = VW::LEARNER::as_singleline(setup_base());
   VW::LEARNER::learner<expreplay<lp>, example> *l = &init_learner(er, er->base, learn<lp>, predict<lp>, replay_string);
   l->set_end_pass(end_pass<lp>);
 

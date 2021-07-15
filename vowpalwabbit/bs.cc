@@ -254,7 +254,7 @@ base_learner* bs_setup(VW::setup_base_fn& setup_base)
   data->all = &all;
   data->_random_state = all.get_random_state();
 
-  learner<bs, example>& l = init_learner(data, as_singleline(setup_base(options, all)), predict_or_learn<true>,
+  learner<bs, example>& l = init_learner(data, as_singleline(setup_base()), predict_or_learn<true>,
       predict_or_learn<false>, data->B, all.get_setupfn_name(bs_setup), true);
   l.set_finish_example(finish_example);
 

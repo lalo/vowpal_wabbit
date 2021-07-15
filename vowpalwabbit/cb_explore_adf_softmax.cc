@@ -82,7 +82,7 @@ VW::LEARNER::base_learner* setup(VW::setup_base_fn& setup_base)
   // Set explore_type
   size_t problem_multiplier = 1;
 
-  VW::LEARNER::multi_learner* base = as_multiline(setup_base(options, all));
+  VW::LEARNER::multi_learner* base = as_multiline(setup_base());
   all.example_parser->lbl_parser = CB::cb_label;
 
   bool with_metrics = options.was_supplied("extra_metrics");

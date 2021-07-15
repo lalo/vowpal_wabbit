@@ -111,7 +111,7 @@ LEARNER::base_learner* sample_pdf_setup(VW::setup_base_fn& setup_base)
   // to the reduction stack;
   if (!options.add_parse_and_check_necessary(new_options)) return nullptr;
 
-  LEARNER::base_learner* p_base = setup_base(options, all);
+  LEARNER::base_learner* p_base = setup_base();
   auto p_reduction = VW::make_unique<sample_pdf>();
   p_reduction->init(as_singleline(p_base), all.get_random_state());
 

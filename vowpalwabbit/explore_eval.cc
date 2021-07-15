@@ -210,7 +210,7 @@ base_learner* explore_eval_setup(VW::setup_base_fn& setup_base)
 
   if (!options.was_supplied("cb_explore_adf")) options.insert("cb_explore_adf", "");
 
-  multi_learner* base = as_multiline(setup_base(options, all));
+  multi_learner* base = as_multiline(setup_base());
   all.example_parser->lbl_parser = CB::cb_label;
 
   learner<explore_eval, multi_ex>& l = init_learner(data, base, do_actual_learning<true>, do_actual_learning<false>, 1,

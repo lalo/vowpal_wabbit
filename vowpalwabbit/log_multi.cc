@@ -519,7 +519,7 @@ base_learner* log_multi_setup(VW::setup_base_fn& setup_base)  // learner setup
   data->max_predictors = data->k - 1;
   init_tree(*data.get());
 
-  learner<log_multi, example>& l = init_multiclass_learner(data, as_singleline(setup_base(options, all)), learn,
+  learner<log_multi, example>& l = init_multiclass_learner(data, as_singleline(setup_base()), learn,
       predict, all.example_parser, data->max_predictors, all.get_setupfn_name(log_multi_setup));
   all.example_parser->lbl_parser.label_type = label_type_t::multiclass;
   l.set_save_load(save_load_tree);

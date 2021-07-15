@@ -247,7 +247,7 @@ VW::LEARNER::base_learner* slates_setup(VW::setup_base_fn& setup_base)
     options.add_and_parse(new_options);
   }
 
-  auto* base = as_multiline(setup_base(options, all));
+  auto* base = as_multiline(setup_base());
   all.example_parser->lbl_parser = slates_label_parser;
   auto* l = VW::LEARNER::make_reduction_learner(
       std::move(data), base, learn_or_predict<true>, learn_or_predict<false>, all.get_setupfn_name(slates_setup))

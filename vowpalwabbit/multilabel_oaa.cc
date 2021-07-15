@@ -69,7 +69,7 @@ VW::LEARNER::base_learner* multilabel_oaa_setup(VW::setup_base_fn& setup_base)
 
   if (!options.add_parse_and_check_necessary(new_options)) return nullptr;
 
-  VW::LEARNER::learner<multi_oaa, example>& l = VW::LEARNER::init_learner(data, as_singleline(setup_base(options, all)),
+  VW::LEARNER::learner<multi_oaa, example>& l = VW::LEARNER::init_learner(data, as_singleline(setup_base()),
       predict_or_learn<true>, predict_or_learn<false>, data->k, prediction_type_t::multilabels,
       all.get_setupfn_name(multilabel_oaa_setup), true);
   l.set_finish_example(finish_example);

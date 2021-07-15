@@ -365,7 +365,7 @@ base_learner* setup(setup_base_fn& setup_base, options_i& options, vw& all)
   tree->init(num_actions, bandwidth);
   tree->set_trace_message(all.trace_message.get(), all.logger.quiet);
 
-  base_learner* base = setup_base(options, all);
+  base_learner* base = setup_base();
   int32_t params_per_weight = tree->learner_count();
   auto* l = make_reduction_learner(std::move(tree), as_singleline(base), learn, predict, all.get_setupfn_name(setup))
                 .set_params_per_weight(params_per_weight)

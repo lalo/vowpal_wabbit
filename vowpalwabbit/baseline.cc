@@ -194,7 +194,7 @@ base_learner* baseline_setup(VW::setup_base_fn& setup_base)
   auto loss_function_type = all.loss->getType();
   if (loss_function_type != "logistic") data->lr_scaling = true;
 
-  auto base = as_singleline(setup_base(options, all));
+  auto base = as_singleline(setup_base());
 
   learner<baseline, example>& l =
       init_learner(data, base, predict_or_learn<true>, predict_or_learn<false>, all.get_setupfn_name(baseline_setup));

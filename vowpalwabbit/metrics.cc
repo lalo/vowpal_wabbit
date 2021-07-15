@@ -135,7 +135,7 @@ VW::LEARNER::base_learner* metrics_setup(VW::setup_base_fn& setup_base)
 
   if (data->out_file.empty()) THROW("extra_metrics argument (output filename) is missing.");
 
-  auto* base_learner = setup_base(options, all);
+  auto* base_learner = setup_base();
 
   if (base_learner->is_multiline)
   {

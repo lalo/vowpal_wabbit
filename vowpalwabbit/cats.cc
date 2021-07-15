@@ -196,7 +196,7 @@ LEARNER::base_learner* setup(setup_base_fn& setup_base, options_i& options, vw& 
                          << bandwidth << std::endl;
   }
 
-  LEARNER::base_learner* p_base = setup_base(options, all);
+  LEARNER::base_learner* p_base = setup_base();
   auto p_reduction = scoped_calloc_or_throw<cats>(as_singleline(p_base));
   p_reduction->num_actions = num_actions;
   p_reduction->bandwidth = bandwidth;

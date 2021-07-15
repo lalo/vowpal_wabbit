@@ -161,7 +161,7 @@ VW::LEARNER::base_learner* cb_to_cb_adf_setup(VW::setup_base_fn& setup_base)
   {
     options.insert("cb_explore_adf", "");
     // no need to register custom predict/learn, cbify will take care of that
-    return setup_base(options, all);
+    return setup_base();
   }
 
   // user specified "cb_explore" but we're not using an old model file
@@ -180,7 +180,7 @@ VW::LEARNER::base_learner* cb_to_cb_adf_setup(VW::setup_base_fn& setup_base)
   data->explore_mode = override_cb_explore;
   data->weights = &(all.weights);
 
-  multi_learner* base = as_multiline(setup_base(options, all));
+  multi_learner* base = as_multiline(setup_base());
 
   learner<cb_to_cb_adf, example>* l;
 

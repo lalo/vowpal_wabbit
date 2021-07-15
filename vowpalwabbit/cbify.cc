@@ -754,7 +754,7 @@ base_learner* cbify_setup(VW::setup_base_fn& setup_base)
 
   if (data->use_adf)
   {
-    multi_learner* base = as_multiline(setup_base(options, all));
+    multi_learner* base = as_multiline(setup_base());
 
     if (data->use_adf) { data->adf_data.init_adf_data(num_actions, base->increment, all.interactions); }
 
@@ -773,7 +773,7 @@ base_learner* cbify_setup(VW::setup_base_fn& setup_base)
   }
   else
   {
-    single_learner* base = as_singleline(setup_base(options, all));
+    single_learner* base = as_singleline(setup_base());
     if (use_reg)
     {
       all.example_parser->lbl_parser = simple_label_parser;
@@ -839,7 +839,7 @@ base_learner* cbifyldf_setup(VW::setup_base_fn& setup_base)
     options.insert("lr_multiplier", ss.str());
   }
 
-  multi_learner* base = as_multiline(setup_base(options, all));
+  multi_learner* base = as_multiline(setup_base());
   learner<cbify, multi_ex>& l = init_learner(data, base, do_actual_learning_ldf, do_actual_predict_ldf, 1,
       prediction_type_t::multiclass, all.get_setupfn_name(cbifyldf_setup));
 

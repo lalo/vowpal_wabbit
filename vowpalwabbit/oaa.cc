@@ -263,7 +263,7 @@ VW::LEARNER::base_learner* oaa_setup(VW::setup_base_fn& setup_base)
 
   oaa* data_ptr = data.get();
   VW::LEARNER::learner<oaa, example>* l;
-  auto base = as_singleline(setup_base(options, all));
+  auto base = as_singleline(setup_base());
   if (probabilities || scores)
   {
     if (probabilities)

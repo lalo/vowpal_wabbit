@@ -367,7 +367,7 @@ base_learner* cb_explore_setup(VW::setup_base_fn& setup_base)
   data->cbcs.cb_type = CB_TYPE_DR;
   data->model_file_version = all.model_file_ver;
 
-  single_learner* base = as_singleline(setup_base(options, all));
+  single_learner* base = as_singleline(setup_base());
   data->cbcs.scorer = all.scorer;
 
   learner<cb_explore, example>* l;

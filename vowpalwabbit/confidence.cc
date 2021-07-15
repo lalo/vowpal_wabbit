@@ -124,7 +124,7 @@ base_learner* confidence_setup(VW::setup_base_fn& setup_base)
     predict_with_confidence_ptr = predict_or_learn_with_confidence<false, false>;
   }
 
-  auto base = as_singleline(setup_base(options, all));
+  auto base = as_singleline(setup_base());
 
   // Create new learner
   learner<confidence, example>& l = init_learner(

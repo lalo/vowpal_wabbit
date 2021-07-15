@@ -123,7 +123,7 @@ LEARNER::base_learner* cb_explore_pdf_setup(VW::setup_base_fn& setup_base)
   if (!options.was_supplied("min_value") || !options.was_supplied("max_value"))
     THROW("error: min and max values must be supplied with cb_explore_pdf");
 
-  LEARNER::base_learner* p_base = setup_base(options, all);
+  LEARNER::base_learner* p_base = setup_base();
   auto p_reduction = VW::make_unique<cb_explore_pdf>();
   p_reduction->init(as_singleline(p_base));
   p_reduction->epsilon = epsilon;

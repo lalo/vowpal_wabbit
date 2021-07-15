@@ -4,7 +4,7 @@
 
 struct vw;
 
-typedef VW::LEARNER::base_learner* (*reduction_setup_fn)(VW::setup_base_fn&, VW::config::options_i&, vw&);
+typedef VW::LEARNER::base_learner* (*reduction_setup_fn)(VW::setup_base_fn&);
 
 namespace VW
 {

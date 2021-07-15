@@ -551,7 +551,7 @@ base_learner* cb_adf_setup(VW::setup_base_fn& setup_base)
 
   auto ld = VW::make_unique<cb_adf>(all.sd, cb_type, &all.model_file_ver, rank_all, clip_p, no_predict);
 
-  auto base = as_multiline(setup_base(options, all));
+  auto base = as_multiline(setup_base());
   all.example_parser->lbl_parser = CB::cb_label;
 
   cb_adf* bare = ld.get();

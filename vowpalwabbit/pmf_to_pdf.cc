@@ -293,7 +293,7 @@ base_learner* setup(VW::setup_base_fn& setup_base)
 
   options.replace("tree_bandwidth", std::to_string(data->tree_bandwidth));
 
-  auto p_base = as_singleline(setup_base(options, all));
+  auto p_base = as_singleline(setup_base());
   data->_p_base = p_base;
 
   learner<pmf_to_pdf::reduction, example>& l =

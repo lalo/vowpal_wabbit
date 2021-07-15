@@ -203,7 +203,7 @@ base_learner* cb_algs_setup(VW::setup_base_fn& setup_base)
     options.insert("csoaa", ss.str());
   }
 
-  auto base = as_singleline(setup_base(options, all));
+  auto base = as_singleline(setup_base());
   if (eval) { all.example_parser->lbl_parser = CB_EVAL::cb_eval; }
   else
   {

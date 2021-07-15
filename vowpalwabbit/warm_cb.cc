@@ -594,7 +594,7 @@ base_learner* warm_cb_setup(VW::setup_base_fn& setup_base)
 
   learner<warm_cb, example>* l;
 
-  multi_learner* base = as_multiline(setup_base(options, all));
+  multi_learner* base = as_multiline(setup_base());
   // Note: the current version of warm start CB can only support epsilon-greedy exploration
   // We need to wait for the epsilon value to be passed from the base
   // cb_explore learner, if there is one

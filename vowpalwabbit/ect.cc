@@ -339,7 +339,7 @@ base_learner* ect_setup(VW::setup_base_fn& setup_base)
 
   size_t wpp = create_circuit(*data.get(), data->k, data->errors + 1);
 
-  base_learner* base = setup_base(options, all);
+  base_learner* base = setup_base();
   if (link == "logistic") data->class_boundary = 0.5;  // as --link=logistic maps predictions in [0;1]
 
   learner<ect, example>& l = init_multiclass_learner(

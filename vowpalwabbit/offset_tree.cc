@@ -266,7 +266,7 @@ base_learner* setup(VW::setup_base_fn& setup_base)
   auto otree = scoped_calloc_or_throw<offset_tree>(num_actions);
   otree->init();
 
-  base_learner* base = setup_base(options, all);
+  base_learner* base = setup_base();
 
   learner<offset_tree, example>& l = init_learner(otree, as_singleline(base), learn, predict, otree->learner_count(),
       prediction_type_t::action_probs, all.get_setupfn_name(setup));

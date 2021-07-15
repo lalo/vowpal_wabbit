@@ -99,7 +99,7 @@ LEARNER::base_learner* get_pmf_setup(VW::setup_base_fn& setup_base)
   // to the reduction stack;
   if (!options.add_parse_and_check_necessary(new_options)) return nullptr;
 
-  LEARNER::base_learner* p_base = setup_base(options, all);
+  LEARNER::base_learner* p_base = setup_base();
   auto p_reduction = scoped_calloc_or_throw<get_pmf>();
   p_reduction->init(as_singleline(p_base), epsilon);
 

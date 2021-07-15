@@ -81,7 +81,7 @@ VW::LEARNER::base_learner* scorer_setup(VW::setup_base_fn& setup_base)
 
   s->all = &all;
 
-  auto base = as_singleline(setup_base(options, all));
+  auto base = as_singleline(setup_base());
   VW::LEARNER::learner<scorer, example>* l;
   void (*multipredict_f)(scorer&, VW::LEARNER::single_learner&, example&, size_t, size_t, polyprediction*, bool) =
       multipredict<id>;
