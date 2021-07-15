@@ -212,7 +212,7 @@ void prepare_reductions(std::vector<std::tuple<std::string, reduction_setup_fn>>
 
 namespace VW
 {
-default_reduction_stack_setup::default_reduction_stack_setup(vw& all)
+default_reduction_stack_setup::default_reduction_stack_setup(vw& all, VW::config::options_i& options)
 {
   // push all reduction functions into the stack
   prepare_reductions(reduction_stack);
@@ -222,7 +222,7 @@ default_reduction_stack_setup::default_reduction_stack_setup(vw& all)
 
 // this function consumes all the reduction_stack until it's able to construct a base_learner
 // same signature/code as the old setup_base(...) from parse_args.cc
-VW::LEARNER::base_learner* default_reduction_stack_setup::operator()(VW::config::options_i& options, vw& all)
+VW::LEARNER::base_learner* default_reduction_stack_setup::operator()()
 {
   if (!reduction_stack.empty())
   {
@@ -233,13 +233,13 @@ VW::LEARNER::base_learner* default_reduction_stack_setup::operator()(VW::config:
 
     // 'hacky' way of keeping track of the option group created by the setup_func about to be created
     options.tint(setup_func_name);
-    auto base = setup_func(*this, options, all);
+    auto base = setup_func(*this);
     options.reset_tint();
 
     // returning nullptr means that setup_func (any reduction) was not 'enabled' but
     // only added their respective command args and did not add itself into the
     // chain of learners, therefore we call into setup_base again
-    if (base == nullptr) { return this->operator()(options, all); }
+    if (base == nullptr) { return this->operator()(); }
     else
     {
       reduction_stack.clear();
