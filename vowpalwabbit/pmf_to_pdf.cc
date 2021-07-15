@@ -232,8 +232,7 @@ void finish_example(vw& all, reduction& c, example& ec)
   VW::finish_example(all, ec);
 }
 
-base_learner* setup(VW::setup_base_fn& setup_base)
-{
+base_learner* setup(VW::setup_base_fn& setup_base) {  options_i& options = *setup_base.get_options(); vw& all = *setup_base.get_all_pointer();
   auto data = scoped_calloc_or_throw<pmf_to_pdf::reduction>();
 
   option_group_definition new_options("Convert discrete PMF into continuous PDF");

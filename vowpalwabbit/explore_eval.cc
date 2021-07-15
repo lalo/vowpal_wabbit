@@ -185,8 +185,7 @@ void do_actual_learning(explore_eval& data, multi_learner& base, multi_ex& ec_se
 
 using namespace EXPLORE_EVAL;
 
-base_learner* explore_eval_setup(VW::setup_base_fn& setup_base)
-{
+base_learner* explore_eval_setup(VW::setup_base_fn& setup_base) {  options_i& options = *setup_base.get_options(); vw& all = *setup_base.get_all_pointer();
   auto data = scoped_calloc_or_throw<explore_eval>();
   bool explore_eval_option = false;
   option_group_definition new_options("Explore evaluation");

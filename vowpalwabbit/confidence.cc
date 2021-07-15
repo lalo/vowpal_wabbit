@@ -89,8 +89,7 @@ void return_confidence_example(vw& all, confidence& /* c */, example& ec)
   VW::finish_example(all, ec);
 }
 
-base_learner* confidence_setup(VW::setup_base_fn& setup_base)
-{
+base_learner* confidence_setup(VW::setup_base_fn& setup_base) {  options_i& options = *setup_base.get_options(); vw& all = *setup_base.get_all_pointer();
   bool confidence_arg = false;
   bool confidence_after_training = false;
   option_group_definition new_options("Confidence");

@@ -101,8 +101,7 @@ void learn_or_predict(cb_dro_data &data, multi_learner &base, multi_ex &examples
   data.learn_or_predict<is_learn, is_explore>(base, examples);
 }
 
-base_learner* cb_dro_setup(VW::setup_base_fn& setup_base)
-{
+base_learner* cb_dro_setup(VW::setup_base_fn& setup_base) {  options_i& options = *setup_base.get_options(); vw& all = *setup_base.get_all_pointer();
   double alpha;
   double tau;
   double wmax;
@@ -144,18 +143,17 @@ base_learner* cb_dro_setup(VW::setup_base_fn& setup_base)
 
   if (options.was_supplied("cb_explore_adf"))
   {
-    auto* l =
-        make_reduction_learner(std::move(data), as_multiline(setup_base()), learn_or_predict<true, true>,
-            learn_or_predict<false, true>, all.get_setupfn_name(cb_dro_setup) + "-cb_explore_adf")
-            .set_prediction_type(prediction_type_t::action_probs)
-            .set_label_type(label_type_t::cb)
-            .build();
+    auto* l = make_reduction_learner(std::move(data), as_multiline(setup_base()), learn_or_predict<true, true>,
+        learn_or_predict<false, true>, all.get_setupfn_name(cb_dro_setup) + "-cb_explore_adf")
+                  .set_prediction_type(prediction_type_t::action_probs)
+                  .set_label_type(label_type_t::cb)
+                  .build();
     return make_base(*l);
   }
   else
   {
-    auto* l = make_reduction_learner(std::move(data), as_multiline(setup_base()),
-        learn_or_predict<true, false>, learn_or_predict<false, false>, all.get_setupfn_name(cb_dro_setup))
+    auto* l = make_reduction_learner(std::move(data), as_multiline(setup_base()), learn_or_predict<true, false>,
+        learn_or_predict<false, false>, all.get_setupfn_name(cb_dro_setup))
                   .set_prediction_type(prediction_type_t::action_probs)
                   .set_label_type(label_type_t::cb)
                   .build();

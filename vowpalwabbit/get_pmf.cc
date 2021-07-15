@@ -87,8 +87,7 @@ void predict_or_learn(get_pmf& reduction, single_learner&, example& ec)
 ////////////////////////////////////////////////////
 
 // Setup reduction in stack
-LEARNER::base_learner* get_pmf_setup(VW::setup_base_fn& setup_base)
-{
+LEARNER::base_learner* get_pmf_setup(VW::setup_base_fn& setup_base) {  options_i& options = *setup_base.get_options(); vw& all = *setup_base.get_all_pointer();
   option_group_definition new_options("Continuous actions - convert to pmf");
   bool invoked = false;
   float epsilon = 0.0f;

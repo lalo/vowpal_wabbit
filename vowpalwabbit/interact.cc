@@ -139,8 +139,7 @@ void predict_or_learn(interact& in, VW::LEARNER::single_learner& base, example& 
   ec.num_features = in.num_features;
 }
 
-VW::LEARNER::base_learner* interact_setup(VW::setup_base_fn& setup_base)
-{
+VW::LEARNER::base_learner* interact_setup(VW::setup_base_fn& setup_base) {  options_i& options = *setup_base.get_options(); vw& all = *setup_base.get_all_pointer();
   std::string s;
   option_group_definition new_options("Interact via elementwise multiplication");
   new_options.add(make_option("interact", s)

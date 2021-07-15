@@ -249,8 +249,7 @@ void learn(offset_tree& tree, single_learner& base, example& ec)
   copy_to_action_scores(saved_scores, ec.pred.a_s);
 }
 
-base_learner* setup(VW::setup_base_fn& setup_base)
-{
+base_learner* setup(VW::setup_base_fn& setup_base) {  options_i& options = *setup_base.get_options(); vw& all = *setup_base.get_all_pointer();
   option_group_definition new_options("Offset tree Options");
   uint32_t num_actions;
   new_options.add(make_option("ot", num_actions).keep().necessary().help("Offset tree with <k> labels"));

@@ -144,8 +144,7 @@ void eval_finish_example(vw& all, cb& c, example& ec)
 }
 }  // namespace CB_ALGS
 using namespace CB_ALGS;
-base_learner* cb_algs_setup(VW::setup_base_fn& setup_base)
-{
+base_learner* cb_algs_setup(VW::setup_base_fn& setup_base) {  options_i& options = *setup_base.get_options(); vw& all = *setup_base.get_all_pointer();
   auto data = scoped_calloc_or_throw<cb>();
   std::string type_string = "dr";
   bool eval = false;

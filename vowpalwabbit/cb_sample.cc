@@ -108,8 +108,7 @@ void learn_or_predict(cb_sample_data &data, multi_learner &base, multi_ex &examp
   data.learn_or_predict<is_learn>(base, examples);
 }
 
-base_learner* cb_sample_setup(VW::setup_base_fn& setup_base)
-{
+base_learner* cb_sample_setup(VW::setup_base_fn& setup_base) {  options_i& options = *setup_base.get_options(); vw& all = *setup_base.get_all_pointer();
   bool cb_sample_option = false;
 
   option_group_definition new_options("CB Sample");

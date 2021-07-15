@@ -143,8 +143,7 @@ void print_bag_example(vw& all, cb_explore_adf_base<cb_explore_adf_bag>& data, m
   cb_explore_adf_base<cb_explore_adf_bag>::print_multiline_example(all, data, ec_seq);
 }
 
-VW::LEARNER::base_learner* setup(VW::setup_base_fn& setup_base)
-{
+VW::LEARNER::base_learner* setup(VW::setup_base_fn& setup_base) {  options_i& options = *setup_base.get_options(); vw& all = *setup_base.get_all_pointer();
   using config::make_option;
   bool cb_explore_adf_option = false;
   float epsilon = 0.;

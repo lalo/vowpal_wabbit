@@ -474,8 +474,7 @@ void predict(cb_adf& c, multi_learner& base, multi_ex& ec_seq) { c.predict(base,
 
 }  // namespace CB_ADF
 using namespace CB_ADF;
-base_learner* cb_adf_setup(VW::setup_base_fn& setup_base)
-{
+base_learner* cb_adf_setup(VW::setup_base_fn& setup_base) {  options_i& options = *setup_base.get_options(); vw& all = *setup_base.get_all_pointer();
   bool cb_adf_option = false;
   std::string type_string = "mtr";
 
