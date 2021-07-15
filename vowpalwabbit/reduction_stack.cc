@@ -86,8 +86,6 @@
 void register_reductions(std::vector<reduction_setup_fn>& reductions,
     std::vector<std::tuple<std::string, reduction_setup_fn>>& reduction_stack)
 {
-  VW::cached_learner null_ptr_learner;
-
   std::map<reduction_setup_fn, std::string> allowlist = {{GD::setup, "gd"}, {ftrl_setup, "ftrl"},
       {scorer_setup, "scorer"}, {CSOAA::csldf_setup, "csoaa_ldf"},
       {VW::cb_explore_adf::greedy::setup, "cb_explore_adf_greedy"},
@@ -97,6 +95,8 @@ void register_reductions(std::vector<reduction_setup_fn>& reductions,
 
   auto name_extractor = VW::config::options_name_extractor();
   vw dummy_all;
+
+  VW::cached_learner null_ptr_learner(dummy_all, name_extractor, nullptr);
 
   for (auto setup_fn : reductions)
   {
@@ -214,6 +214,8 @@ namespace VW
 {
 default_reduction_stack_setup::default_reduction_stack_setup(vw& all, VW::config::options_i& options)
 {
+  options_impl = &options;
+  all_ptr = &all;
   // push all reduction functions into the stack
   prepare_reductions(reduction_stack);
   // populate setup_fn -> name map to be used to lookup names in setup_base
@@ -232,9 +234,9 @@ VW::LEARNER::base_learner* default_reduction_stack_setup::operator()()
     reduction_stack.pop_back();
 
     // 'hacky' way of keeping track of the option group created by the setup_func about to be created
-    options.tint(setup_func_name);
+    options_impl->tint(setup_func_name);
     auto base = setup_func(*this);
-    options.reset_tint();
+    options_impl->reset_tint();
 
     // returning nullptr means that setup_func (any reduction) was not 'enabled' but
     // only added their respective command args and did not add itself into the

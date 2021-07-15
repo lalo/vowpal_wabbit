@@ -95,7 +95,7 @@ void persist(sfm_data& data, metric_sink& metrics)
 
 VW::LEARNER::base_learner* shared_feature_merger_setup(VW::setup_base_fn& setup_base)
 {
-  options_i& options = *setup_base.get_options();
+  VW::config::options_i& options = *setup_base.get_options();
   vw& all = *setup_base.get_all_pointer();
   if (!use_reduction(options)) return nullptr;
 

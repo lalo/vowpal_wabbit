@@ -16,7 +16,13 @@ struct default_reduction_stack_setup : public setup_base_fn
   // same signature as the old setup_base(...) from parse_args.cc
   VW::LEARNER::base_learner* operator()() override;
 
+  VW::config::options_i* get_options() override { return options_impl; }
+
+  vw* get_all_pointer() override { return all_ptr; }
+
 private:
   std::vector<std::tuple<std::string, reduction_setup_fn>> reduction_stack;
+  VW::config::options_i* options_impl = nullptr;
+  vw* all_ptr = nullptr;
 };
 }  // namespace VW

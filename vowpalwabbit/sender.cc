@@ -100,8 +100,10 @@ void end_examples(sender& s)
   s.buf->close_files();
 }
 
-VW::LEARNER::base_learner* sender_setup(VW::setup_base_fn&)
+VW::LEARNER::base_learner* sender_setup(VW::setup_base_fn& setup_base)
 {
+  VW::config::options_i& options = *setup_base.get_options();
+  vw& all = *setup_base.get_all_pointer();
   std::string host;
 
   option_group_definition sender_options("Network sending");

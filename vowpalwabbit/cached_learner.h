@@ -11,13 +11,20 @@ struct cached_learner : public setup_base_fn
 
   operator bool() const { return !(_cached == nullptr); }
 
-  cached_learner(VW::LEARNER::base_learner* learner = nullptr) : _cached(learner) {}
+  cached_learner(vw& all, VW::config::options_i& options, VW::LEARNER::base_learner* learner = nullptr)
+      : _cached(learner)
+  {
+    options_impl = &options;
+    all_ptr = &all;
+  }
 
-  VW::config::options_i* get_options() override { return nullptr; }
+  VW::config::options_i* get_options() override { return options_impl; }
 
-  vw* get_all_pointer() override { return nullptr; }
+  vw* get_all_pointer() override { return all_ptr; }
 
 private:
   VW::LEARNER::base_learner* _cached = nullptr;
+  VW::config::options_i* options_impl = nullptr;
+  vw* all_ptr = nullptr;
 };
 }  // namespace VW

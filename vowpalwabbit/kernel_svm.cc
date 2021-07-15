@@ -794,8 +794,11 @@ void learn(svm_params& params, single_learner&, example& ec)
   }
 }
 
-VW::LEARNER::base_learner* kernel_svm_setup(VW::setup_base_fn&)
+VW::LEARNER::base_learner* kernel_svm_setup(VW::setup_base_fn& setup_base)
 {
+  options_i& options = *setup_base.get_options();
+  vw& all = *setup_base.get_all_pointer();
+
   auto params = scoped_calloc_or_throw<svm_params>();
   std::string kernel_type;
   float bandwidth = 1.f;

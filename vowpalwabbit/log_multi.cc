@@ -500,6 +500,9 @@ void save_load_tree(log_multi& b, io_buf& model_file, bool read, bool text)
 
 base_learner* log_multi_setup(VW::setup_base_fn& setup_base)  // learner setup
 {
+  options_i& options = *setup_base.get_options();
+  vw& all = *setup_base.get_all_pointer();
+
   auto data = scoped_calloc_or_throw<log_multi>();
   option_group_definition new_options("Logarithmic Time Multiclass Tree");
   new_options.add(make_option("log_multi", data->k).keep().necessary().help("Use online tree for multiclass"))

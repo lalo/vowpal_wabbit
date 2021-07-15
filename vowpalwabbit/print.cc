@@ -45,8 +45,10 @@ void learn(print& p, VW::LEARNER::base_learner&, example& ec)
   cout << std::endl;
 }
 
-VW::LEARNER::base_learner* print_setup(VW::setup_base_fn&)
+VW::LEARNER::base_learner* print_setup(VW::setup_base_fn& setup_base)
 {
+  VW::config::options_i& options = *setup_base.get_options();
+  vw& all = *setup_base.get_all_pointer();
   bool print_option = false;
   option_group_definition new_options("Print psuedolearner");
   new_options.add(make_option("print", print_option).keep().necessary().help("print examples"));

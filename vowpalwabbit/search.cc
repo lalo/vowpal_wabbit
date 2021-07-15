@@ -2745,7 +2745,7 @@ base_learner* setup(VW::setup_base_fn& setup_base)
 
   cdbg << "active_csoaa = " << priv.active_csoaa << ", active_csoaa_verify = " << priv.active_csoaa_verify << endl;
 
-  base_learner* base = setup_base(*all.options, all);
+  base_learner* base = setup_base();
 
   // default to OAA labels unless the task wants to override this (which they can do in initialize)
   all.example_parser->lbl_parser = MC::mc_label;
