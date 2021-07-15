@@ -336,8 +336,11 @@ void learn(cats_tree& tree, single_learner& base, example& ec)
   VW_DBG(ec) << "tree_c: after tree.learn() " << cb_label_to_string(ec) << features_to_string(ec) << std::endl;
 }
 
-base_learner* setup(setup_base_fn& setup_base, options_i& options, vw& all)
+base_learner* setup(setup_base_fn& setup_base)
 {
+  options_i& options = *setup_base.get_options();
+  vw& all = *setup_base.get_all_pointer();
+
   option_group_definition new_options("CATS Tree Options");
   uint32_t num_actions;  // = K = 2^D
   uint32_t bandwidth;    // = 2^h#

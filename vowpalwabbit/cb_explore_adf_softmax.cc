@@ -54,7 +54,10 @@ void cb_explore_adf_softmax::predict_or_learn_impl(VW::LEARNER::multi_learner& b
   exploration::enforce_minimum_probability(_epsilon, true, begin_scores(preds), end_scores(preds));
 }
 
-VW::LEARNER::base_learner* setup(VW::setup_base_fn& setup_base) {  options_i& options = *setup_base.get_options(); vw& all = *setup_base.get_all_pointer();
+VW::LEARNER::base_learner* setup(VW::setup_base_fn& setup_base)
+{
+  VW::config::options_i& options = *setup_base.get_options();
+  vw& all = *setup_base.get_all_pointer();
   using config::make_option;
   bool cb_explore_adf_option = false;
   bool softmax = false;

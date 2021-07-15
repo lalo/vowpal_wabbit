@@ -123,7 +123,10 @@ void finish_example(vw& all, VW::topk& d, multi_ex& ec_seq)
   VW::finish_example(all, ec_seq);
 }
 
-VW::LEARNER::base_learner* topk_setup(VW::setup_base_fn& setup_base) {  options_i& options = *setup_base.get_options(); vw& all = *setup_base.get_all_pointer();
+VW::LEARNER::base_learner* topk_setup(VW::setup_base_fn& setup_base)
+{
+  options_i& options = *setup_base.get_options();
+  vw& all = *setup_base.get_all_pointer();
   uint32_t K;
   option_group_definition new_options("Top K");
   new_options.add(make_option("top", K).keep().necessary().help("top k recommendation"));

@@ -162,7 +162,10 @@ void predict_or_learn(LRQstate& lrq, single_learner& base, example& ec)
   }  // end for(max_iter)
 }
 
-base_learner* lrq_setup(VW::setup_base_fn& setup_base) {  options_i& options = *setup_base.get_options(); vw& all = *setup_base.get_all_pointer();
+base_learner* lrq_setup(VW::setup_base_fn& setup_base)
+{
+  options_i& options = *setup_base.get_options();
+  vw& all = *setup_base.get_all_pointer();
   auto lrq = scoped_calloc_or_throw<LRQstate>();
   std::vector<std::string> lrq_names;
   option_group_definition new_options("Low Rank Quadratics");

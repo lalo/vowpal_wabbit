@@ -60,7 +60,10 @@ void finish_example(vw& all, multi_oaa&, example& ec)
   VW::finish_example(all, ec);
 }
 
-VW::LEARNER::base_learner* multilabel_oaa_setup(VW::setup_base_fn& setup_base) {  options_i& options = *setup_base.get_options(); vw& all = *setup_base.get_all_pointer();
+VW::LEARNER::base_learner* multilabel_oaa_setup(VW::setup_base_fn& setup_base)
+{
+  options_i& options = *setup_base.get_options();
+  vw& all = *setup_base.get_all_pointer();
   auto data = scoped_calloc_or_throw<multi_oaa>();
   option_group_definition new_options("Multilabel One Against All");
   new_options.add(

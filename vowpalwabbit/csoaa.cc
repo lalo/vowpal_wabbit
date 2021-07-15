@@ -131,7 +131,10 @@ void predict_or_learn(csoaa& c, single_learner& base, example& ec)
 
 void finish_example(vw& all, csoaa&, example& ec) { COST_SENSITIVE::finish_example(all, ec); }
 
-base_learner* csoaa_setup(VW::setup_base_fn& setup_base) {  options_i& options = *setup_base.get_options(); vw& all = *setup_base.get_all_pointer();
+base_learner* csoaa_setup(VW::setup_base_fn& setup_base)
+{
+  options_i& options = *setup_base.get_options();
+  vw& all = *setup_base.get_all_pointer();
   auto c = scoped_calloc_or_throw<csoaa>();
   option_group_definition new_options("Cost Sensitive One Against All");
   new_options.add(
@@ -142,7 +145,7 @@ base_learner* csoaa_setup(VW::setup_base_fn& setup_base) {  options_i& options =
   c->pred = calloc_or_throw<polyprediction>(c->num_classes);
 
   learner<csoaa, example>& l = init_learner(
-      c, as_singleline(setup_base(*all.options, all)), predict_or_learn<true>, predict_or_learn<false>, c->num_classes,
+      c, as_singleline(setup_base()), predict_or_learn<true>, predict_or_learn<false>, c->num_classes,
       prediction_type_t::multiclass, all.get_setupfn_name(csoaa_setup), true /*csoaa.learn calls gd.learn. nothing to be
                                                                                 gained by calling csoaa.predict first*/
   );
@@ -816,7 +819,10 @@ multi_ex process_labels(ldf& data, const multi_ex& ec_seq_all)
   return ret;
 }
 
-base_learner* csldf_setup(VW::setup_base_fn& setup_base) {  options_i& options = *setup_base.get_options(); vw& all = *setup_base.get_all_pointer();
+base_learner* csldf_setup(VW::setup_base_fn& setup_base)
+{
+  options_i& options = *setup_base.get_options();
+  vw& all = *setup_base.get_all_pointer();
   auto ld = scoped_calloc_or_throw<ldf>();
 
   std::string csoaa_ldf;
@@ -897,7 +903,7 @@ base_learner* csldf_setup(VW::setup_base_fn& setup_base) {  options_i& options =
   ld->label_features.reserve(256);
 
   ld->read_example_this_loop = 0;
-  single_learner* pbase = as_singleline(setup_base(*all.options, all));
+  single_learner* pbase = as_singleline(setup_base());
   learner<ldf, multi_ex>* pl = nullptr;
 
   std::string name = all.get_setupfn_name(csldf_setup);

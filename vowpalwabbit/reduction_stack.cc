@@ -103,7 +103,7 @@ void register_reductions(std::vector<reduction_setup_fn>& reductions,
     if (allowlist.count(setup_fn)) { reduction_stack.push_back(std::make_tuple(allowlist[setup_fn], setup_fn)); }
     else
     {
-      auto base = setup_fn(null_ptr_learner, name_extractor, dummy_all);
+      auto base = setup_fn(null_ptr_learner);
 
       if (base == nullptr)
         reduction_stack.push_back(std::make_tuple(name_extractor.generated_name, setup_fn));

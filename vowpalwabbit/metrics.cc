@@ -122,7 +122,10 @@ void persist(metrics_data& data, metric_sink& metrics)
   metrics.int_metrics_list.emplace_back("total_learn_calls", data.learn_count);
 }
 
-VW::LEARNER::base_learner* metrics_setup(VW::setup_base_fn& setup_base) {  options_i& options = *setup_base.get_options(); vw& all = *setup_base.get_all_pointer();
+VW::LEARNER::base_learner* metrics_setup(VW::setup_base_fn& setup_base)
+{
+  options_i& options = *setup_base.get_options();
+  vw& all = *setup_base.get_all_pointer();
   auto data = scoped_calloc_or_throw<metrics_data>();
 
   option_group_definition new_options("Debug: Metrics");

@@ -1149,8 +1149,11 @@ uint64_t ceil_log_2(uint64_t v)
     return 1 + ceil_log_2(v >> 1);
 }
 
-base_learner* setup(VW::setup_base_fn&)
+base_learner* setup(VW::setup_base_fn& setup_base)
 {
+  options_i& options = *setup_base.get_options();
+  vw& all = *setup_base.get_all_pointer();
+
   auto g = scoped_calloc_or_throw<gd>();
 
   bool sgd = false;

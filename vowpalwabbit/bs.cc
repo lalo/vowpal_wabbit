@@ -221,7 +221,10 @@ void finish_example(vw& all, bs& d, example& ec)
   VW::finish_example(all, ec);
 }
 
-base_learner* bs_setup(VW::setup_base_fn& setup_base) {  options_i& options = *setup_base.get_options(); vw& all = *setup_base.get_all_pointer();
+base_learner* bs_setup(VW::setup_base_fn& setup_base)
+{
+  options_i& options = *setup_base.get_options();
+  vw& all = *setup_base.get_all_pointer();
   auto data = scoped_calloc_or_throw<bs>();
   std::string type_string("mean");
   option_group_definition new_options("Bootstrap");

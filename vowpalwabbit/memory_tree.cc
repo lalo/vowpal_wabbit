@@ -1194,7 +1194,10 @@ void save_load_memory_tree(memory_tree& b, io_buf& model_file, bool read, bool t
 //////////////////////////////End of Save & Load///////////////////////////////
 }  // namespace memory_tree_ns
 
-base_learner* memory_tree_setup(VW::setup_base_fn& setup_base) {  options_i& options = *setup_base.get_options(); vw& all = *setup_base.get_all_pointer();
+base_learner* memory_tree_setup(VW::setup_base_fn& setup_base)
+{
+  options_i& options = *setup_base.get_options();
+  vw& all = *setup_base.get_all_pointer();
   using namespace memory_tree_ns;
   auto tree = scoped_calloc_or_throw<memory_tree>();
   option_group_definition new_options("Memory Tree");

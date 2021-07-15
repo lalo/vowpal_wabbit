@@ -160,8 +160,11 @@ void reduction_output::print_update_cb_cont(vw& all, const example& ec)
 ////////////////////////////////////////////////////
 
 // Setup reduction in stack
-LEARNER::base_learner* setup(setup_base_fn& setup_base, options_i& options, vw& all)
+LEARNER::base_learner* setup(setup_base_fn& setup_base)
 {
+  options_i& options = *setup_base.get_options();
+  vw& all = *setup_base.get_all_pointer();
+
   option_group_definition new_options("Continuous actions tree with smoothing");
   uint32_t num_actions = 0;
   float bandwidth = 0;

@@ -248,7 +248,10 @@ void cb_explore_adf_regcb::save_load(io_buf& io, bool read, bool text)
   }
 }
 
-base_learner* setup(VW::setup_base_fn& setup_base) {  options_i& options = *setup_base.get_options(); vw& all = *setup_base.get_all_pointer();
+base_learner* setup(VW::setup_base_fn& setup_base)
+{
+  VW::config::options_i& options = *setup_base.get_options();
+  vw& all = *setup_base.get_all_pointer();
   using config::make_option;
   bool cb_explore_adf_option = false;
   bool regcb = false;

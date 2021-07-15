@@ -239,7 +239,8 @@ void init_driver(audit_regressor_data& dat)
   }
 }
 
-VW::LEARNER::base_learner* audit_regressor_setup(VW::setup_base_fn& setup_base) {  options_i& options = *setup_base.get_options(); vw& all = *setup_base.get_all_pointer();
+VW::LEARNER::base_learner* audit_regressor_setup(VW::setup_base_fn& setup_base)
+{
   options_i& options = *setup_base.get_options();
   vw& all = *setup_base.get_all_pointer();
 
