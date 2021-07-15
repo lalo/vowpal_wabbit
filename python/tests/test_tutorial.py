@@ -119,6 +119,13 @@ def run_simulation(vw, num_iterations, users, times_of_day, actions, cost_functi
             metrics = vw.get_learner_metrics()
             vw_b = metrics["test_bound_firstm"]
             vw_b_2 = metrics["test_bound_secondm"]
+            if metrics["test_county"] % 500 == 0:
+                print("no interactions: lb: " + str(vw_b))
+                print("interactions: lb: " + str(vw_b_2))
+                print("no interactions: ips: " + str(metrics["ips_1"]))
+                print("interactions: ips: " + str(metrics["ips_2"]))
+                print("num examples: " + str(metrics["test_county"]))
+                print()
             w = metrics["test_w1"]
             r = metrics["test_r1"]
             w2 = metrics["test_w2"]
@@ -165,9 +172,6 @@ def test_custom_reduction(config=0):
     global curr_file
     curr_file = open("custom_reduc_"+str(config)+".txt", 'w')
     ctr = run_simulation(vw, num_iterations, users, times_of_day, actions, get_cost)
-    metrics = vw.get_learner_metrics()
-    print(metrics["test_bound_firstm"])
-    print(metrics["test_bound_secondm"])
 
     curr_file.close()
 

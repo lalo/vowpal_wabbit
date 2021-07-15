@@ -234,11 +234,12 @@ void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
 
   if (is_learn && data.county % 500 == 0)
   {
-    std::cerr << "empty_0:" << data.chisq_1.recompute_duals().first << std::endl;
-    std::cerr << "interac_1:" << data.chisq_2.recompute_duals().first << std::endl;
-    std::cerr << "ips_0:" << data.ipsone / data.county << std::endl;
-    std::cerr << "ips_1:" << data.ipstwo / data.county << std::endl;
-    std::cerr << data.county << std::endl << std::endl;
+    // std::cerr << "empty_0:" << data.chisq_1.recompute_duals().first << std::endl;
+    // std::cerr << "interac_1:" << data.chisq_2.recompute_duals().first << std::endl;
+    // std::cerr << "ips_0:" << data.ipsone / data.county << std::endl;
+    // std::cerr << "ips_1:" << data.ipstwo / data.county << std::endl;
+    // // which_one_is_better(float, float, float, float, count);
+    // std::cerr << data.county << std::endl << std::endl;
   }
 
   // replace with prediction depending on which_to_return
@@ -251,12 +252,15 @@ void predict_or_learn_m(tr_data& data, T& base, multi_ex& ec)
 
 void persist(tr_data& data, metric_sink& metrics)
 {
+  metrics.int_metrics_list.emplace_back("test_county", data.county);
   metrics.float_metrics_list.emplace_back("test_bound_firstm", data.chisq_1.recompute_duals().first);
   metrics.float_metrics_list.emplace_back("test_bound_secondm", data.chisq_2.recompute_duals().first);
   metrics.float_metrics_list.emplace_back("test_w1", data.w1);
   metrics.float_metrics_list.emplace_back("test_r1", data.r1);
   metrics.float_metrics_list.emplace_back("test_w2", data.w2);
   metrics.float_metrics_list.emplace_back("test_r2", data.r2);
+  metrics.float_metrics_list.emplace_back("ips_1", data.ipsone / data.county);
+  metrics.float_metrics_list.emplace_back("ips_2", data.ipstwo / data.county);
 }
 
 void _finish_example(vw& all, tr_data&, multi_ex& ec) { VW::finish_example(all, ec); }
