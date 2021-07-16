@@ -99,7 +99,7 @@ def prettyprint(config, filter_out_general=True):
         # general are the VW generic options
         if filter_out_general and name == "general":
             continue
-        # temp fix:
+        # temp fix: cb_adf gets added twice
         if name == "cb_adf":
             config_group.pop()
         for (group_name, options) in config_group:
