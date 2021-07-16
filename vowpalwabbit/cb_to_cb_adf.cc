@@ -101,10 +101,10 @@ void finish_example(vw& all, cb_to_cb_adf& c, example& ec)
 
     Related files: cb_algs.cc, cb_explore.cc, cbify.cc
 */
-VW::LEARNER::base_learner* cb_to_cb_adf_setup(VW::setup_base_fn& setup_base)
+VW::LEARNER::base_learner* cb_to_cb_adf_setup(VW::setup_base_fn& stack_builder)
 {
-  options_i& options = *setup_base.get_options();
-  vw& all = *setup_base.get_all_pointer();
+  options_i& options = *stack_builder.get_options();
+  vw& all = *stack_builder.get_all_pointer();
   bool compat_old_cb = false;
   bool force_legacy = false;
   std::string type_string = "mtr";
@@ -163,7 +163,7 @@ VW::LEARNER::base_learner* cb_to_cb_adf_setup(VW::setup_base_fn& setup_base)
   {
     options.insert("cb_explore_adf", "");
     // no need to register custom predict/learn, cbify will take care of that
-    return setup_base();
+    return stack_builder.setup_base_learner();
   }
 
   // user specified "cb_explore" but we're not using an old model file
@@ -182,7 +182,7 @@ VW::LEARNER::base_learner* cb_to_cb_adf_setup(VW::setup_base_fn& setup_base)
   data->explore_mode = override_cb_explore;
   data->weights = &(all.weights);
 
-  multi_learner* base = as_multiline(setup_base());
+  multi_learner* base = as_multiline(stack_builder.setup_base_learner());
 
   learner<cb_to_cb_adf, example>* l;
 

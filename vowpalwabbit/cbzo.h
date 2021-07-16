@@ -10,7 +10,7 @@ namespace VW
 {
 namespace cbzo
 {
-VW::LEARNER::base_learner* setup(VW::setup_base_fn& setup_base);
+VW::LEARNER::base_learner* setup(VW::setup_base_fn& stack_builder);
 
 }  // namespace cbzo
 }  // namespace VW

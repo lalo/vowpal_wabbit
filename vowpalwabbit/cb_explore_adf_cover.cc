@@ -221,10 +221,10 @@ void cb_explore_adf_cover::save_load(io_buf& io, bool read, bool text)
   }
 }
 
-VW::LEARNER::base_learner* setup(VW::setup_base_fn& setup_base)
+VW::LEARNER::base_learner* setup(VW::setup_base_fn& stack_builder)
 {
-  VW::config::options_i& options = *setup_base.get_options();
-  vw& all = *setup_base.get_all_pointer();
+  VW::config::options_i& options = *stack_builder.get_options();
+  vw& all = *stack_builder.get_all_pointer();
   using config::make_option;
 
   bool cb_explore_adf_option = false;
@@ -291,7 +291,7 @@ VW::LEARNER::base_learner* setup(VW::setup_base_fn& setup_base)
   // Cover is using doubly robust without the cooperation of the base reduction
   if (cb_type_enum == CB_TYPE_MTR) { problem_multiplier *= 2; }
 
-  VW::LEARNER::multi_learner* base = VW::LEARNER::as_multiline(setup_base());
+  VW::LEARNER::multi_learner* base = VW::LEARNER::as_multiline(stack_builder.setup_base_learner());
   all.example_parser->lbl_parser = CB::cb_label;
 
   bool epsilon_decay;

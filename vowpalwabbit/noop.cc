@@ -10,10 +10,10 @@ using namespace VW::config;
 
 void learn(char&, VW::LEARNER::base_learner&, example&) {}
 
-VW::LEARNER::base_learner* noop_setup(VW::setup_base_fn& setup_base)
+VW::LEARNER::base_learner* noop_setup(VW::setup_base_fn& stack_builder)
 {
-  options_i& options = *setup_base.get_options();
-  vw& all = *setup_base.get_all_pointer();
+  options_i& options = *stack_builder.get_options();
+  vw& all = *stack_builder.get_all_pointer();
 
   bool noop = false;
   option_group_definition new_options("Noop Learner");

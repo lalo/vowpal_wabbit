@@ -93,17 +93,17 @@ void persist(sfm_data& data, metric_sink& metrics)
   }
 }
 
-VW::LEARNER::base_learner* shared_feature_merger_setup(VW::setup_base_fn& setup_base)
+VW::LEARNER::base_learner* shared_feature_merger_setup(VW::setup_base_fn& stack_builder)
 {
-  VW::config::options_i& options = *setup_base.get_options();
-  vw& all = *setup_base.get_all_pointer();
+  VW::config::options_i& options = *stack_builder.get_options();
+  vw& all = *stack_builder.get_all_pointer();
   if (!use_reduction(options)) return nullptr;
 
   auto data = scoped_calloc_or_throw<sfm_data>();
 
   if (options.was_supplied("extra_metrics")) data->_metrics = VW::make_unique<sfm_metrics>();
 
-  auto* base = VW::LEARNER::as_multiline(setup_base());
+  auto* base = VW::LEARNER::as_multiline(stack_builder.setup_base_learner());
 
   auto& learner = VW::LEARNER::init_learner(data, base, predict_or_learn<true>, predict_or_learn<false>,
       all.get_setupfn_name(shared_feature_merger_setup), base->learn_returns_prediction);

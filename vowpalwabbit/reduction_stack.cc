@@ -224,7 +224,7 @@ default_reduction_stack_setup::default_reduction_stack_setup(vw& all, VW::config
 
 // this function consumes all the reduction_stack until it's able to construct a base_learner
 // same signature/code as the old setup_base(...) from parse_args.cc
-VW::LEARNER::base_learner* default_reduction_stack_setup::operator()()
+VW::LEARNER::base_learner* default_reduction_stack_setup::setup_base_learner()
 {
   if (!reduction_stack.empty())
   {
@@ -241,7 +241,7 @@ VW::LEARNER::base_learner* default_reduction_stack_setup::operator()()
     // returning nullptr means that setup_func (any reduction) was not 'enabled' but
     // only added their respective command args and did not add itself into the
     // chain of learners, therefore we call into setup_base again
-    if (base == nullptr) { return this->operator()(); }
+    if (base == nullptr) { return this->setup_base_learner(); }
     else
     {
       reduction_stack.clear();

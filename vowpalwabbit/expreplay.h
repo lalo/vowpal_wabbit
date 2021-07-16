@@ -77,10 +77,10 @@ void end_pass(expreplay<lp>& er)
 }
 
 template <char er_level, label_parser& lp>
-VW::LEARNER::base_learner* expreplay_setup(VW::setup_base_fn& setup_base)
+VW::LEARNER::base_learner* expreplay_setup(VW::setup_base_fn& stack_builder)
 {
-  VW::config::options_i& options = *setup_base.get_options();
-  vw& all = *setup_base.get_all_pointer();
+  VW::config::options_i& options = *stack_builder.get_options();
+  vw& all = *stack_builder.get_all_pointer();
   std::string replay_string = "replay_";
   replay_string += er_level;
   std::string replay_count_string = replay_string;
@@ -110,7 +110,7 @@ VW::LEARNER::base_learner* expreplay_setup(VW::setup_base_fn& setup_base)
     *(all.trace_message) << "experience replay level=" << er_level << ", buffer=" << er->N << ", replay count=" << er->replay_count
               << std::endl;
 
-  er->base = VW::LEARNER::as_singleline(setup_base());
+  er->base = VW::LEARNER::as_singleline(stack_builder.setup_base_learner());
   VW::LEARNER::learner<expreplay<lp>, example> *l = &init_learner(er, er->base, learn<lp>, predict<lp>, replay_string);
   l->set_end_pass(end_pass<lp>);
 

@@ -215,10 +215,10 @@ void save_load(mwt& c, io_buf& model_file, bool read, bool text)
 }  // namespace MWT
 using namespace MWT;
 
-base_learner* mwt_setup(VW::setup_base_fn& setup_base)
+base_learner* mwt_setup(VW::setup_base_fn& stack_builder)
 {
-  options_i& options = *setup_base.get_options();
-  vw& all = *setup_base.get_all_pointer();
+  options_i& options = *stack_builder.get_options();
+  vw& all = *stack_builder.get_all_pointer();
   auto c = scoped_calloc_or_throw<mwt>();
   std::string s;
   bool exclude_eval = false;
@@ -253,15 +253,15 @@ base_learner* mwt_setup(VW::setup_base_fn& setup_base)
   learner<mwt, example>* l;
   if (c->learn)
     if (exclude_eval)
-      l = &init_learner(c, as_singleline(setup_base()), predict_or_learn<true, true, true>,
+      l = &init_learner(c, as_singleline(stack_builder.setup_base_learner()), predict_or_learn<true, true, true>,
           predict_or_learn<true, true, false>, 1, prediction_type_t::scalars,
           all.get_setupfn_name(mwt_setup) + "-no_eval", true);
     else
-      l = &init_learner(c, as_singleline(setup_base()), predict_or_learn<true, false, true>,
+      l = &init_learner(c, as_singleline(stack_builder.setup_base_learner()), predict_or_learn<true, false, true>,
           predict_or_learn<true, false, false>, 1, prediction_type_t::scalars,
           all.get_setupfn_name(mwt_setup) + "-eval", true);
   else
-    l = &init_learner(c, as_singleline(setup_base()), predict_or_learn<false, false, true>,
+    l = &init_learner(c, as_singleline(stack_builder.setup_base_learner()), predict_or_learn<false, false, true>,
         predict_or_learn<false, false, false>, 1, prediction_type_t::scalars, all.get_setupfn_name(mwt_setup), true);
 
   l->set_save_load(save_load);

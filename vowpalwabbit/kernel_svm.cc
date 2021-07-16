@@ -794,10 +794,10 @@ void learn(svm_params& params, single_learner&, example& ec)
   }
 }
 
-VW::LEARNER::base_learner* kernel_svm_setup(VW::setup_base_fn& setup_base)
+VW::LEARNER::base_learner* kernel_svm_setup(VW::setup_base_fn& stack_builder)
 {
-  options_i& options = *setup_base.get_options();
-  vw& all = *setup_base.get_all_pointer();
+  options_i& options = *stack_builder.get_options();
+  vw& all = *stack_builder.get_all_pointer();
 
   auto params = scoped_calloc_or_throw<svm_params>();
   std::string kernel_type;

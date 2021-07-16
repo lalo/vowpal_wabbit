@@ -6,7 +6,7 @@
 
 #include "io/io_adapter.h"
 
-VW::LEARNER::base_learner* mwt_setup(VW::setup_base_fn& setup_base);
+VW::LEARNER::base_learner* mwt_setup(VW::setup_base_fn& stack_builder);
 
 namespace MWT
 {

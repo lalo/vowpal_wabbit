@@ -1058,10 +1058,10 @@ void save_load(bfgs& b, io_buf& model_file, bool read, bool text)
 
 void init_driver(bfgs& b) { b.backstep_on = true; }
 
-base_learner* bfgs_setup(VW::setup_base_fn& setup_base)
+base_learner* bfgs_setup(VW::setup_base_fn& stack_builder)
 {
-  options_i& options = *setup_base.get_options();
-  vw& all = *setup_base.get_all_pointer();
+  options_i& options = *stack_builder.get_options();
+  vw& all = *stack_builder.get_all_pointer();
 
   auto b = VW::make_unique<bfgs>();
   bool conjugate_gradient = false;

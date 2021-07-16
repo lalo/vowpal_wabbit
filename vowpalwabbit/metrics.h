@@ -9,7 +9,7 @@ namespace VW
 {
 namespace metrics
 {
-VW::LEARNER::base_learner* metrics_setup(VW::setup_base_fn& setup_base);
+VW::LEARNER::base_learner* metrics_setup(VW::setup_base_fn& stack_builder);
 void output_metrics(vw& all);
 }  // namespace metrics
 }  // namespace VW

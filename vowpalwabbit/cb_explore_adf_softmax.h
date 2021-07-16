@@ -13,7 +13,7 @@ namespace cb_explore_adf
 {
 namespace softmax
 {
-VW::LEARNER::base_learner* setup(VW::setup_base_fn& setup_base);
+VW::LEARNER::base_learner* setup(VW::setup_base_fn& stack_builder);
 }  // namespace softmax
 }  // namespace cb_explore_adf
 }  // namespace VW

@@ -92,10 +92,10 @@ void predict_or_learn(cb_explore_pdf& reduction, single_learner&, example& ec)
 ////////////////////////////////////////////////////
 
 // Setup reduction in stack
-LEARNER::base_learner* cb_explore_pdf_setup(VW::setup_base_fn& setup_base)
+LEARNER::base_learner* cb_explore_pdf_setup(VW::setup_base_fn& stack_builder)
 {
-  options_i& options = *setup_base.get_options();
-  vw& all = *setup_base.get_all_pointer();
+  options_i& options = *stack_builder.get_options();
+  vw& all = *stack_builder.get_all_pointer();
   option_group_definition new_options("Continuous actions - cb_explore_pdf");
   bool invoked = false;
   float epsilon;
@@ -125,7 +125,7 @@ LEARNER::base_learner* cb_explore_pdf_setup(VW::setup_base_fn& setup_base)
   if (!options.was_supplied("min_value") || !options.was_supplied("max_value"))
     THROW("error: min and max values must be supplied with cb_explore_pdf");
 
-  LEARNER::base_learner* p_base = setup_base();
+  LEARNER::base_learner* p_base = stack_builder.setup_base_learner();
   auto p_reduction = VW::make_unique<cb_explore_pdf>();
   p_reduction->init(as_singleline(p_base));
   p_reduction->epsilon = epsilon;

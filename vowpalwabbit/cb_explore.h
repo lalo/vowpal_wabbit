@@ -5,7 +5,7 @@
 #include "reductions_fwd.h"
 #include "cb.h"
 
-VW::LEARNER::base_learner* cb_explore_setup(VW::setup_base_fn& setup_base);
+VW::LEARNER::base_learner* cb_explore_setup(VW::setup_base_fn& stack_builder);
 
 namespace CB_EXPLORE
 {

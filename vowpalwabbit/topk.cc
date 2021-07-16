@@ -123,10 +123,10 @@ void finish_example(vw& all, VW::topk& d, multi_ex& ec_seq)
   VW::finish_example(all, ec_seq);
 }
 
-VW::LEARNER::base_learner* topk_setup(VW::setup_base_fn& setup_base)
+VW::LEARNER::base_learner* topk_setup(VW::setup_base_fn& stack_builder)
 {
-  options_i& options = *setup_base.get_options();
-  vw& all = *setup_base.get_all_pointer();
+  options_i& options = *stack_builder.get_options();
+  vw& all = *stack_builder.get_all_pointer();
   uint32_t K;
   option_group_definition new_options("Top K");
   new_options.add(make_option("top", K).keep().necessary().help("top k recommendation"));
@@ -135,8 +135,8 @@ VW::LEARNER::base_learner* topk_setup(VW::setup_base_fn& setup_base)
 
   auto data = scoped_calloc_or_throw<VW::topk>(K);
 
-  VW::LEARNER::learner<VW::topk, multi_ex>& l = init_learner(data, as_singleline(setup_base()), predict_or_learn<true>,
-      predict_or_learn<false>, all.get_setupfn_name(topk_setup), true);
+  VW::LEARNER::learner<VW::topk, multi_ex>& l = init_learner(data, as_singleline(stack_builder.setup_base_learner()),
+      predict_or_learn<true>, predict_or_learn<false>, all.get_setupfn_name(topk_setup), true);
   l.set_finish_example(finish_example);
 
   return make_base(l);

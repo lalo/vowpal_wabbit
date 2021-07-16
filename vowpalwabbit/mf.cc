@@ -185,10 +185,10 @@ void learn(mf& data, single_learner& base, example& ec)
   ec.interactions = saved_interactions;
 }
 
-base_learner* mf_setup(VW::setup_base_fn& setup_base)
+base_learner* mf_setup(VW::setup_base_fn& stack_builder)
 {
-  options_i& options = *setup_base.get_options();
-  vw& all = *setup_base.get_all_pointer();
+  options_i& options = *stack_builder.get_options();
+  vw& all = *stack_builder.get_all_pointer();
   auto data = scoped_calloc_or_throw<mf>();
   option_group_definition new_options("Matrix Factorization Reduction");
   new_options.add(
@@ -205,7 +205,7 @@ base_learner* mf_setup(VW::setup_base_fn& setup_base)
 
   all.random_positive_weights = true;
 
-  learner<mf, example>& l = init_learner(
-      data, as_singleline(setup_base()), learn, predict<false>, 2 * data->rank + 1, all.get_setupfn_name(mf_setup));
+  learner<mf, example>& l = init_learner(data, as_singleline(stack_builder.setup_base_learner()), learn, predict<false>,
+      2 * data->rank + 1, all.get_setupfn_name(mf_setup));
   return make_base(l);
 }

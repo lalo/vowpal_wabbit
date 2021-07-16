@@ -19,7 +19,7 @@ struct writer;
 }
 }  // namespace VW
 
-VW::LEARNER::base_learner* cb_adf_setup(VW::setup_base_fn& setup_base);
+VW::LEARNER::base_learner* cb_adf_setup(VW::setup_base_fn& stack_builder);
 
 namespace CB_ADF
 {

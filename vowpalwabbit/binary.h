@@ -9,6 +9,6 @@ namespace VW
 {
 namespace binary
 {
-VW::LEARNER::base_learner* binary_setup(setup_base_fn& setup_base);
+VW::LEARNER::base_learner* binary_setup(setup_base_fn& stack_builder);
 }
 }  // namespace VW

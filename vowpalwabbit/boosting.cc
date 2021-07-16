@@ -363,10 +363,10 @@ void save_load(boosting& o, io_buf& model_file, bool read, bool text)
   }
 }
 
-VW::LEARNER::base_learner* boosting_setup(VW::setup_base_fn& setup_base)
+VW::LEARNER::base_learner* boosting_setup(VW::setup_base_fn& stack_builder)
 {
-  options_i& options = *setup_base.get_options();
-  vw& all = *setup_base.get_all_pointer();
+  options_i& options = *stack_builder.get_options();
+  vw& all = *stack_builder.get_all_pointer();
   free_ptr<boosting> data = scoped_calloc_or_throw<boosting>();
   option_group_definition new_options("Boosting");
   new_options.add(make_option("boosting", data->N).keep().necessary().help("Online boosting with <N> weak learners"))
@@ -400,18 +400,20 @@ VW::LEARNER::base_learner* boosting_setup(VW::setup_base_fn& setup_base)
 
   learner<boosting, example>* l;
   if (data->alg == "BBM")
-    l = &init_learner<boosting, example>(data, as_singleline(setup_base()), predict_or_learn<true>,
-        predict_or_learn<false>, data->N, all.get_setupfn_name(boosting_setup));
+    l = &init_learner<boosting, example>(data, as_singleline(stack_builder.setup_base_learner()),
+        predict_or_learn<true>, predict_or_learn<false>, data->N, all.get_setupfn_name(boosting_setup));
   else if (data->alg == "logistic")
   {
-    l = &init_learner<boosting, example>(data, as_singleline(setup_base()), predict_or_learn_logistic<true>,
-        predict_or_learn_logistic<false>, data->N, all.get_setupfn_name(boosting_setup) + "-logistic");
+    l = &init_learner<boosting, example>(data, as_singleline(stack_builder.setup_base_learner()),
+        predict_or_learn_logistic<true>, predict_or_learn_logistic<false>, data->N,
+        all.get_setupfn_name(boosting_setup) + "-logistic");
     l->set_save_load(save_load);
   }
   else if (data->alg == "adaptive")
   {
-    l = &init_learner<boosting, example>(data, as_singleline(setup_base()), predict_or_learn_adaptive<true>,
-        predict_or_learn_adaptive<false>, data->N, all.get_setupfn_name(boosting_setup) + "-adaptive");
+    l = &init_learner<boosting, example>(data, as_singleline(stack_builder.setup_base_learner()),
+        predict_or_learn_adaptive<true>, predict_or_learn_adaptive<false>, data->N,
+        all.get_setupfn_name(boosting_setup) + "-adaptive");
     l->set_save_load(save_load_sampling);
   }
   else

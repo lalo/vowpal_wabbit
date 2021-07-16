@@ -13,7 +13,7 @@ namespace cb_explore_adf
 {
 namespace rnd
 {
-LEARNER::base_learner* setup(VW::setup_base_fn& setup_base);
+LEARNER::base_learner* setup(VW::setup_base_fn& stack_builder);
 }  // namespace rnd
 }  // namespace cb_explore_adf
 }  // namespace VW

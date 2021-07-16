@@ -654,10 +654,10 @@ void finish_multiline_example(vw& all, cbify&, multi_ex& ec_seq)
   VW::finish_example(all, ec_seq);
 }
 
-base_learner* cbify_setup(VW::setup_base_fn& setup_base)
+base_learner* cbify_setup(VW::setup_base_fn& stack_builder)
 {
-  options_i& options = *setup_base.get_options();
-  vw& all = *setup_base.get_all_pointer();
+  options_i& options = *stack_builder.get_options();
+  vw& all = *stack_builder.get_all_pointer();
   uint32_t num_actions = 0;
   uint32_t cb_continuous_num_actions = 0;
   auto data = scoped_calloc_or_throw<cbify>();
@@ -756,7 +756,7 @@ base_learner* cbify_setup(VW::setup_base_fn& setup_base)
 
   if (data->use_adf)
   {
-    multi_learner* base = as_multiline(setup_base());
+    multi_learner* base = as_multiline(stack_builder.setup_base_learner());
 
     if (data->use_adf) { data->adf_data.init_adf_data(num_actions, base->increment, all.interactions); }
 
@@ -775,7 +775,7 @@ base_learner* cbify_setup(VW::setup_base_fn& setup_base)
   }
   else
   {
-    single_learner* base = as_singleline(setup_base());
+    single_learner* base = as_singleline(stack_builder.setup_base_learner());
     if (use_reg)
     {
       all.example_parser->lbl_parser = simple_label_parser;
@@ -810,10 +810,10 @@ base_learner* cbify_setup(VW::setup_base_fn& setup_base)
   return make_base(*l);
 }
 
-base_learner* cbifyldf_setup(VW::setup_base_fn& setup_base)
+base_learner* cbifyldf_setup(VW::setup_base_fn& stack_builder)
 {
-  options_i& options = *setup_base.get_options();
-  vw& all = *setup_base.get_all_pointer();
+  options_i& options = *stack_builder.get_options();
+  vw& all = *stack_builder.get_all_pointer();
   auto data = scoped_calloc_or_throw<cbify>();
   bool cbify_ldf_option = false;
 
@@ -843,7 +843,7 @@ base_learner* cbifyldf_setup(VW::setup_base_fn& setup_base)
     options.insert("lr_multiplier", ss.str());
   }
 
-  multi_learner* base = as_multiline(setup_base());
+  multi_learner* base = as_multiline(stack_builder.setup_base_learner());
   learner<cbify, multi_ex>& l = init_learner(data, base, do_actual_learning_ldf, do_actual_predict_ldf, 1,
       prediction_type_t::multiclass, all.get_setupfn_name(cbifyldf_setup));
 

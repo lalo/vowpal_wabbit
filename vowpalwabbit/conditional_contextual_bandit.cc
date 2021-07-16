@@ -608,10 +608,10 @@ void save_load(ccb& sm, io_buf& io, bool read, bool text)
   if (read && sm.has_seen_multi_slot_example) { insert_ccb_interactions(sm.all->interactions); }
 }
 
-base_learner* ccb_explore_adf_setup(VW::setup_base_fn& setup_base)
+base_learner* ccb_explore_adf_setup(VW::setup_base_fn& stack_builder)
 {
-  options_i& options = *setup_base.get_options();
-  vw& all = *setup_base.get_all_pointer();
+  options_i& options = *stack_builder.get_options();
+  vw& all = *stack_builder.get_all_pointer();
   auto data = VW::make_unique<ccb>();
   bool ccb_explore_adf_option = false;
   bool all_slots_loss_report = false;
@@ -641,7 +641,7 @@ base_learner* ccb_explore_adf_setup(VW::setup_base_fn& setup_base)
     options.add_and_parse(new_options);
   }
 
-  auto* base = as_multiline(setup_base());
+  auto* base = as_multiline(stack_builder.setup_base_learner());
   all.example_parser->lbl_parser = CCB::ccb_label_parser;
 
   // Stash the base learners stride_shift so we can properly add a feature

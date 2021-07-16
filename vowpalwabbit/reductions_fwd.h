@@ -31,7 +31,7 @@ struct options_i;
 
 struct setup_base_fn
 {
-  virtual VW::LEARNER::base_learner* operator()() = 0;
+  virtual VW::LEARNER::base_learner* setup_base_learner() = 0;
 
   // this one we can share freely
   virtual VW::config::options_i* get_options() = 0;

@@ -405,10 +405,10 @@ void finish_example(vw& all, nn&, example& ec)
   return_simple_example(all, nullptr, ec);
 }
 
-base_learner* nn_setup(VW::setup_base_fn& setup_base)
+base_learner* nn_setup(VW::setup_base_fn& stack_builder)
 {
-  options_i& options = *setup_base.get_options();
-  vw& all = *setup_base.get_all_pointer();
+  options_i& options = *stack_builder.get_options();
+  vw& all = *stack_builder.get_all_pointer();
   auto n = scoped_calloc_or_throw<nn>();
   bool meanfield = false;
   option_group_definition new_options("Neural Network");
@@ -453,7 +453,7 @@ base_learner* nn_setup(VW::setup_base_fn& setup_base)
   n->hidden_units_pred = calloc_or_throw<polyprediction>(n->k);
   n->hiddenbias_pred = calloc_or_throw<polyprediction>(n->k);
 
-  auto base = as_singleline(setup_base());
+  auto base = as_singleline(stack_builder.setup_base_learner());
   n->increment = base->increment;  // Indexing of output layer is odd.
   nn& nv = *n.get();
   learner<nn, example>& l = init_learner(n, base, predict_or_learn_multi<true, true>,

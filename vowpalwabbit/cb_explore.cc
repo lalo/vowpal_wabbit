@@ -323,10 +323,10 @@ void save_load(cb_explore& cb, io_buf& io, bool read, bool text)
 }  // namespace CB_EXPLORE
 using namespace CB_EXPLORE;
 
-base_learner* cb_explore_setup(VW::setup_base_fn& setup_base)
+base_learner* cb_explore_setup(VW::setup_base_fn& stack_builder)
 {
-  options_i& options = *setup_base.get_options();
-  vw& all = *setup_base.get_all_pointer();
+  options_i& options = *stack_builder.get_options();
+  vw& all = *stack_builder.get_all_pointer();
   auto data = scoped_calloc_or_throw<cb_explore>();
   option_group_definition new_options("Contextual Bandit Exploration");
   new_options
@@ -369,7 +369,7 @@ base_learner* cb_explore_setup(VW::setup_base_fn& setup_base)
   data->cbcs.cb_type = CB_TYPE_DR;
   data->model_file_version = all.model_file_ver;
 
-  single_learner* base = as_singleline(setup_base());
+  single_learner* base = as_singleline(stack_builder.setup_base_learner());
   data->cbcs.scorer = all.scorer;
 
   learner<cb_explore, example>* l;

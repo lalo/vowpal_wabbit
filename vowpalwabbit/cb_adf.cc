@@ -474,10 +474,10 @@ void predict(cb_adf& c, multi_learner& base, multi_ex& ec_seq) { c.predict(base,
 
 }  // namespace CB_ADF
 using namespace CB_ADF;
-base_learner* cb_adf_setup(VW::setup_base_fn& setup_base)
+base_learner* cb_adf_setup(VW::setup_base_fn& stack_builder)
 {
-  options_i& options = *setup_base.get_options();
-  vw& all = *setup_base.get_all_pointer();
+  options_i& options = *stack_builder.get_options();
+  vw& all = *stack_builder.get_all_pointer();
   bool cb_adf_option = false;
   std::string type_string = "mtr";
 
@@ -553,7 +553,7 @@ base_learner* cb_adf_setup(VW::setup_base_fn& setup_base)
 
   auto ld = VW::make_unique<cb_adf>(all.sd, cb_type, &all.model_file_ver, rank_all, clip_p, no_predict);
 
-  auto base = as_multiline(setup_base());
+  auto base = as_multiline(stack_builder.setup_base_learner());
   all.example_parser->lbl_parser = CB::cb_label;
 
   cb_adf* bare = ld.get();

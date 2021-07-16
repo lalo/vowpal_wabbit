@@ -122,10 +122,10 @@ void persist(metrics_data& data, metric_sink& metrics)
   metrics.int_metrics_list.emplace_back("total_learn_calls", data.learn_count);
 }
 
-VW::LEARNER::base_learner* metrics_setup(VW::setup_base_fn& setup_base)
+VW::LEARNER::base_learner* metrics_setup(VW::setup_base_fn& stack_builder)
 {
-  options_i& options = *setup_base.get_options();
-  vw& all = *setup_base.get_all_pointer();
+  options_i& options = *stack_builder.get_options();
+  vw& all = *stack_builder.get_all_pointer();
   auto data = scoped_calloc_or_throw<metrics_data>();
 
   option_group_definition new_options("Debug: Metrics");
@@ -137,7 +137,7 @@ VW::LEARNER::base_learner* metrics_setup(VW::setup_base_fn& setup_base)
 
   if (data->out_file.empty()) THROW("extra_metrics argument (output filename) is missing.");
 
-  auto* base_learner = setup_base();
+  auto* base_learner = stack_builder.setup_base_learner();
 
   if (base_learner->is_multiline)
   {

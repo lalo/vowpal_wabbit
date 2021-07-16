@@ -10,6 +10,6 @@ namespace VW
 namespace continuous_action
 {
 // Setup reduction in stack
-LEARNER::base_learner* sample_pdf_setup(VW::setup_base_fn& setup_base);
+LEARNER::base_learner* sample_pdf_setup(VW::setup_base_fn& stack_builder);
 }  // namespace continuous_action
 }  // namespace VW

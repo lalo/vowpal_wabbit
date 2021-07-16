@@ -218,10 +218,10 @@ void finish_example_scores(vw& all, oaa& o, example& ec)
   VW::finish_example(all, ec);
 }
 
-VW::LEARNER::base_learner* oaa_setup(VW::setup_base_fn& setup_base)
+VW::LEARNER::base_learner* oaa_setup(VW::setup_base_fn& stack_builder)
 {
-  options_i& options = *setup_base.get_options();
-  vw& all = *setup_base.get_all_pointer();
+  options_i& options = *stack_builder.get_options();
+  vw& all = *stack_builder.get_all_pointer();
   auto data = scoped_calloc_or_throw<oaa>();
   bool probabilities = false;
   bool scores = false;
@@ -265,7 +265,7 @@ VW::LEARNER::base_learner* oaa_setup(VW::setup_base_fn& setup_base)
 
   oaa* data_ptr = data.get();
   VW::LEARNER::learner<oaa, example>* l;
-  auto base = as_singleline(setup_base());
+  auto base = as_singleline(stack_builder.setup_base_learner());
   if (probabilities || scores)
   {
     if (probabilities)

@@ -475,10 +475,10 @@ void save_load(OjaNewton& ON, io_buf& model_file, bool read, bool text)
   }
 }
 
-base_learner* OjaNewton_setup(VW::setup_base_fn& setup_base)
+base_learner* OjaNewton_setup(VW::setup_base_fn& stack_builder)
 {
-  options_i& options = *setup_base.get_options();
-  vw& all = *setup_base.get_all_pointer();
+  options_i& options = *stack_builder.get_options();
+  vw& all = *stack_builder.get_all_pointer();
 
   auto ON = scoped_calloc_or_throw<OjaNewton>();
 

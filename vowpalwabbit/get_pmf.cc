@@ -87,10 +87,10 @@ void predict_or_learn(get_pmf& reduction, single_learner&, example& ec)
 ////////////////////////////////////////////////////
 
 // Setup reduction in stack
-LEARNER::base_learner* get_pmf_setup(VW::setup_base_fn& setup_base)
+LEARNER::base_learner* get_pmf_setup(VW::setup_base_fn& stack_builder)
 {
-  options_i& options = *setup_base.get_options();
-  vw& all = *setup_base.get_all_pointer();
+  options_i& options = *stack_builder.get_options();
+  vw& all = *stack_builder.get_all_pointer();
   option_group_definition new_options("Continuous actions - convert to pmf");
   bool invoked = false;
   float epsilon = 0.0f;
@@ -101,7 +101,7 @@ LEARNER::base_learner* get_pmf_setup(VW::setup_base_fn& setup_base)
   // to the reduction stack;
   if (!options.add_parse_and_check_necessary(new_options)) return nullptr;
 
-  LEARNER::base_learner* p_base = setup_base();
+  LEARNER::base_learner* p_base = stack_builder.setup_base_learner();
   auto p_reduction = scoped_calloc_or_throw<get_pmf>();
   p_reduction->init(as_singleline(p_base), epsilon);
 

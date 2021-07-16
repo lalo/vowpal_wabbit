@@ -322,10 +322,10 @@ void learn(ect& e, single_learner& base, example& ec)
   ec.pred.multiclass = pred;
 }
 
-base_learner* ect_setup(VW::setup_base_fn& setup_base)
+base_learner* ect_setup(VW::setup_base_fn& stack_builder)
 {
-  options_i& options = *setup_base.get_options();
-  vw& all = *setup_base.get_all_pointer();
+  options_i& options = *stack_builder.get_options();
+  vw& all = *stack_builder.get_all_pointer();
   auto data = scoped_calloc_or_throw<ect>();
   std::string link;
   option_group_definition new_options("Error Correcting Tournament Options");
@@ -341,7 +341,7 @@ base_learner* ect_setup(VW::setup_base_fn& setup_base)
 
   size_t wpp = create_circuit(*data.get(), data->k, data->errors + 1);
 
-  base_learner* base = setup_base();
+  base_learner* base = stack_builder.setup_base_learner();
   if (link == "logistic") data->class_boundary = 0.5;  // as --link=logistic maps predictions in [0;1]
 
   learner<ect, example>& l = init_multiclass_learner(

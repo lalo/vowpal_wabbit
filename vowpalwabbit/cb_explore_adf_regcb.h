@@ -12,7 +12,7 @@ namespace cb_explore_adf
 {
 namespace regcb
 {
-VW::LEARNER::base_learner* setup(VW::setup_base_fn& setup_base);
+VW::LEARNER::base_learner* setup(VW::setup_base_fn& stack_builder);
 }  // namespace regcb
 }  // namespace cb_explore_adf
 }  // namespace VW
