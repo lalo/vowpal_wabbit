@@ -872,7 +872,8 @@ VW::LEARNER::base_learner* kernel_svm_setup(VW::setup_base_fn& stack_builder)
 
   params->all->weights.stride_shift(0);
 
-  learner<svm_params, example>& l = init_learner(params, learn, predict, 1, stack_builder.get_setupfn_name(kernel_svm_setup));
+  learner<svm_params, example>& l =
+      init_learner(params, learn, predict, 1, stack_builder.get_setupfn_name(kernel_svm_setup));
   l.set_save_load(save_load);
   return make_base(l);
 }

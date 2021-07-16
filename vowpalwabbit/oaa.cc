@@ -284,7 +284,8 @@ VW::LEARNER::base_learner* oaa_setup(VW::setup_base_fn& stack_builder)
     else
     {
       l = &VW::LEARNER::init_multiclass_learner(data, base, learn<false, true, false>, predict<false, true, false>,
-          all.example_parser, data->k, stack_builder.get_setupfn_name(oaa_setup) + "-scores", prediction_type_t::scalars);
+          all.example_parser, data->k, stack_builder.get_setupfn_name(oaa_setup) + "-scores",
+          prediction_type_t::scalars);
       all.example_parser->lbl_parser.label_type = label_type_t::multiclass;
       l->set_finish_example(finish_example_scores<false>);
     }

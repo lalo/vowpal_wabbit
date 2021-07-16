@@ -2771,8 +2771,9 @@ base_learner* setup(VW::setup_base_fn& stack_builder)
 
   cdbg << "num_learners = " << priv.num_learners << endl;
 
-  learner<search, multi_ex>& l = init_learner(sch, make_base(*base), do_actual_learning<true>,
-      do_actual_learning<false>, priv.total_number_of_policies * priv.num_learners, stack_builder.get_setupfn_name(setup), true);
+  learner<search, multi_ex>& l =
+      init_learner(sch, make_base(*base), do_actual_learning<true>, do_actual_learning<false>,
+          priv.total_number_of_policies * priv.num_learners, stack_builder.get_setupfn_name(setup), true);
 
   l.set_finish_example(finish_multiline_example);
   l.set_end_examples(end_examples);

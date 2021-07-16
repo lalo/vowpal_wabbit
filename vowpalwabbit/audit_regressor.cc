@@ -269,9 +269,9 @@ VW::LEARNER::base_learner* audit_regressor_setup(VW::setup_base_fn& stack_builde
 
   VW::LEARNER::learner<audit_regressor_data, example>& ret =
       VW::LEARNER::init_learner(dat, as_singleline(stack_builder.setup_base_learner()), audit_regressor,
-          audit_regressor, 1, stack_builder.get_setupfn_name(audit_regressor_setup), true /*audit.learn does not predict or learn.
-                                                                                   nothing to be gained by calling
-                                                                                   predict() before learn()*/
+          audit_regressor, 1, stack_builder.get_setupfn_name(audit_regressor_setup), true /*audit.learn does not predict
+                                                                                   or learn. nothing to be gained by
+                                                                                   calling predict() before learn()*/
       );
   ret.set_end_examples(end_examples);
   ret.set_finish_example(finish_example);

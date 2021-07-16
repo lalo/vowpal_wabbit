@@ -7,7 +7,6 @@
 #include "learner.h"
 #include "global_data.h"
 
-
 #include <cstdint>
 
 using namespace VW::config;

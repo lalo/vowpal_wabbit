@@ -155,9 +155,9 @@ VW::LEARNER::base_learner* lrqfa_setup(VW::setup_base_fn& stack_builder)
 
   all.wpp = all.wpp * static_cast<uint64_t>(1 + lrq->k);
   auto base = stack_builder.setup_base_learner();
-  learner<LRQFAstate, example>& l =
-      init_learner(lrq, as_singleline(base), predict_or_learn<true>, predict_or_learn<false>,
-          1 + lrq->field_name.size() * lrq->k, stack_builder.get_setupfn_name(lrqfa_setup), base->learn_returns_prediction);
+  learner<LRQFAstate, example>& l = init_learner(lrq, as_singleline(base), predict_or_learn<true>,
+      predict_or_learn<false>, 1 + lrq->field_name.size() * lrq->k, stack_builder.get_setupfn_name(lrqfa_setup),
+      base->learn_returns_prediction);
 
   return make_base(l);
 }

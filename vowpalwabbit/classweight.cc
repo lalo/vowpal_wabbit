@@ -99,7 +99,8 @@ VW::LEARNER::base_learner* classweight_setup(VW::setup_base_fn& stack_builder)
   VW::LEARNER::learner<classweights, example>* ret;
   if (base->pred_type == prediction_type_t::scalar)
     ret = &VW::LEARNER::init_learner<classweights>(cweights, base, &predict_or_learn<true, prediction_type_t::scalar>,
-        &predict_or_learn<false, prediction_type_t::scalar>, stack_builder.get_setupfn_name(classweight_setup) + "-scalar");
+        &predict_or_learn<false, prediction_type_t::scalar>,
+        stack_builder.get_setupfn_name(classweight_setup) + "-scalar");
   else if (base->pred_type == prediction_type_t::multiclass)
     ret = &VW::LEARNER::init_learner<classweights>(cweights, base,
         &predict_or_learn<true, prediction_type_t::multiclass>, &predict_or_learn<false, prediction_type_t::multiclass>,

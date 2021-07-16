@@ -796,7 +796,8 @@ base_learner* cbify_setup(VW::setup_base_fn& stack_builder)
     else if (use_cs)
     {
       l = &init_cost_sensitive_learner(data, base, predict_or_learn<true, true>, predict_or_learn<false, true>,
-          all.example_parser, 1, stack_builder.get_setupfn_name(cbify_setup) + "-cs", prediction_type_t::multiclass, true);
+          all.example_parser, 1, stack_builder.get_setupfn_name(cbify_setup) + "-cs", prediction_type_t::multiclass,
+          true);
       all.example_parser->lbl_parser.label_type = label_type_t::cs;
     }
     else
