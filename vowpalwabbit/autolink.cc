@@ -6,7 +6,7 @@
 
 #include "learner.h"
 #include "global_data.h"
-#include "parse_args.h"
+
 
 #include <cstdint>
 
@@ -99,5 +99,5 @@ VW::LEARNER::base_learner* autolink_setup(VW::setup_base_fn& stack_builder)
   auto autolink_reduction = scoped_calloc_or_throw<VW::autolink>(d, all.weights.stride_shift());
   auto base = stack_builder.setup_base_learner();
   return make_base(init_learner(autolink_reduction, as_singleline(base), predict_or_learn<true>,
-      predict_or_learn<false>, all.get_setupfn_name(autolink_setup), base->learn_returns_prediction));
+      predict_or_learn<false>, stack_builder.get_setupfn_name(autolink_setup), base->learn_returns_prediction));
 }

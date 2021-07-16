@@ -20,6 +20,8 @@ struct default_reduction_stack_setup : public setup_base_fn
 
   vw* get_all_pointer() override { return all_ptr; }
 
+  std::string get_setupfn_name(reduction_setup_fn setup) override;
+
 private:
   std::vector<std::tuple<std::string, reduction_setup_fn>> reduction_stack;
   VW::config::options_i* options_impl = nullptr;

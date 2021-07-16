@@ -130,7 +130,7 @@ base_learner* confidence_setup(VW::setup_base_fn& stack_builder)
 
   // Create new learner
   learner<confidence, example>& l = init_learner(
-      data, base, learn_with_confidence_ptr, predict_with_confidence_ptr, all.get_setupfn_name(confidence_setup), true);
+      data, base, learn_with_confidence_ptr, predict_with_confidence_ptr, stack_builder.get_setupfn_name(confidence_setup), true);
 
   l.set_finish_example(return_confidence_example);
 

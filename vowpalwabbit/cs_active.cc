@@ -359,10 +359,10 @@ base_learner* cs_active_setup(VW::setup_base_fn& stack_builder)
   learner<cs_active, example>& l = simulation
       ? init_learner(data, as_singleline(stack_builder.setup_base_learner()), predict_or_learn<true, true>,
             predict_or_learn<false, true>, data->num_classes, prediction_type_t::active_multiclass,
-            all.get_setupfn_name(cs_active_setup) + "-sim", true)
+            stack_builder.get_setupfn_name(cs_active_setup) + "-sim", true)
       : init_learner(data, as_singleline(stack_builder.setup_base_learner()), predict_or_learn<true, false>,
             predict_or_learn<false, false>, data->num_classes, prediction_type_t::active_multiclass,
-            all.get_setupfn_name(cs_active_setup), true);
+            stack_builder.get_setupfn_name(cs_active_setup), true);
 
   l.set_finish_example(finish_example);
   base_learner* b = make_base(l);

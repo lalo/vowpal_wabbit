@@ -8,7 +8,7 @@
 #include "label_dictionary.h"
 #include "learner.h"
 #include "options.h"
-#include "parse_args.h"
+
 #include "vw.h"
 #include "scope_exit.h"
 
@@ -106,7 +106,7 @@ VW::LEARNER::base_learner* shared_feature_merger_setup(VW::setup_base_fn& stack_
   auto* base = VW::LEARNER::as_multiline(stack_builder.setup_base_learner());
 
   auto& learner = VW::LEARNER::init_learner(data, base, predict_or_learn<true>, predict_or_learn<false>,
-      all.get_setupfn_name(shared_feature_merger_setup), base->learn_returns_prediction);
+      stack_builder.get_setupfn_name(shared_feature_merger_setup), base->learn_returns_prediction);
 
   learner.set_persist_metrics(persist);
 

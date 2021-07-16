@@ -376,7 +376,7 @@ VW::LEARNER::base_learner* marginal_setup(VW::setup_base_fn& stack_builder)
 
   VW::LEARNER::learner<MARGINAL::data, example>& ret =
       init_learner(d, as_singleline(stack_builder.setup_base_learner()), predict_or_learn<true>,
-          predict_or_learn<false>, all.get_setupfn_name(marginal_setup), true);
+          predict_or_learn<false>, stack_builder.get_setupfn_name(marginal_setup), true);
   ret.set_save_load(save_load);
 
   return make_base(ret);

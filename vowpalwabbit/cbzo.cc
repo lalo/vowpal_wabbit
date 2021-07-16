@@ -363,7 +363,7 @@ base_learner* setup(VW::setup_base_fn& stack_builder)
   data->max_prediction_supplied = options.was_supplied("max_prediction");
 
   learner<cbzo, example>& l = init_learner(data, get_learn(all, policy, feature_mask_off), get_predict(all, policy), 0,
-      prediction_type_t::pdf, all.get_setupfn_name(setup));
+      prediction_type_t::pdf, stack_builder.get_setupfn_name(setup));
 
   l.set_save_load(save_load);
   l.set_finish_example(finish_example);

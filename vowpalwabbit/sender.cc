@@ -117,7 +117,7 @@ VW::LEARNER::base_learner* sender_setup(VW::setup_base_fn& stack_builder)
   s->all = &all;
   s->delay_ring = calloc_or_throw<example*>(all.example_parser->ring_size);
 
-  VW::LEARNER::learner<sender, example>& l = init_learner(s, learn, learn, 1, all.get_setupfn_name(sender_setup));
+  VW::LEARNER::learner<sender, example>& l = init_learner(s, learn, learn, 1, stack_builder.get_setupfn_name(sender_setup));
   l.set_finish_example(finish_example);
   l.set_end_examples(end_examples);
   return make_base(l);

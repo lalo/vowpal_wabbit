@@ -6,7 +6,7 @@
 #include "error_constants.h"
 #include "api_status.h"
 #include "debug_log.h"
-#include "parse_args.h"
+#include "global_data.h"
 #include "explore.h"
 #include "guard.h"
 
@@ -119,7 +119,7 @@ LEARNER::base_learner* sample_pdf_setup(VW::setup_base_fn& stack_builder)
 
   // This learner will assume the label type from base, so should not call set_label_type
   auto* l = make_reduction_learner(std::move(p_reduction), as_singleline(p_base), predict_or_learn<true>,
-      predict_or_learn<false>, all.get_setupfn_name(sample_pdf_setup))
+      predict_or_learn<false>, stack_builder.get_setupfn_name(sample_pdf_setup))
                 .set_prediction_type(prediction_type_t::action_pdf_value)
                 .build();
 

@@ -7,7 +7,7 @@
 #include <limits>
 
 #include "cats_tree.h"
-#include "parse_args.h"  // stack_builder.setup_base_learner()
+  // stack_builder.setup_base_learner()
 #include "learner.h"     // init_learner()
 #include "reductions.h"
 #include "debug_log.h"
@@ -370,7 +370,7 @@ base_learner* setup(setup_base_fn& stack_builder)
 
   base_learner* base = stack_builder.setup_base_learner();
   int32_t params_per_weight = tree->learner_count();
-  auto* l = make_reduction_learner(std::move(tree), as_singleline(base), learn, predict, all.get_setupfn_name(setup))
+  auto* l = make_reduction_learner(std::move(tree), as_singleline(base), learn, predict, stack_builder.get_setupfn_name(setup))
                 .set_params_per_weight(params_per_weight)
                 .set_prediction_type(prediction_type_t::multiclass)
                 .set_label_type(label_type_t::cb)

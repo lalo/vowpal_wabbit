@@ -372,7 +372,7 @@ base_learner* gd_mf_setup(VW::setup_base_fn& stack_builder)
   all.eta *= powf(static_cast<float>(all.sd->t), all.power_t);
 
   learner<gdmf, example>& l = init_learner(
-      data, learn, predict, (UINT64_ONE << all.weights.stride_shift()), all.get_setupfn_name(gd_mf_setup), true);
+      data, learn, predict, (UINT64_ONE << all.weights.stride_shift()), stack_builder.get_setupfn_name(gd_mf_setup), true);
   l.set_save_load(save_load);
   l.set_end_pass(end_pass);
 

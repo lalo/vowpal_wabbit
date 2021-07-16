@@ -216,7 +216,7 @@ base_learner* explore_eval_setup(VW::setup_base_fn& stack_builder)
   all.example_parser->lbl_parser = CB::cb_label;
 
   learner<explore_eval, multi_ex>& l = init_learner(data, base, do_actual_learning<true>, do_actual_learning<false>, 1,
-      prediction_type_t::action_probs, all.get_setupfn_name(explore_eval_setup), true);
+      prediction_type_t::action_probs, stack_builder.get_setupfn_name(explore_eval_setup), true);
 
   l.set_finish_example(finish_multiline_example);
   l.set_finish(finish);

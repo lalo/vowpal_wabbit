@@ -4,7 +4,7 @@
 
 #include "reductions.h"
 #include "interactions.h"
-#include "parse_args.h"
+
 #include "vw.h"
 #include "shared_data.h"
 #include "gd.h"
@@ -269,7 +269,7 @@ VW::LEARNER::base_learner* audit_regressor_setup(VW::setup_base_fn& stack_builde
 
   VW::LEARNER::learner<audit_regressor_data, example>& ret =
       VW::LEARNER::init_learner(dat, as_singleline(stack_builder.setup_base_learner()), audit_regressor,
-          audit_regressor, 1, all.get_setupfn_name(audit_regressor_setup), true /*audit.learn does not predict or learn.
+          audit_regressor, 1, stack_builder.get_setupfn_name(audit_regressor_setup), true /*audit.learn does not predict or learn.
                                                                                    nothing to be gained by calling
                                                                                    predict() before learn()*/
       );

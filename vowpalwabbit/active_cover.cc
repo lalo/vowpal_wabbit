@@ -256,7 +256,7 @@ base_learner* active_cover_setup(VW::setup_base_fn& stack_builder)
 
   const auto cover_size = data->cover_size;
   auto* l = VW::LEARNER::make_reduction_learner(std::move(data), base, predict_or_learn_active_cover<true>,
-      predict_or_learn_active_cover<false>, all.get_setupfn_name(active_cover_setup))
+      predict_or_learn_active_cover<false>, stack_builder.get_setupfn_name(active_cover_setup))
                 .set_params_per_weight(cover_size + 1)
                 .set_prediction_type(prediction_type_t::scalar)
                 .set_label_type(label_type_t::simple)

@@ -8,7 +8,7 @@
 // It can also parse a continuous labeled example.
 
 #include "cats_pdf.h"
-#include "parse_args.h"
+#include "global_data.h"
 #include "error_constants.h"
 #include "api_status.h"
 #include "cb_continuous_label.h"
@@ -187,7 +187,7 @@ LEARNER::base_learner* setup(setup_base_fn& stack_builder)
   auto p_reduction = scoped_calloc_or_throw<cats_pdf>(as_singleline(p_base), always_predict);
 
   LEARNER::learner<cats_pdf, example>& l = init_learner(p_reduction, as_singleline(p_base), predict_or_learn<true>,
-      predict_or_learn<false>, 1, prediction_type_t::pdf, all.get_setupfn_name(setup), true);
+      predict_or_learn<false>, 1, prediction_type_t::pdf, stack_builder.get_setupfn_name(setup), true);
 
   l.set_finish_example(finish_example);
   all.example_parser->lbl_parser = cb_continuous::the_label_parser;

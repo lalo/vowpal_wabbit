@@ -299,7 +299,7 @@ base_learner* setup(VW::setup_base_fn& stack_builder)
   data->_p_base = p_base;
 
   learner<pmf_to_pdf::reduction, example>& l =
-      init_learner(data, p_base, learn, predict, 1, prediction_type_t::pdf, all.get_setupfn_name(setup));
+      init_learner(data, p_base, learn, predict, 1, prediction_type_t::pdf, stack_builder.get_setupfn_name(setup));
 
   return make_base(l);
 }

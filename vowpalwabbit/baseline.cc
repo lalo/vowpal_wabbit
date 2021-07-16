@@ -199,7 +199,7 @@ base_learner* baseline_setup(VW::setup_base_fn& stack_builder)
   auto base = as_singleline(stack_builder.setup_base_learner());
 
   learner<baseline, example>& l =
-      init_learner(data, base, predict_or_learn<true>, predict_or_learn<false>, all.get_setupfn_name(baseline_setup));
+      init_learner(data, base, predict_or_learn<true>, predict_or_learn<false>, stack_builder.get_setupfn_name(baseline_setup));
 
   l.set_sensitivity(sensitivity);
 

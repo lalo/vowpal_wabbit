@@ -523,7 +523,7 @@ base_learner* recall_tree_setup(VW::setup_base_fn& stack_builder)
                          << std::endl;
 
   learner<recall_tree, example>& l = init_multiclass_learner(tree, as_singleline(stack_builder.setup_base_learner()),
-      learn, predict, all.example_parser, tree->max_routers + tree->k, all.get_setupfn_name(recall_tree_setup));
+      learn, predict, all.example_parser, tree->max_routers + tree->k, stack_builder.get_setupfn_name(recall_tree_setup));
   all.example_parser->lbl_parser.label_type = label_type_t::multiclass;
   l.set_save_load(save_load_tree);
 

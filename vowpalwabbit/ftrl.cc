@@ -435,10 +435,10 @@ base_learner* ftrl_setup(VW::setup_base_fn& stack_builder)
   learner<ftrl, example>* l;
   if (all.audit || all.hash_inv)
     l = &init_learner(b, learn_ptr, predict<true>, UINT64_ONE << all.weights.stride_shift(),
-        all.get_setupfn_name(ftrl_setup) + "-" + algorithm_name + "-audit");
+        stack_builder.get_setupfn_name(ftrl_setup) + "-" + algorithm_name + "-audit");
   else
     l = &init_learner(b, learn_ptr, predict<false>, UINT64_ONE << all.weights.stride_shift(),
-        all.get_setupfn_name(ftrl_setup) + "-" + algorithm_name, learn_returns_prediction);
+        stack_builder.get_setupfn_name(ftrl_setup) + "-" + algorithm_name, learn_returns_prediction);
   l->set_sensitivity(sensitivity);
   if (all.audit || all.hash_inv)
     l->set_multipredict(multipredict<true>);

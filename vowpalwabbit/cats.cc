@@ -3,7 +3,7 @@
 // license as described in the file LICENSE.
 
 #include "cats.h"
-#include "parse_args.h"
+#include "global_data.h"
 #include "error_constants.h"
 #include "debug_log.h"
 #include "shared_data.h"
@@ -207,7 +207,7 @@ LEARNER::base_learner* setup(setup_base_fn& stack_builder)
   p_reduction->min_value = min_value;
 
   LEARNER::learner<cats, example>& l = init_learner(p_reduction, as_singleline(p_base), predict_or_learn<true>,
-      predict_or_learn<false>, 1, prediction_type_t::action_pdf_value, all.get_setupfn_name(setup), true);
+      predict_or_learn<false>, 1, prediction_type_t::action_pdf_value, stack_builder.get_setupfn_name(setup), true);
 
   l.set_finish_example(finish_example);
 

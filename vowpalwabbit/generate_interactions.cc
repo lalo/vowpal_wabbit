@@ -112,7 +112,7 @@ VW::LEARNER::base_learner* generate_interactions_setup(VW::setup_base_fn& stack_
   auto data = VW::make_unique<INTERACTIONS::interactions_generator>();
   auto* base = as_singleline(stack_builder.setup_base_learner());
   auto* l = VW::LEARNER::make_reduction_learner(
-      std::move(data), base, learn_func, pred_func, all.get_setupfn_name(generate_interactions_setup))
+      std::move(data), base, learn_func, pred_func, stack_builder.get_setupfn_name(generate_interactions_setup))
                 .set_learn_returns_prediction(base->learn_returns_prediction)
                 .set_update(update_func)
                 .set_multipredict(multipredict_func)

@@ -558,7 +558,7 @@ base_learner* cb_adf_setup(VW::setup_base_fn& stack_builder)
 
   cb_adf* bare = ld.get();
   bool lrp = ld->learn_returns_prediction();
-  auto* l = make_reduction_learner(std::move(ld), base, learn, predict, all.get_setupfn_name(cb_adf_setup))
+  auto* l = make_reduction_learner(std::move(ld), base, learn, predict, stack_builder.get_setupfn_name(cb_adf_setup))
                 .set_learn_returns_prediction(lrp)
                 .set_params_per_weight(problem_multiplier)
                 .set_prediction_type(prediction_type_t::action_scores)

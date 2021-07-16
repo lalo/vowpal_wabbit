@@ -1125,13 +1125,13 @@ base_learner* bfgs_setup(VW::setup_base_fn& stack_builder)
   {
     learn_ptr = learn<true>;
     predict_ptr = predict<true>;
-    learner_name = all.get_setupfn_name(bfgs_setup) + "-audit";
+    learner_name = stack_builder.get_setupfn_name(bfgs_setup) + "-audit";
   }
   else
   {
     learn_ptr = learn<false>;
     predict_ptr = predict<false>;
-    learner_name = all.get_setupfn_name(bfgs_setup);
+    learner_name = stack_builder.get_setupfn_name(bfgs_setup);
   }
 
   return make_base(*make_base_learner(

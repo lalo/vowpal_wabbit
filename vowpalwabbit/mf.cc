@@ -206,6 +206,6 @@ base_learner* mf_setup(VW::setup_base_fn& stack_builder)
   all.random_positive_weights = true;
 
   learner<mf, example>& l = init_learner(data, as_singleline(stack_builder.setup_base_learner()), learn, predict<false>,
-      2 * data->rank + 1, all.get_setupfn_name(mf_setup));
+      2 * data->rank + 1, stack_builder.get_setupfn_name(mf_setup));
   return make_base(l);
 }

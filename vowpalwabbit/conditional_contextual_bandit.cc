@@ -657,7 +657,7 @@ base_learner* ccb_explore_adf_setup(VW::setup_base_fn& stack_builder)
   data->id_namespace_hash = VW::hash_space(all, data->id_namespace_str);
 
   auto* l = VW::LEARNER::make_reduction_learner(std::move(data), base, learn_or_predict<true>, learn_or_predict<false>,
-      all.get_setupfn_name(ccb_explore_adf_setup))
+      stack_builder.get_setupfn_name(ccb_explore_adf_setup))
                 .set_learn_returns_prediction(true)
                 .set_prediction_type(prediction_type_t::decision_probs)
                 .set_label_type(label_type_t::ccb)

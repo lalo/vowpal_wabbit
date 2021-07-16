@@ -390,17 +390,17 @@ base_learner* cb_explore_setup(VW::setup_base_fn& stack_builder)
     data->cover_probs.resize_but_with_stl_behavior(num_actions);
     data->preds.reserve(data->cover_size);
     l = &init_learner(data, base, predict_or_learn_cover<true>, predict_or_learn_cover<false>, data->cover_size + 1,
-        prediction_type_t::action_probs, all.get_setupfn_name(cb_explore_setup) + "-cover");
+        prediction_type_t::action_probs, stack_builder.get_setupfn_name(cb_explore_setup) + "-cover");
   }
   else if (options.was_supplied("bag"))
     l = &init_learner(data, base, predict_or_learn_bag<true>, predict_or_learn_bag<false>, data->bag_size,
-        prediction_type_t::action_probs, all.get_setupfn_name(cb_explore_setup) + "-bag");
+        prediction_type_t::action_probs, stack_builder.get_setupfn_name(cb_explore_setup) + "-bag");
   else if (options.was_supplied("first"))
     l = &init_learner(data, base, predict_or_learn_first<true>, predict_or_learn_first<false>, 1,
-        prediction_type_t::action_probs, all.get_setupfn_name(cb_explore_setup) + "-first");
+        prediction_type_t::action_probs, stack_builder.get_setupfn_name(cb_explore_setup) + "-first");
   else  // greedy
     l = &init_learner(data, base, predict_or_learn_greedy<true>, predict_or_learn_greedy<false>, 1,
-        prediction_type_t::action_probs, all.get_setupfn_name(cb_explore_setup) + "-greedy");
+        prediction_type_t::action_probs, stack_builder.get_setupfn_name(cb_explore_setup) + "-greedy");
 
   l->set_finish_example(finish_example);
   l->set_save_load(save_load);

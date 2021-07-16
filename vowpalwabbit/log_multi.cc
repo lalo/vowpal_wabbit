@@ -523,7 +523,7 @@ base_learner* log_multi_setup(VW::setup_base_fn& stack_builder)  // learner setu
   init_tree(*data.get());
 
   learner<log_multi, example>& l = init_multiclass_learner(data, as_singleline(stack_builder.setup_base_learner()),
-      learn, predict, all.example_parser, data->max_predictors, all.get_setupfn_name(log_multi_setup));
+      learn, predict, all.example_parser, data->max_predictors, stack_builder.get_setupfn_name(log_multi_setup));
   all.example_parser->lbl_parser.label_type = label_type_t::multiclass;
   l.set_save_load(save_load_tree);
 

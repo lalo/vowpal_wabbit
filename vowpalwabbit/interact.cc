@@ -167,7 +167,7 @@ VW::LEARNER::base_learner* interact_setup(VW::setup_base_fn& stack_builder)
 
   VW::LEARNER::learner<interact, example>* l;
   l = &VW::LEARNER::init_learner(data, as_singleline(stack_builder.setup_base_learner()), predict_or_learn<true, true>,
-      predict_or_learn<false, true>, 1, all.get_setupfn_name(interact_setup));
+      predict_or_learn<false, true>, 1, stack_builder.get_setupfn_name(interact_setup));
 
   return make_base(*l);
 }

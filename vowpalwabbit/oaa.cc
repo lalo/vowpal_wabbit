@@ -276,7 +276,7 @@ VW::LEARNER::base_learner* oaa_setup(VW::setup_base_fn& stack_builder)
                              << std::endl;
       // the three boolean template parameters are: is_learn, print_all and scores
       l = &LEARNER::init_multiclass_learner(data, base, learn<false, true, true>, predict<false, true, true>,
-          all.example_parser, data->k, all.get_setupfn_name(oaa_setup) + "-prob", prediction_type_t::scalars);
+          all.example_parser, data->k, stack_builder.get_setupfn_name(oaa_setup) + "-prob", prediction_type_t::scalars);
       all.example_parser->lbl_parser.label_type = label_type_t::multiclass;
       all.sd->report_multiclass_log_loss = true;
       l->set_finish_example(finish_example_scores<true>);
@@ -284,7 +284,7 @@ VW::LEARNER::base_learner* oaa_setup(VW::setup_base_fn& stack_builder)
     else
     {
       l = &VW::LEARNER::init_multiclass_learner(data, base, learn<false, true, false>, predict<false, true, false>,
-          all.example_parser, data->k, all.get_setupfn_name(oaa_setup) + "-scores", prediction_type_t::scalars);
+          all.example_parser, data->k, stack_builder.get_setupfn_name(oaa_setup) + "-scores", prediction_type_t::scalars);
       all.example_parser->lbl_parser.label_type = label_type_t::multiclass;
       l->set_finish_example(finish_example_scores<false>);
     }
@@ -292,13 +292,13 @@ VW::LEARNER::base_learner* oaa_setup(VW::setup_base_fn& stack_builder)
   else if (all.raw_prediction != nullptr)
   {
     l = &VW::LEARNER::init_multiclass_learner(data, base, learn<true, false, false>, predict<true, false, false>,
-        all.example_parser, data->k, all.get_setupfn_name(oaa_setup) + "-raw", prediction_type_t::multiclass);
+        all.example_parser, data->k, stack_builder.get_setupfn_name(oaa_setup) + "-raw", prediction_type_t::multiclass);
     all.example_parser->lbl_parser.label_type = label_type_t::multiclass;
   }
   else
   {
     l = &VW::LEARNER::init_multiclass_learner(data, base, learn<false, false, false>, predict<false, false, false>,
-        all.example_parser, data->k, all.get_setupfn_name(oaa_setup), prediction_type_t::multiclass);
+        all.example_parser, data->k, stack_builder.get_setupfn_name(oaa_setup), prediction_type_t::multiclass);
     all.example_parser->lbl_parser.label_type = label_type_t::multiclass;
   }
 

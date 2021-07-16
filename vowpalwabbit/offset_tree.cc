@@ -3,7 +3,7 @@
 // license as described in the file LICENSE.
 
 #include "offset_tree.h"
-#include "parse_args.h"  // stack_builder.setup_base_learner()
+#include "global_data.h"
 #include "learner.h"     // init_learner()
 #include "action_score.h"
 
@@ -252,7 +252,6 @@ void learn(offset_tree& tree, single_learner& base, example& ec)
 base_learner* setup(VW::setup_base_fn& stack_builder)
 {
   options_i& options = *stack_builder.get_options();
-  vw& all = *stack_builder.get_all_pointer();
   option_group_definition new_options("Offset tree Options");
   uint32_t num_actions;
   new_options.add(make_option("ot", num_actions).keep().necessary().help("Offset tree with <k> labels"));
@@ -271,7 +270,7 @@ base_learner* setup(VW::setup_base_fn& stack_builder)
   base_learner* base = stack_builder.setup_base_learner();
 
   learner<offset_tree, example>& l = init_learner(otree, as_singleline(base), learn, predict, otree->learner_count(),
-      prediction_type_t::action_probs, all.get_setupfn_name(setup));
+      prediction_type_t::action_probs, stack_builder.get_setupfn_name(setup));
 
   return make_base(l);
 }

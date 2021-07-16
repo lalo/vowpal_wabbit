@@ -1279,7 +1279,7 @@ base_learner* setup(VW::setup_base_fn& stack_builder)
 
   gd* bare = g.get();
   learner<gd, example>& ret = init_learner(g, g->learn, bare->predict,
-      (static_cast<uint64_t>(1) << all.weights.stride_shift()), all.get_setupfn_name(setup), true);
+      (static_cast<uint64_t>(1) << all.weights.stride_shift()), stack_builder.get_setupfn_name(setup), true);
   ret.set_sensitivity(bare->sensitivity);
   ret.set_multipredict(bare->multipredict);
   ret.set_update(bare->update);

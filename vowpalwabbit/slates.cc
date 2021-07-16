@@ -252,7 +252,7 @@ VW::LEARNER::base_learner* slates_setup(VW::setup_base_fn& stack_builder)
   auto* base = as_multiline(stack_builder.setup_base_learner());
   all.example_parser->lbl_parser = slates_label_parser;
   auto* l = VW::LEARNER::make_reduction_learner(
-      std::move(data), base, learn_or_predict<true>, learn_or_predict<false>, all.get_setupfn_name(slates_setup))
+      std::move(data), base, learn_or_predict<true>, learn_or_predict<false>, stack_builder.get_setupfn_name(slates_setup))
                 .set_learn_returns_prediction(base->learn_returns_prediction)
                 .set_prediction_type(prediction_type_t::decision_probs)
                 .set_label_type(label_type_t::slates)

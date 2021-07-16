@@ -6,7 +6,7 @@
 #include "error_constants.h"
 #include "api_status.h"
 #include "debug_log.h"
-#include "parse_args.h"
+#include "global_data.h"
 
 // Aliases
 using std::endl;
@@ -95,7 +95,6 @@ void predict_or_learn(cb_explore_pdf& reduction, single_learner&, example& ec)
 LEARNER::base_learner* cb_explore_pdf_setup(VW::setup_base_fn& stack_builder)
 {
   options_i& options = *stack_builder.get_options();
-  vw& all = *stack_builder.get_all_pointer();
   option_group_definition new_options("Continuous actions - cb_explore_pdf");
   bool invoked = false;
   float epsilon;
@@ -134,7 +133,7 @@ LEARNER::base_learner* cb_explore_pdf_setup(VW::setup_base_fn& stack_builder)
   p_reduction->first_only = first_only;
 
   auto* l = make_reduction_learner(std::move(p_reduction), as_singleline(p_base), predict_or_learn<true>,
-      predict_or_learn<false>, all.get_setupfn_name(cb_explore_pdf_setup))
+      predict_or_learn<false>, stack_builder.get_setupfn_name(cb_explore_pdf_setup))
                 .set_prediction_type(prediction_type_t::pdf)
                 .set_label_type(label_type_t::cb)
                 .build();

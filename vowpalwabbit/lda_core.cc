@@ -1343,7 +1343,7 @@ VW::LEARNER::base_learner* lda_setup(VW::setup_base_fn& stack_builder)
 
   VW::LEARNER::learner<lda, example> &l = init_learner(ld, ld->compute_coherence_metrics ? learn_with_metrics : learn,
       ld->compute_coherence_metrics ? predict_with_metrics : predict, UINT64_ONE << all.weights.stride_shift(),
-      prediction_type_t::scalars, all.get_setupfn_name(lda_setup), true);
+      prediction_type_t::scalars, stack_builder.get_setupfn_name(lda_setup), true);
 
   l.set_save_load(save_load);
   l.set_finish_example(finish_example);

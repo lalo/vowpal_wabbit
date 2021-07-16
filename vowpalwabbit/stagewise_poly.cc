@@ -693,7 +693,7 @@ base_learner* stagewise_poly_setup(VW::setup_base_fn& stack_builder)
   poly->next_batch_sz = poly->batch_sz;
 
   learner<stagewise_poly, example>& l = init_learner(poly, as_singleline(stack_builder.setup_base_learner()), learn,
-      predict, all.get_setupfn_name(stagewise_poly_setup));
+      predict, stack_builder.get_setupfn_name(stagewise_poly_setup));
 
   l.set_save_load(save_load);
   l.set_finish_example(finish_example);

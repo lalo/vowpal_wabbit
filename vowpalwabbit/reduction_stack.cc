@@ -251,4 +251,6 @@ VW::LEARNER::base_learner* default_reduction_stack_setup::setup_base_learner()
 
   return nullptr;
 }
+
+std::string default_reduction_stack_setup::get_setupfn_name(reduction_setup_fn setup) { return all_ptr->get_setupfn_name(setup); }
 }  // namespace VW
