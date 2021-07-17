@@ -7,7 +7,6 @@
 #include <limits>
 
 #include "cats_tree.h"
-// stack_builder.setup_base_learner()
 #include "learner.h"     // init_learner()
 #include "reductions.h"
 #include "debug_log.h"
