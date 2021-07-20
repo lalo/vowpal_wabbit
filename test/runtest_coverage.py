@@ -23,6 +23,101 @@ def to_json():
         f.write(json.dumps(config, indent=2, default=lambda x: x.__dict__))
 
 
+def print_option_group(desc, options):
+    if options:
+        print(desc)
+        for l in options:
+            print("\t\t// "+str(l._seq_id)+". "+l.help_str)
+            if l.default_value_supplied:
+                if l._type == "str":
+                    print("\t\t"+l._type+" " +l.name+" = \""+str(l.default_value)+"\";")
+                else:
+                    print("\t\t"+l._type+" " +l.name+" = "+str(l.default_value)+";")
+            else:
+                print("\t\t"+l._type+" " +l.name+";")
+        print()
+
+
+# dummy codegen
+# prints constructor for option group
+def necessary_to_constructor(name, options):
+    if len(options) == 0:
+        print("\t"+name + "() {}")
+    elif len(options) == 1:
+        if options[0]._type == "bool":
+            print("\t"+name + "() {}")
+        else:
+            print("\t"+name + "("+options[0]._type+" "+options[0].name+") {}")
+    elif len(options) == 2:
+        if "cb_explore_adf_" in name:
+            if "bool" == options[1]._type:
+                print("\t"+name + "() {}")
+            else:
+                print("\t"+name + "("+options[1]._type+" "+options[1].name+") {}")
+        else:
+            raise("not possible")
+    else:
+        raise("not possible")
+    print()
+
+
+def print_dummy_contract():
+    print("\t// fn to be used for add_parse_and_check_necessary of")
+    print("\t// config_backed_options (which would implement options_i)")
+    print("\t// this method is part of config_i interface")
+    print("\tbool process_option_group(option_group_definition ogd);")
+    print()
+
+
+def print_group(name, group_name, group_id, options):
+    print("// "+ str(group_id) + ". " + group_name)
+    print("// total options: " + str(len(options)))
+    print("pseudoclass " + name + "_config : config_i {")
+
+    necessary = list(filter(lambda x: x.necessary, options)) 
+    keep = list(filter(lambda x: x.keep, options)) 
+    bools = list(filter(lambda x: x._type == "bool" and x.keep == False, options)) 
+    default = list(filter(lambda x: x.default_value_supplied and x._type != "bool", options)) 
+    default = list(filter(lambda x: not x.keep and not x.necessary, default)) 
+    rest = list(filter(lambda x: not x.default_value_supplied and x._type != "bool", options)) 
+    rest = list(filter(lambda x: not x.keep and not x.necessary, rest)) 
+        
+    print_option_group("\tNECESSARY (turn on reduction):", necessary)
+    necessary_to_constructor(name+"_config", necessary)
+    print_dummy_contract()
+    print_option_group("\tKEEP (persisted in the model):", keep)
+    print_option_group("\tOTHER FLAGS (bools & !keep):", bools)
+    print_option_group("\tHAS_DEFAULT:", default)
+    print_option_group("\tNO_DEFAULT:", rest)
+
+    print("};\n")
+
+
+def prettyprint(config, filter_out_general=True):
+    group_id = 1
+    for name, config_group in config.items():
+        # general are the VW generic options
+        if filter_out_general and name == "general":
+            continue
+        # temp fix: cb_adf gets added twice
+        if name == "cb_adf":
+            config_group.pop()
+        for (group_name, options) in config_group:
+            num_id = 1
+            for option in options:
+                option._type = str(type(option._default_value).__name__)
+                option._seq_id = num_id
+                num_id += 1
+            print_group(name, group_name, group_id, options)
+            group_id += 1
+
+
+vw = pyvw.vw(arg_str="--cb_explore_adf")
+prettyprint(vw.get_config())
+
+# prettyprint(get_all_options(), False)
+exit()
+
 def get_config_of_vw_cmd(test):
     vw = pyvw.vw(arg_str=test["vw_command"])
     config = vw.get_config()
