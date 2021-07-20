@@ -119,7 +119,7 @@ void cbify_adf_data::init_adf_data(
     ecs[a] = VW::alloc_examples(1);
     auto& lab = ecs[a]->l.cb;
     CB::default_label(lab);
-    ecs[a]->interactions = &interactions;
+    ecs[a]->interactions_ = &interactions;
   }
 
   // cache mask for copy routine
@@ -756,7 +756,7 @@ base_learner* cbify_setup(options_i& options, vw& all)
   {
     multi_learner* base = as_multiline(setup_base(options, all));
 
-    if (data->use_adf) { data->adf_data.init_adf_data(num_actions, base->increment, all.interactions); }
+    if (data->use_adf) { data->adf_data.init_adf_data(num_actions, base->increment, all._interactions); }
 
     if (use_cs)
     {

@@ -26,6 +26,7 @@
 #include "rand48.h"
 #include "bs.h"
 #include "topk.h"
+#include "test_red.h"
 #include "ect.h"
 #include "csoaa.h"
 #include "cb_algs.h"
@@ -545,7 +546,7 @@ const char* are_features_compatible(vw& vw1, vw& vw2)
 
   if (vw1.permutations != vw2.permutations) return "permutations";
 
-  if (vw1.interactions.size() != vw2.interactions.size()) return "interactions size";
+  if (vw1._interactions.size() != vw2._interactions.size()) return "interactions size";
 
   if (vw1.ignore_some != vw2.ignore_some) return "ignore_some";
 
@@ -569,7 +570,7 @@ const char* are_features_compatible(vw& vw1, vw& vw2)
   if (!std::equal(vw1.dictionary_path.begin(), vw1.dictionary_path.end(), vw2.dictionary_path.begin()))
     return "dictionary_path";
 
-  for (auto i = std::begin(vw1.interactions), j = std::begin(vw2.interactions); i != std::end(vw1.interactions);
+  for (auto i = std::begin(vw1._interactions), j = std::begin(vw2._interactions); i != std::end(vw1._interactions);
        ++i, ++j)
     if (*i != *j) return "interaction mismatch";
 
@@ -761,7 +762,7 @@ void parse_feature_tweaks(
   // prepare namespace interactions
   std::vector<std::vector<namespace_index>> decoded_interactions;
 
-  if ( ( (!all.interactions.empty() && /*data was restored from old model file directly to v_array and will be overriden automatically*/
+  if ( ( (!all._interactions.empty() && /*data was restored from old model file directly to v_array and will be overriden automatically*/
           (options.was_supplied("quadratic") || options.was_supplied("cubic") || options.was_supplied("interactions")) ) )
        ||
        interactions_settings_duplicated /*settings were restored from model file to file_options and overriden by params from command line*/)
@@ -772,7 +773,7 @@ void parse_feature_tweaks(
         << endl;
 
     // in case arrays were already filled in with values from old model file - reset them
-    if (!all.interactions.empty()) { all.interactions.clear(); }
+    if (!all._interactions.empty()) { all._interactions.clear(); }
   }
 
   if (options.was_supplied("quadratic"))
@@ -867,7 +868,7 @@ void parse_feature_tweaks(
                            << sorted_cnt << '.' << endl;
     }
 
-    all.interactions = std::move(decoded_interactions);
+    all._interactions = std::move(decoded_interactions);
   }
 
   for (size_t i = 0; i < 256; i++)
@@ -1381,6 +1382,7 @@ void parse_reductions(options_i& options, vw& all)
   reductions.push_back(ExpReplay::expreplay_setup<'c', COST_SENSITIVE::cs_label>);
   reductions.push_back(Search::setup);
   reductions.push_back(audit_regressor_setup);
+  reductions.push_back(VW::test_red::test_red_setup);
   reductions.push_back(VW::metrics::metrics_setup);
 
   register_reductions(all, reductions);

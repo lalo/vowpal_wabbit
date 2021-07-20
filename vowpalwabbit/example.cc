@@ -16,7 +16,7 @@ float calculate_total_sum_features_squared(bool permutations, example& ec)
 
   size_t ignored_interacted_feature_count = 0;
   float calculated_sum_features_squared = 0.f;
-  INTERACTIONS::eval_count_of_generated_ft(permutations, *ec.interactions, ec.feature_space,
+  INTERACTIONS::eval_count_of_generated_ft(permutations, *ec.interactions_, ec.feature_space,
       ignored_interacted_feature_count, calculated_sum_features_squared);
   sum_features_squared += calculated_sum_features_squared;
   return sum_features_squared;
@@ -102,7 +102,7 @@ void copy_example_data(example* dst, const example* src)
   dst->total_sum_feat_sq = src->total_sum_feat_sq;
   dst->total_sum_feat_sq_calculated = src->total_sum_feat_sq_calculated;
   dst->use_permutations = src->use_permutations;
-  dst->interactions = src->interactions;
+  dst->interactions_ = src->interactions_;
   dst->_debug_current_reduction_depth = src->_debug_current_reduction_depth;
 }
 

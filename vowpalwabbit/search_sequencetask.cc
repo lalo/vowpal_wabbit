@@ -378,7 +378,7 @@ void initialize(Search::search& sch, size_t& num_actions, options_i& /*options*/
     CS::label& lab = ldf_examples[a].l.cs;
     CS::default_label(lab);
     lab.costs.push_back(default_wclass);
-    ldf_examples[a].interactions = &sch.get_vw_pointer_unsafe().interactions;
+    ldf_examples[a].interactions_ = &sch.get_vw_pointer_unsafe()._interactions;
   }
 
   task_data* data = &calloc_or_throw<task_data>();

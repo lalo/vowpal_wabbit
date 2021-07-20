@@ -21,17 +21,17 @@ void transform_single_ex(INTERACTIONS::interactions_generator& data, VW::LEARNER
 {
   // We pass *ec.interactions here BUT the contract is that this does not change...
   data.update_interactions_if_new_namespace_seen<generate_func, leave_duplicate_interactions>(
-      *ec.interactions, ec.indices);
+      *ec.interactions_, ec.indices);
 
-  auto* saved_interactions = ec.interactions;
-  ec.interactions = &data.generated_interactions;
+  auto* saved_interactions = ec.interactions_;
+  ec.interactions_ = &data.generated_interactions;
 
   if (is_learn) { base.learn(ec); }
   else
   {
     base.predict(ec);
   }
-  ec.interactions = saved_interactions;
+  ec.interactions_ = saved_interactions;
 }
 
 template <INTERACTIONS::generate_func_t generate_func, bool leave_duplicate_interactions>
@@ -39,12 +39,12 @@ void update(INTERACTIONS::interactions_generator& data, VW::LEARNER::single_lear
 {
   // We pass *ec.interactions here BUT the contract is that this does not change...
   data.update_interactions_if_new_namespace_seen<generate_func, leave_duplicate_interactions>(
-      *ec.interactions, ec.indices);
+      *ec.interactions_, ec.indices);
 
-  auto* saved_interactions = ec.interactions;
-  ec.interactions = &data.generated_interactions;
+  auto* saved_interactions = ec.interactions_;
+  ec.interactions_ = &data.generated_interactions;
   base.update(ec);
-  ec.interactions = saved_interactions;
+  ec.interactions_ = saved_interactions;
 }
 
 template <INTERACTIONS::generate_func_t generate_func, bool leave_duplicate_interactions>
@@ -53,12 +53,12 @@ inline void multipredict(INTERACTIONS::interactions_generator& data, VW::LEARNER
 {
   // We pass *ec.interactions here BUT the contract is that this does not change...
   data.update_interactions_if_new_namespace_seen<generate_func, leave_duplicate_interactions>(
-      *ec.interactions, ec.indices);
+      *ec.interactions_, ec.indices);
 
-  auto* saved_interactions = ec.interactions;
-  ec.interactions = &data.generated_interactions;
+  auto* saved_interactions = ec.interactions_;
+  ec.interactions_ = &data.generated_interactions;
   base.multipredict(ec, 0, count, pred, finalize_predictions);
-  ec.interactions = saved_interactions;
+  ec.interactions_ = saved_interactions;
 }
 
 VW::LEARNER::base_learner* generate_interactions_setup(options_i& options, vw& all)
@@ -71,7 +71,7 @@ VW::LEARNER::base_learner* generate_interactions_setup(options_i& options, vw& a
   options.add_and_parse(new_options);
 
   auto interactions_spec_contains_wildcards = false;
-  for (const auto& inter : all.interactions)
+  for (const auto& inter : all._interactions)
   {
     if (INTERACTIONS::contains_wildcard(inter))
     {

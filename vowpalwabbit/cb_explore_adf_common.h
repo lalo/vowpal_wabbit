@@ -256,6 +256,8 @@ template <typename ExploreType>
 void cb_explore_adf_base<ExploreType>::finish_multiline_example(
     vw& all, cb_explore_adf_base<ExploreType>& data, multi_ex& ec_seq)
 {
+  // temp assert
+  assert(ec_seq[0]->ft_offset == 0);
   print_multiline_example(all, data, ec_seq);
 
   VW::finish_example(all, ec_seq);

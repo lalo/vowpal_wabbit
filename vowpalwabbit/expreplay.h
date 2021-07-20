@@ -101,7 +101,7 @@ VW::LEARNER::base_learner* expreplay_setup(VW::config::options_i& options, vw& a
   er->all = &all;
   er->_random_state = all.get_random_state();
   er->buf = VW::alloc_examples(er->N);
-  er->buf->interactions = &all.interactions;
+  er->buf->interactions_ = &all._interactions;
   er->filled = calloc_or_throw<bool>(er->N);
 
   if (!all.logger.quiet)

@@ -409,7 +409,7 @@ void learn_or_predict(ccb& data, multi_learner& base, multi_ex& examples)
   // mode a new namespace is added (ccb_id_namespace) and so we can be confident
   // that the cache will be invalidated.
   if (!previously_should_augment_with_slot_info && should_augment_with_slot_info)
-  { insert_ccb_interactions(data.all->interactions); }
+  { insert_ccb_interactions(data.all->_interactions); }
 
   // This will overwrite the labels with CB.
   create_cb_labels(data);
@@ -605,7 +605,7 @@ void save_load(ccb& sm, io_buf& io, bool read, bool text)
         sizeof(sm.has_seen_multi_slot_example), "", read, msg, text);
   }
 
-  if (read && sm.has_seen_multi_slot_example) { insert_ccb_interactions(sm.all->interactions); }
+  if (read && sm.has_seen_multi_slot_example) { insert_ccb_interactions(sm.all->_interactions); }
 }
 
 base_learner* ccb_explore_adf_setup(options_i& options, vw& all)

@@ -2485,6 +2485,18 @@ train-sets/ref/slates_simple_w_interactions.stderr
 {VW} -d train-sets/cb_multi_cost.dat --cb 4 -k -c --passes 2 --holdout_off --cb_force_legacy
     train-sets/ref/cb_multi_cost_multipass_legacy.stderr
 
+# # Test 342: test without --test_red and with --quadratic
+# {VW} -d train-sets/decisionservice.json --dsjson --cb_explore_adf --epsilon 0.2 --quadratic GT -P 1 -p cbe_adf_dsjson_.predict --extra_metrics metrics_.json
+#     train-sets/ref/cbe_adf_dsjson_metrics_.stderr
+#     pred-sets/ref/cbe_adf_dsjson_.predict
+#     test-sets/ref/metrics_.json
+
+# # Test 343: should be the same output as 334
+# # except the line of enabled_reductions, so it will fail
+# {VW} --test_red 1 -d train-sets/decisionservice.json --dsjson --cb_explore_adf --epsilon 0.2 -P 1 -p cbe_adf_dsjson_.predict --extra_metrics metrics_.json
+#     pred-sets/ref/cbe_adf_dsjson_.predict
+#     test-sets/ref/metrics_.json
+
 # Test 347: cats save with predictions
 {VW} --cats 32 --bandwidth 1 --min_value 0 --max_value 32 --json --chain_hash --coin --epsilon 0.2 -q :: -d train-sets/cats_train.json -f models/cats_train.model -p cats_save.predict --save_resume
     train-sets/ref/cats_save.stderr
