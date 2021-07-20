@@ -13,7 +13,7 @@ namespace continuous_action
 {
 namespace cats
 {
-LEARNER::base_learner* setup(setup_base_i& stack_builder_fn);
+LEARNER::base_learner* setup(setup_base_i& stack_builder);
 struct cats
 {
   uint32_t num_actions;
