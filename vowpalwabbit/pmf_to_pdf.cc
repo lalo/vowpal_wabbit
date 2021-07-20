@@ -232,7 +232,7 @@ void finish_example(vw& all, reduction& c, example& ec)
   VW::finish_example(all, ec);
 }
 
-base_learner* setup(VW::setup_base_fn& stack_builder)
+base_learner* setup(VW::setup_base_i& stack_builder)
 {
   options_i& options = *stack_builder.get_options();
   vw& all = *stack_builder.get_all_pointer();

@@ -6,9 +6,9 @@
 
 namespace CSOAA
 {
-VW::LEARNER::base_learner* csoaa_setup(VW::setup_base_fn& stack_builder);
+VW::LEARNER::base_learner* csoaa_setup(VW::setup_base_i& stack_builder);
 
-VW::LEARNER::base_learner* csldf_setup(VW::setup_base_fn& stack_builder);
+VW::LEARNER::base_learner* csldf_setup(VW::setup_base_i& stack_builder);
 struct csoaa;
 void finish_example(vw& all, csoaa&, example& ec);
 }  // namespace CSOAA

@@ -405,7 +405,7 @@ void finish_example(vw& all, nn&, example& ec)
   return_simple_example(all, nullptr, ec);
 }
 
-base_learner* nn_setup(VW::setup_base_fn& stack_builder)
+base_learner* nn_setup(VW::setup_base_i& stack_builder)
 {
   options_i& options = *stack_builder.get_options();
   vw& all = *stack_builder.get_all_pointer();

@@ -1273,7 +1273,7 @@ std::istream &operator>>(std::istream &in, lda_math_mode &mmode)
   return in;
 }
 
-VW::LEARNER::base_learner* lda_setup(VW::setup_base_fn& stack_builder)
+VW::LEARNER::base_learner* lda_setup(VW::setup_base_i& stack_builder)
 {
   options_i& options = *stack_builder.get_options();
   vw& all = *stack_builder.get_all_pointer();

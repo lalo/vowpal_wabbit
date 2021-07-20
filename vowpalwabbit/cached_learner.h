@@ -5,7 +5,7 @@
 
 namespace VW
 {
-struct cached_learner : public setup_base_fn
+struct cached_learner : public setup_base_i
 {
   VW::LEARNER::base_learner* setup_base_learner() override { return _cached; }
 

@@ -249,7 +249,7 @@ void learn(offset_tree& tree, single_learner& base, example& ec)
   copy_to_action_scores(saved_scores, ec.pred.a_s);
 }
 
-base_learner* setup(VW::setup_base_fn& stack_builder)
+base_learner* setup(VW::setup_base_i& stack_builder)
 {
   options_i& options = *stack_builder.get_options();
   option_group_definition new_options("Offset tree Options");

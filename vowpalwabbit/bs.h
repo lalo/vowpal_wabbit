@@ -9,7 +9,7 @@
 #define BS_TYPE_MEAN 0
 #define BS_TYPE_VOTE 1
 
-VW::LEARNER::base_learner* bs_setup(VW::setup_base_fn& stack_builder);
+VW::LEARNER::base_learner* bs_setup(VW::setup_base_i& stack_builder);
 
 namespace BS
 {

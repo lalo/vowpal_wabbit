@@ -15,7 +15,7 @@ namespace cb_explore_adf
 {
 namespace bag
 {
-VW::LEARNER::base_learner* setup(VW::setup_base_fn& stack_builder);
+VW::LEARNER::base_learner* setup(VW::setup_base_i& stack_builder);
 }  // namespace bag
 }  // namespace cb_explore_adf
 }  // namespace VW

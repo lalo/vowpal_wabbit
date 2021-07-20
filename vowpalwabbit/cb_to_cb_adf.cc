@@ -101,7 +101,7 @@ void finish_example(vw& all, cb_to_cb_adf& c, example& ec)
 
     Related files: cb_algs.cc, cb_explore.cc, cbify.cc
 */
-VW::LEARNER::base_learner* cb_to_cb_adf_setup(VW::setup_base_fn& stack_builder)
+VW::LEARNER::base_learner* cb_to_cb_adf_setup(VW::setup_base_i& stack_builder)
 {
   options_i& options = *stack_builder.get_options();
   vw& all = *stack_builder.get_all_pointer();

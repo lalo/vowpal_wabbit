@@ -521,7 +521,7 @@ void init_adf_data(warm_cb& data, const uint32_t num_actions)
   data.cumu_var = 0.f;
 }
 
-base_learner* warm_cb_setup(VW::setup_base_fn& stack_builder)
+base_learner* warm_cb_setup(VW::setup_base_i& stack_builder)
 {
   options_i& options = *stack_builder.get_options();
   vw& all = *stack_builder.get_all_pointer();

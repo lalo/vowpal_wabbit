@@ -232,7 +232,7 @@ void learn_or_predict(slates_data& data, VW::LEARNER::multi_learner& base, multi
   }
 }
 
-VW::LEARNER::base_learner* slates_setup(VW::setup_base_fn& stack_builder)
+VW::LEARNER::base_learner* slates_setup(VW::setup_base_i& stack_builder)
 {
   options_i& options = *stack_builder.get_options();
   vw& all = *stack_builder.get_all_pointer();

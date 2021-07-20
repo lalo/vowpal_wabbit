@@ -486,7 +486,7 @@ void save_load_tree(recall_tree& b, io_buf& model_file, bool read, bool text)
 
 using namespace recall_tree_ns;
 
-base_learner* recall_tree_setup(VW::setup_base_fn& stack_builder)
+base_learner* recall_tree_setup(VW::setup_base_i& stack_builder)
 {
   options_i& options = *stack_builder.get_options();
   vw& all = *stack_builder.get_all_pointer();

@@ -185,7 +185,7 @@ void do_actual_learning(explore_eval& data, multi_learner& base, multi_ex& ec_se
 
 using namespace EXPLORE_EVAL;
 
-base_learner* explore_eval_setup(VW::setup_base_fn& stack_builder)
+base_learner* explore_eval_setup(VW::setup_base_i& stack_builder)
 {
   options_i& options = *stack_builder.get_options();
   vw& all = *stack_builder.get_all_pointer();

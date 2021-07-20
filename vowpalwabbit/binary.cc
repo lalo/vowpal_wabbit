@@ -48,7 +48,7 @@ void predict_or_learn(char&, VW::LEARNER::single_learner& base, example& ec)
   }
 }
 
-VW::LEARNER::base_learner* binary_setup(setup_base_fn& stack_builder)
+VW::LEARNER::base_learner* binary_setup(setup_base_i& stack_builder)
 {
   options_i& options = *stack_builder.get_options();
 

@@ -143,7 +143,7 @@ void print_bag_example(vw& all, cb_explore_adf_base<cb_explore_adf_bag>& data, m
   cb_explore_adf_base<cb_explore_adf_bag>::print_multiline_example(all, data, ec_seq);
 }
 
-VW::LEARNER::base_learner* setup(VW::setup_base_fn& stack_builder)
+VW::LEARNER::base_learner* setup(VW::setup_base_i& stack_builder)
 {
   VW::config::options_i& options = *stack_builder.get_options();
   vw& all = *stack_builder.get_all_pointer();

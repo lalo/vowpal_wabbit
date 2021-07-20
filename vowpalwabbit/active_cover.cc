@@ -206,7 +206,7 @@ void predict_or_learn_active_cover(active_cover& a, single_learner& base, exampl
   }
 }
 
-base_learner* active_cover_setup(VW::setup_base_fn& stack_builder)
+base_learner* active_cover_setup(VW::setup_base_i& stack_builder)
 {
   options_i& options = *stack_builder.get_options();
   vw& all = *stack_builder.get_all_pointer();

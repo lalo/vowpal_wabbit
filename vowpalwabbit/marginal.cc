@@ -345,7 +345,7 @@ void save_load(data& sm, io_buf& io, bool read, bool text)
 
 using namespace MARGINAL;
 
-VW::LEARNER::base_learner* marginal_setup(VW::setup_base_fn& stack_builder)
+VW::LEARNER::base_learner* marginal_setup(VW::setup_base_i& stack_builder)
 {
   options_i& options = *stack_builder.get_options();
   vw& all = *stack_builder.get_all_pointer();

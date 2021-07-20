@@ -60,7 +60,7 @@ void finish_example(vw& all, multi_oaa&, example& ec)
   VW::finish_example(all, ec);
 }
 
-VW::LEARNER::base_learner* multilabel_oaa_setup(VW::setup_base_fn& stack_builder)
+VW::LEARNER::base_learner* multilabel_oaa_setup(VW::setup_base_i& stack_builder)
 {
   options_i& options = *stack_builder.get_options();
   vw& all = *stack_builder.get_all_pointer();

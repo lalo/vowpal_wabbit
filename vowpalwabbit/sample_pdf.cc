@@ -100,7 +100,7 @@ void predict_or_learn(sample_pdf& reduction, single_learner&, example& ec)
 // END sample_pdf reduction and reduction methods
 ////////////////////////////////////////////////////
 
-LEARNER::base_learner* sample_pdf_setup(VW::setup_base_fn& stack_builder)
+LEARNER::base_learner* sample_pdf_setup(VW::setup_base_i& stack_builder)
 {
   options_i& options = *stack_builder.get_options();
   vw& all = *stack_builder.get_all_pointer();

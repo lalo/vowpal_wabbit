@@ -123,7 +123,7 @@ void finish_example(vw& all, VW::topk& d, multi_ex& ec_seq)
   VW::finish_example(all, ec_seq);
 }
 
-VW::LEARNER::base_learner* topk_setup(VW::setup_base_fn& stack_builder)
+VW::LEARNER::base_learner* topk_setup(VW::setup_base_i& stack_builder)
 {
   options_i& options = *stack_builder.get_options();
   uint32_t K;

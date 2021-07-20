@@ -162,7 +162,7 @@ void predict_or_learn(LRQstate& lrq, single_learner& base, example& ec)
   }  // end for(max_iter)
 }
 
-base_learner* lrq_setup(VW::setup_base_fn& stack_builder)
+base_learner* lrq_setup(VW::setup_base_i& stack_builder)
 {
   options_i& options = *stack_builder.get_options();
   vw& all = *stack_builder.get_all_pointer();

@@ -654,7 +654,7 @@ void finish_multiline_example(vw& all, cbify&, multi_ex& ec_seq)
   VW::finish_example(all, ec_seq);
 }
 
-base_learner* cbify_setup(VW::setup_base_fn& stack_builder)
+base_learner* cbify_setup(VW::setup_base_i& stack_builder)
 {
   options_i& options = *stack_builder.get_options();
   vw& all = *stack_builder.get_all_pointer();
@@ -811,7 +811,7 @@ base_learner* cbify_setup(VW::setup_base_fn& stack_builder)
   return make_base(*l);
 }
 
-base_learner* cbifyldf_setup(VW::setup_base_fn& stack_builder)
+base_learner* cbifyldf_setup(VW::setup_base_i& stack_builder)
 {
   options_i& options = *stack_builder.get_options();
   vw& all = *stack_builder.get_all_pointer();

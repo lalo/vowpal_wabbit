@@ -163,7 +163,7 @@ void save_load(svrg& s, io_buf& model_file, bool read, bool text)
 
 using namespace SVRG;
 
-base_learner* svrg_setup(VW::setup_base_fn& stack_builder)
+base_learner* svrg_setup(VW::setup_base_i& stack_builder)
 {
   VW::config::options_i& options = *stack_builder.get_options();
   vw& all = *stack_builder.get_all_pointer();

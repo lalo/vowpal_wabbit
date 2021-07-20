@@ -335,7 +335,7 @@ void learn(cats_tree& tree, single_learner& base, example& ec)
   VW_DBG(ec) << "tree_c: after tree.learn() " << cb_label_to_string(ec) << features_to_string(ec) << std::endl;
 }
 
-base_learner* setup(setup_base_fn& stack_builder)
+base_learner* setup(setup_base_i& stack_builder)
 {
   options_i& options = *stack_builder.get_options();
   vw& all = *stack_builder.get_all_pointer();

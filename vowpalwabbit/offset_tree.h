@@ -10,7 +10,7 @@ namespace VW
 {
 namespace offset_tree
 {
-LEARNER::base_learner* setup(VW::setup_base_fn& stack_builder);
+LEARNER::base_learner* setup(VW::setup_base_i& stack_builder);
 
 struct tree_node
 {

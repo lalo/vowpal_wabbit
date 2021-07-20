@@ -316,7 +316,7 @@ void (*get_predict(vw& all, uint8_t policy))(cbzo&, base_learner&, example&)
     THROW("Unknown policy encountered: " << policy)
 }
 
-base_learner* setup(VW::setup_base_fn& stack_builder)
+base_learner* setup(VW::setup_base_i& stack_builder)
 {
   options_i& options = *stack_builder.get_options();
   vw& all = *stack_builder.get_all_pointer();

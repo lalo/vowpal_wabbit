@@ -12,7 +12,7 @@ namespace VW
 {
 namespace shared_feature_merger
 {
-VW::LEARNER::base_learner* shared_feature_merger_setup(VW::setup_base_fn& stack_builder);
+VW::LEARNER::base_learner* shared_feature_merger_setup(VW::setup_base_i& stack_builder);
 
 }  // namespace shared_feature_merger
 }  // namespace VW

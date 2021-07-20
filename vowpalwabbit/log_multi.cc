@@ -498,7 +498,7 @@ void save_load_tree(log_multi& b, io_buf& model_file, bool read, bool text)
   }
 }
 
-base_learner* log_multi_setup(VW::setup_base_fn& stack_builder)  // learner setup
+base_learner* log_multi_setup(VW::setup_base_i& stack_builder)  // learner setup
 {
   options_i& options = *stack_builder.get_options();
   vw& all = *stack_builder.get_all_pointer();

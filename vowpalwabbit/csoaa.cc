@@ -131,7 +131,7 @@ void predict_or_learn(csoaa& c, single_learner& base, example& ec)
 
 void finish_example(vw& all, csoaa&, example& ec) { COST_SENSITIVE::finish_example(all, ec); }
 
-base_learner* csoaa_setup(VW::setup_base_fn& stack_builder)
+base_learner* csoaa_setup(VW::setup_base_i& stack_builder)
 {
   options_i& options = *stack_builder.get_options();
   vw& all = *stack_builder.get_all_pointer();
@@ -819,7 +819,7 @@ multi_ex process_labels(ldf& data, const multi_ex& ec_seq_all)
   return ret;
 }
 
-base_learner* csldf_setup(VW::setup_base_fn& stack_builder)
+base_learner* csldf_setup(VW::setup_base_i& stack_builder)
 {
   options_i& options = *stack_builder.get_options();
   vw& all = *stack_builder.get_all_pointer();
