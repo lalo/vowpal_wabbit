@@ -11,6 +11,8 @@ struct cached_learner : public setup_base_i
 
   operator bool() const { return !(_cached == nullptr); }
 
+  void delayed_setup(vw&) { return; }
+
   cached_learner(VW::LEARNER::base_learner* learner = nullptr) : _cached(learner) {}
 
 private:

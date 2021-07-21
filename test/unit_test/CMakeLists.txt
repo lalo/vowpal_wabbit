@@ -36,6 +36,7 @@ add_executable(vw-unit-test.out
   pmf_to_pdf_test.cc
   power_test.cc
   prediction_test.cc
+  custom_reduction_test.cc
   random_test.cc
   random_test.cc
   scope_exit_test.cc
