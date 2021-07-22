@@ -1408,9 +1408,10 @@ void parse_modules(
   parse_output_model(options, all);
 
   parse_output_preds(options, all);
+}
 
-  // create reduction stack builder instance
-  std::unique_ptr<VW::setup_base_i> learner_builder = VW::make_unique<VW::default_reduction_stack_setup>(all);
+void parse_reductions(options_i& options, vw& all, std::unique_ptr<VW::setup_base_i> learner_builder)
+{
   // kick-off reduction setup functions
   all.l = learner_builder->operator()(options, all);
 
@@ -1557,7 +1558,7 @@ vw* initialize(
 }
 
 vw* initialize(std::unique_ptr<options_i, options_deleter_type> options, io_buf* model, bool skipModelLoad,
-    trace_message_t trace_listener, void* trace_context)
+    trace_message_t trace_listener, void* trace_context, std::unique_ptr<VW::setup_base_i> learner_builder)
 {
   // Set up logger as early as possible
   logger::initialize_logger();
@@ -1582,6 +1583,12 @@ vw* initialize(std::unique_ptr<options_i, options_deleter_type> options, io_buf*
 
     std::vector<std::string> dictionary_nses;
     parse_modules(*all.options.get(), all, interactions_settings_duplicated, dictionary_nses);
+    if (!learner_builder) { learner_builder = VW::make_unique<VW::default_reduction_stack_setup>(all); }
+    else
+    {
+      learner_builder->delayed_setup(all);
+    }
+    parse_reductions(*all.options.get(), all, std::move(learner_builder));
     parse_sources(*all.options.get(), all, *model, skipModelLoad);
 
     // we must delay so parse_mask is fully defined.
@@ -1623,7 +1630,8 @@ vw* initialize(std::unique_ptr<options_i, options_deleter_type> options, io_buf*
   }
 }
 
-vw* initialize(std::string s, io_buf* model, bool skipModelLoad, trace_message_t trace_listener, void* trace_context)
+vw* initialize(std::string s, io_buf* model, bool skipModelLoad, trace_message_t trace_listener, void* trace_context,
+    std::unique_ptr<VW::setup_base_i> learner_builder)
 {
   int argc = 0;
   char** argv = to_argv(s, argc);
@@ -1631,7 +1639,7 @@ vw* initialize(std::string s, io_buf* model, bool skipModelLoad, trace_message_t
 
   try
   {
-    ret = initialize(argc, argv, model, skipModelLoad, trace_listener, trace_context);
+    ret = initialize(argc, argv, model, skipModelLoad, trace_listener, trace_context, std::move(learner_builder));
   }
   catch (...)
   {
@@ -1664,12 +1672,13 @@ vw* initialize_escaped(
   return ret;
 }
 
-vw* initialize(
-    int argc, char* argv[], io_buf* model, bool skipModelLoad, trace_message_t trace_listener, void* trace_context)
+vw* initialize(int argc, char* argv[], io_buf* model, bool skipModelLoad, trace_message_t trace_listener,
+    void* trace_context, std::unique_ptr<VW::setup_base_i> learner_builder)
 {
   std::unique_ptr<options_i, options_deleter_type> options(
       new config::options_boost_po(argc, argv), [](VW::config::options_i* ptr) { delete ptr; });
-  return initialize(std::move(options), model, skipModelLoad, trace_listener, trace_context);
+  return initialize(
+      std::move(options), model, skipModelLoad, trace_listener, trace_context, std::move(learner_builder));
 }
 
 // Create a new VW instance while sharing the model with another instance
